@@ -14,6 +14,7 @@ const navItems = [
   { to: "/programs", label: "Programs" },
   { to: "/coding-practice", label: "Coding Practice" },
   { to: "/ai-learning", label: "AI Learning" },
+  { to: "/career", label: "Careers" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" },
 ] as const;
