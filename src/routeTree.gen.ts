@@ -24,8 +24,19 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as TeacherRouteImport } from './routes/teacher'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminArticlesRouteImport } from './routes/admin.articles'
+import { Route as AdminAttendanceRouteImport } from './routes/admin.attendance'
+import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
+import { Route as AdminBatchesRouteImport } from './routes/admin.batches'
+import { Route as AdminCmsRouteImport } from './routes/admin.cms'
+import { Route as AdminCommunicationRouteImport } from './routes/admin.communication'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
+import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
+import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminTeachersRouteImport } from './routes/admin.teachers'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as StudentCareerRouteImport } from './routes/student.career'
@@ -35,6 +46,16 @@ import { Route as StudentLeaderboardRouteImport } from './routes/student.leaderb
 import { Route as StudentLiveClassesRouteImport } from './routes/student.live-classes'
 import { Route as TeacherDashboardRouteImport } from './routes/teacher.dashboard'
 import { Route as TeacherStudentsRouteImport } from './routes/teacher.students'
+import { Route as AdminCareerApplicationsRouteImport } from './routes/admin.career.applications'
+import { Route as AdminCareerCompaniesRouteImport } from './routes/admin.career.companies'
+import { Route as AdminCareerEligibilityRouteImport } from './routes/admin.career.eligibility'
+import { Route as AdminCareerJobsRouteImport } from './routes/admin.career.jobs'
+import { Route as AdminCareerPreparationRouteImport } from './routes/admin.career.preparation'
+import { Route as AdminCareerReferralsRouteImport } from './routes/admin.career.referrals'
+import { Route as AdminCareerResourcesRouteImport } from './routes/admin.career.resources'
+import { Route as AdminCareerResumeTemplatesRouteImport } from './routes/admin.career.resume-templates'
+import { Route as AdminStudentsIndexRouteImport } from './routes/admin.students.index'
+import { Route as AdminStudentsStudentIdRouteImport } from './routes/admin.students.$studentId'
 import { Route as StudentCareerIndexRouteImport } from './routes/student.career.index'
 import { Route as StudentCareerApplicationsRouteImport } from './routes/student.career.applications'
 import { Route as StudentCareerJobsRouteImport } from './routes/student.career.jobs'
@@ -116,6 +137,41 @@ const VerifyEmailRoute = VerifyEmailRouteImport.update({
   path: '/verify-email',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminArticlesRoute = AdminArticlesRouteImport.update({
+  id: '/articles',
+  path: '/articles',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAttendanceRoute = AdminAttendanceRouteImport.update({
+  id: '/attendance',
+  path: '/attendance',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditLogsRoute = AdminAuditLogsRouteImport.update({
+  id: '/audit-logs',
+  path: '/audit-logs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBatchesRoute = AdminBatchesRouteImport.update({
+  id: '/batches',
+  path: '/batches',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCmsRoute = AdminCmsRouteImport.update({
+  id: '/cms',
+  path: '/cms',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCommunicationRoute = AdminCommunicationRouteImport.update({
+  id: '/communication',
+  path: '/communication',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -124,6 +180,26 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
 const AdminEventsRoute = AdminEventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPerformanceRoute = AdminPerformanceRouteImport.update({
+  id: '/performance',
+  path: '/performance',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTeachersRoute = AdminTeachersRouteImport.update({
+  id: '/teachers',
+  path: '/teachers',
   getParentRoute: () => AdminRoute,
 } as any)
 const CoursesIndexRoute = CoursesIndexRouteImport.update({
@@ -171,6 +247,57 @@ const TeacherStudentsRoute = TeacherStudentsRouteImport.update({
   path: '/students',
   getParentRoute: () => TeacherRoute,
 } as any)
+const AdminCareerApplicationsRoute = AdminCareerApplicationsRouteImport.update({
+  id: '/career/applications',
+  path: '/career/applications',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCareerCompaniesRoute = AdminCareerCompaniesRouteImport.update({
+  id: '/career/companies',
+  path: '/career/companies',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCareerEligibilityRoute = AdminCareerEligibilityRouteImport.update({
+  id: '/career/eligibility',
+  path: '/career/eligibility',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCareerJobsRoute = AdminCareerJobsRouteImport.update({
+  id: '/career/jobs',
+  path: '/career/jobs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCareerPreparationRoute = AdminCareerPreparationRouteImport.update({
+  id: '/career/preparation',
+  path: '/career/preparation',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCareerReferralsRoute = AdminCareerReferralsRouteImport.update({
+  id: '/career/referrals',
+  path: '/career/referrals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCareerResourcesRoute = AdminCareerResourcesRouteImport.update({
+  id: '/career/resources',
+  path: '/career/resources',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCareerResumeTemplatesRoute =
+  AdminCareerResumeTemplatesRouteImport.update({
+    id: '/career/resume-templates',
+    path: '/career/resume-templates',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminStudentsIndexRoute = AdminStudentsIndexRouteImport.update({
+  id: '/students/',
+  path: '/students/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminStudentsStudentIdRoute = AdminStudentsStudentIdRouteImport.update({
+  id: '/students/$studentId',
+  path: '/students/$studentId',
+  getParentRoute: () => AdminRoute,
+} as any)
 const StudentCareerIndexRoute = StudentCareerIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -214,8 +341,19 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRouteWithChildren
   '/teacher': typeof TeacherRouteWithChildren
   '/verify-email': typeof VerifyEmailRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/articles': typeof AdminArticlesRoute
+  '/admin/attendance': typeof AdminAttendanceRoute
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/batches': typeof AdminBatchesRoute
+  '/admin/cms': typeof AdminCmsRoute
+  '/admin/communication': typeof AdminCommunicationRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/performance': typeof AdminPerformanceRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/student/career': typeof StudentCareerRouteWithChildren
   '/student/courses': typeof StudentCoursesRoute
@@ -225,10 +363,20 @@ export interface FileRoutesByFullPath {
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
+  '/admin/career/applications': typeof AdminCareerApplicationsRoute
+  '/admin/career/companies': typeof AdminCareerCompaniesRoute
+  '/admin/career/eligibility': typeof AdminCareerEligibilityRoute
+  '/admin/career/jobs': typeof AdminCareerJobsRoute
+  '/admin/career/preparation': typeof AdminCareerPreparationRoute
+  '/admin/career/referrals': typeof AdminCareerReferralsRoute
+  '/admin/career/resources': typeof AdminCareerResourcesRoute
+  '/admin/career/resume-templates': typeof AdminCareerResumeTemplatesRoute
+  '/admin/students/$studentId': typeof AdminStudentsStudentIdRoute
   '/student/career/applications': typeof StudentCareerApplicationsRoute
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/admin/students/': typeof AdminStudentsIndexRoute
   '/student/career/': typeof StudentCareerIndexRoute
 }
 export interface FileRoutesByTo {
@@ -247,8 +395,19 @@ export interface FileRoutesByTo {
   '/student': typeof StudentRouteWithChildren
   '/teacher': typeof TeacherRouteWithChildren
   '/verify-email': typeof VerifyEmailRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/articles': typeof AdminArticlesRoute
+  '/admin/attendance': typeof AdminAttendanceRoute
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/batches': typeof AdminBatchesRoute
+  '/admin/cms': typeof AdminCmsRoute
+  '/admin/communication': typeof AdminCommunicationRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/performance': typeof AdminPerformanceRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/student/courses': typeof StudentCoursesRoute
   '/student/dashboard': typeof StudentDashboardRoute
@@ -257,10 +416,20 @@ export interface FileRoutesByTo {
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses': typeof CoursesIndexRoute
+  '/admin/career/applications': typeof AdminCareerApplicationsRoute
+  '/admin/career/companies': typeof AdminCareerCompaniesRoute
+  '/admin/career/eligibility': typeof AdminCareerEligibilityRoute
+  '/admin/career/jobs': typeof AdminCareerJobsRoute
+  '/admin/career/preparation': typeof AdminCareerPreparationRoute
+  '/admin/career/referrals': typeof AdminCareerReferralsRoute
+  '/admin/career/resources': typeof AdminCareerResourcesRoute
+  '/admin/career/resume-templates': typeof AdminCareerResumeTemplatesRoute
+  '/admin/students/$studentId': typeof AdminStudentsStudentIdRoute
   '/student/career/applications': typeof StudentCareerApplicationsRoute
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/admin/students': typeof AdminStudentsIndexRoute
   '/student/career': typeof StudentCareerIndexRoute
 }
 export interface FileRoutesById {
@@ -280,8 +449,19 @@ export interface FileRoutesById {
   '/student': typeof StudentRouteWithChildren
   '/teacher': typeof TeacherRouteWithChildren
   '/verify-email': typeof VerifyEmailRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/articles': typeof AdminArticlesRoute
+  '/admin/attendance': typeof AdminAttendanceRoute
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/batches': typeof AdminBatchesRoute
+  '/admin/cms': typeof AdminCmsRoute
+  '/admin/communication': typeof AdminCommunicationRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
+  '/admin/performance': typeof AdminPerformanceRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/student/career': typeof StudentCareerRouteWithChildren
   '/student/courses': typeof StudentCoursesRoute
@@ -291,10 +471,20 @@ export interface FileRoutesById {
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
+  '/admin/career/applications': typeof AdminCareerApplicationsRoute
+  '/admin/career/companies': typeof AdminCareerCompaniesRoute
+  '/admin/career/eligibility': typeof AdminCareerEligibilityRoute
+  '/admin/career/jobs': typeof AdminCareerJobsRoute
+  '/admin/career/preparation': typeof AdminCareerPreparationRoute
+  '/admin/career/referrals': typeof AdminCareerReferralsRoute
+  '/admin/career/resources': typeof AdminCareerResourcesRoute
+  '/admin/career/resume-templates': typeof AdminCareerResumeTemplatesRoute
+  '/admin/students/$studentId': typeof AdminStudentsStudentIdRoute
   '/student/career/applications': typeof StudentCareerApplicationsRoute
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/admin/students/': typeof AdminStudentsIndexRoute
   '/student/career/': typeof StudentCareerIndexRoute
 }
 export interface FileRouteTypes {
@@ -315,8 +505,19 @@ export interface FileRouteTypes {
     | '/student'
     | '/teacher'
     | '/verify-email'
+    | '/admin/analytics'
+    | '/admin/articles'
+    | '/admin/attendance'
+    | '/admin/audit-logs'
+    | '/admin/batches'
+    | '/admin/cms'
+    | '/admin/communication'
     | '/admin/dashboard'
     | '/admin/events'
+    | '/admin/notifications'
+    | '/admin/performance'
+    | '/admin/settings'
+    | '/admin/teachers'
     | '/courses/$slug'
     | '/student/career'
     | '/student/courses'
@@ -326,10 +527,20 @@ export interface FileRouteTypes {
     | '/teacher/dashboard'
     | '/teacher/students'
     | '/courses/'
+    | '/admin/career/applications'
+    | '/admin/career/companies'
+    | '/admin/career/eligibility'
+    | '/admin/career/jobs'
+    | '/admin/career/preparation'
+    | '/admin/career/referrals'
+    | '/admin/career/resources'
+    | '/admin/career/resume-templates'
+    | '/admin/students/$studentId'
     | '/student/career/applications'
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/admin/students/'
     | '/student/career/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -348,8 +559,19 @@ export interface FileRouteTypes {
     | '/student'
     | '/teacher'
     | '/verify-email'
+    | '/admin/analytics'
+    | '/admin/articles'
+    | '/admin/attendance'
+    | '/admin/audit-logs'
+    | '/admin/batches'
+    | '/admin/cms'
+    | '/admin/communication'
     | '/admin/dashboard'
     | '/admin/events'
+    | '/admin/notifications'
+    | '/admin/performance'
+    | '/admin/settings'
+    | '/admin/teachers'
     | '/courses/$slug'
     | '/student/courses'
     | '/student/dashboard'
@@ -358,10 +580,20 @@ export interface FileRouteTypes {
     | '/teacher/dashboard'
     | '/teacher/students'
     | '/courses'
+    | '/admin/career/applications'
+    | '/admin/career/companies'
+    | '/admin/career/eligibility'
+    | '/admin/career/jobs'
+    | '/admin/career/preparation'
+    | '/admin/career/referrals'
+    | '/admin/career/resources'
+    | '/admin/career/resume-templates'
+    | '/admin/students/$studentId'
     | '/student/career/applications'
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/admin/students'
     | '/student/career'
   id:
     | '__root__'
@@ -380,8 +612,19 @@ export interface FileRouteTypes {
     | '/student'
     | '/teacher'
     | '/verify-email'
+    | '/admin/analytics'
+    | '/admin/articles'
+    | '/admin/attendance'
+    | '/admin/audit-logs'
+    | '/admin/batches'
+    | '/admin/cms'
+    | '/admin/communication'
     | '/admin/dashboard'
     | '/admin/events'
+    | '/admin/notifications'
+    | '/admin/performance'
+    | '/admin/settings'
+    | '/admin/teachers'
     | '/courses/$slug'
     | '/student/career'
     | '/student/courses'
@@ -391,10 +634,20 @@ export interface FileRouteTypes {
     | '/teacher/dashboard'
     | '/teacher/students'
     | '/courses/'
+    | '/admin/career/applications'
+    | '/admin/career/companies'
+    | '/admin/career/eligibility'
+    | '/admin/career/jobs'
+    | '/admin/career/preparation'
+    | '/admin/career/referrals'
+    | '/admin/career/resources'
+    | '/admin/career/resume-templates'
+    | '/admin/students/$studentId'
     | '/student/career/applications'
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/admin/students/'
     | '/student/career/'
   fileRoutesById: FileRoutesById
 }
@@ -525,6 +778,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/articles': {
+      id: '/admin/articles'
+      path: '/articles'
+      fullPath: '/admin/articles'
+      preLoaderRoute: typeof AdminArticlesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/attendance': {
+      id: '/admin/attendance'
+      path: '/attendance'
+      fullPath: '/admin/attendance'
+      preLoaderRoute: typeof AdminAttendanceRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audit-logs': {
+      id: '/admin/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/admin/audit-logs'
+      preLoaderRoute: typeof AdminAuditLogsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/batches': {
+      id: '/admin/batches'
+      path: '/batches'
+      fullPath: '/admin/batches'
+      preLoaderRoute: typeof AdminBatchesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/cms': {
+      id: '/admin/cms'
+      path: '/cms'
+      fullPath: '/admin/cms'
+      preLoaderRoute: typeof AdminCmsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/communication': {
+      id: '/admin/communication'
+      path: '/communication'
+      fullPath: '/admin/communication'
+      preLoaderRoute: typeof AdminCommunicationRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/dashboard': {
       id: '/admin/dashboard'
       path: '/dashboard'
@@ -537,6 +839,34 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/admin/events'
       preLoaderRoute: typeof AdminEventsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/performance': {
+      id: '/admin/performance'
+      path: '/performance'
+      fullPath: '/admin/performance'
+      preLoaderRoute: typeof AdminPerformanceRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/teachers': {
+      id: '/admin/teachers'
+      path: '/teachers'
+      fullPath: '/admin/teachers'
+      preLoaderRoute: typeof AdminTeachersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/courses/': {
@@ -602,6 +932,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeacherStudentsRouteImport
       parentRoute: typeof TeacherRoute
     }
+    '/admin/career/applications': {
+      id: '/admin/career/applications'
+      path: '/career/applications'
+      fullPath: '/admin/career/applications'
+      preLoaderRoute: typeof AdminCareerApplicationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/career/companies': {
+      id: '/admin/career/companies'
+      path: '/career/companies'
+      fullPath: '/admin/career/companies'
+      preLoaderRoute: typeof AdminCareerCompaniesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/career/eligibility': {
+      id: '/admin/career/eligibility'
+      path: '/career/eligibility'
+      fullPath: '/admin/career/eligibility'
+      preLoaderRoute: typeof AdminCareerEligibilityRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/career/jobs': {
+      id: '/admin/career/jobs'
+      path: '/career/jobs'
+      fullPath: '/admin/career/jobs'
+      preLoaderRoute: typeof AdminCareerJobsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/career/preparation': {
+      id: '/admin/career/preparation'
+      path: '/career/preparation'
+      fullPath: '/admin/career/preparation'
+      preLoaderRoute: typeof AdminCareerPreparationRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/career/referrals': {
+      id: '/admin/career/referrals'
+      path: '/career/referrals'
+      fullPath: '/admin/career/referrals'
+      preLoaderRoute: typeof AdminCareerReferralsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/career/resources': {
+      id: '/admin/career/resources'
+      path: '/career/resources'
+      fullPath: '/admin/career/resources'
+      preLoaderRoute: typeof AdminCareerResourcesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/career/resume-templates': {
+      id: '/admin/career/resume-templates'
+      path: '/career/resume-templates'
+      fullPath: '/admin/career/resume-templates'
+      preLoaderRoute: typeof AdminCareerResumeTemplatesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/students/': {
+      id: '/admin/students/'
+      path: '/students'
+      fullPath: '/admin/students/'
+      preLoaderRoute: typeof AdminStudentsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/students/$studentId': {
+      id: '/admin/students/$studentId'
+      path: '/students/$studentId'
+      fullPath: '/admin/students/$studentId'
+      preLoaderRoute: typeof AdminStudentsStudentIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/student/career/': {
       id: '/student/career/'
       path: '/'
@@ -641,13 +1041,55 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminArticlesRoute: typeof AdminArticlesRoute
+  AdminAttendanceRoute: typeof AdminAttendanceRoute
+  AdminAuditLogsRoute: typeof AdminAuditLogsRoute
+  AdminBatchesRoute: typeof AdminBatchesRoute
+  AdminCmsRoute: typeof AdminCmsRoute
+  AdminCommunicationRoute: typeof AdminCommunicationRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEventsRoute: typeof AdminEventsRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
+  AdminPerformanceRoute: typeof AdminPerformanceRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminTeachersRoute: typeof AdminTeachersRoute
+  AdminCareerApplicationsRoute: typeof AdminCareerApplicationsRoute
+  AdminCareerCompaniesRoute: typeof AdminCareerCompaniesRoute
+  AdminCareerEligibilityRoute: typeof AdminCareerEligibilityRoute
+  AdminCareerJobsRoute: typeof AdminCareerJobsRoute
+  AdminCareerPreparationRoute: typeof AdminCareerPreparationRoute
+  AdminCareerReferralsRoute: typeof AdminCareerReferralsRoute
+  AdminCareerResourcesRoute: typeof AdminCareerResourcesRoute
+  AdminCareerResumeTemplatesRoute: typeof AdminCareerResumeTemplatesRoute
+  AdminStudentsStudentIdRoute: typeof AdminStudentsStudentIdRoute
+  AdminStudentsIndexRoute: typeof AdminStudentsIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminArticlesRoute: AdminArticlesRoute,
+  AdminAttendanceRoute: AdminAttendanceRoute,
+  AdminAuditLogsRoute: AdminAuditLogsRoute,
+  AdminBatchesRoute: AdminBatchesRoute,
+  AdminCmsRoute: AdminCmsRoute,
+  AdminCommunicationRoute: AdminCommunicationRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminEventsRoute: AdminEventsRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
+  AdminPerformanceRoute: AdminPerformanceRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminTeachersRoute: AdminTeachersRoute,
+  AdminCareerApplicationsRoute: AdminCareerApplicationsRoute,
+  AdminCareerCompaniesRoute: AdminCareerCompaniesRoute,
+  AdminCareerEligibilityRoute: AdminCareerEligibilityRoute,
+  AdminCareerJobsRoute: AdminCareerJobsRoute,
+  AdminCareerPreparationRoute: AdminCareerPreparationRoute,
+  AdminCareerReferralsRoute: AdminCareerReferralsRoute,
+  AdminCareerResourcesRoute: AdminCareerResourcesRoute,
+  AdminCareerResumeTemplatesRoute: AdminCareerResumeTemplatesRoute,
+  AdminStudentsStudentIdRoute: AdminStudentsStudentIdRoute,
+  AdminStudentsIndexRoute: AdminStudentsIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
