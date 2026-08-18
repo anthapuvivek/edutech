@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AiLearningRouteImport } from './routes/ai-learning'
 import { Route as CodingPracticeRouteImport } from './routes/coding-practice'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -18,12 +19,17 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as StudentRouteImport } from './routes/student'
+import { Route as TeacherRouteImport } from './routes/teacher'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as StudentCoursesRouteImport } from './routes/student.courses'
 import { Route as StudentDashboardRouteImport } from './routes/student.dashboard'
 import { Route as StudentLeaderboardRouteImport } from './routes/student.leaderboard'
 import { Route as StudentLiveClassesRouteImport } from './routes/student.live-classes'
+import { Route as TeacherDashboardRouteImport } from './routes/teacher.dashboard'
+import { Route as TeacherStudentsRouteImport } from './routes/teacher.students'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -33,6 +39,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AiLearningRoute = AiLearningRouteImport.update({
@@ -70,6 +81,21 @@ const StudentRoute = StudentRouteImport.update({
   path: '/student',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeacherRoute = TeacherRouteImport.update({
+  id: '/teacher',
+  path: '/teacher',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEventsRoute = AdminEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AdminRoute,
+} as any)
 const CoursesIndexRoute = CoursesIndexRouteImport.update({
   id: '/courses/',
   path: '/courses/',
@@ -100,10 +126,21 @@ const StudentLiveClassesRoute = StudentLiveClassesRouteImport.update({
   path: '/live-classes',
   getParentRoute: () => StudentRoute,
 } as any)
+const TeacherDashboardRoute = TeacherDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherStudentsRoute = TeacherStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => TeacherRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/ai-learning': typeof AiLearningRoute
   '/coding-practice': typeof CodingPracticeRoute
   '/contact': typeof ContactRoute
@@ -111,16 +148,22 @@ export interface FileRoutesByFullPath {
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
   '/student': typeof StudentRouteWithChildren
+  '/teacher': typeof TeacherRouteWithChildren
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/events': typeof AdminEventsRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/student/courses': typeof StudentCoursesRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
+  '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/ai-learning': typeof AiLearningRoute
   '/coding-practice': typeof CodingPracticeRoute
   '/contact': typeof ContactRoute
@@ -128,17 +171,23 @@ export interface FileRoutesByTo {
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
   '/student': typeof StudentRouteWithChildren
+  '/teacher': typeof TeacherRouteWithChildren
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/events': typeof AdminEventsRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/student/courses': typeof StudentCoursesRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
+  '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/teacher/students': typeof TeacherStudentsRoute
   '/courses': typeof CoursesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/ai-learning': typeof AiLearningRoute
   '/coding-practice': typeof CodingPracticeRoute
   '/contact': typeof ContactRoute
@@ -146,11 +195,16 @@ export interface FileRoutesById {
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
   '/student': typeof StudentRouteWithChildren
+  '/teacher': typeof TeacherRouteWithChildren
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/events': typeof AdminEventsRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/student/courses': typeof StudentCoursesRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
+  '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
 }
 export interface FileRouteTypes {
@@ -158,6 +212,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/ai-learning'
     | '/coding-practice'
     | '/contact'
@@ -165,16 +220,22 @@ export interface FileRouteTypes {
     | '/programs'
     | '/register'
     | '/student'
+    | '/teacher'
+    | '/admin/dashboard'
+    | '/admin/events'
     | '/courses/$slug'
     | '/student/courses'
     | '/student/dashboard'
     | '/student/leaderboard'
     | '/student/live-classes'
+    | '/teacher/dashboard'
+    | '/teacher/students'
     | '/courses/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/admin'
     | '/ai-learning'
     | '/coding-practice'
     | '/contact'
@@ -182,16 +243,22 @@ export interface FileRouteTypes {
     | '/programs'
     | '/register'
     | '/student'
+    | '/teacher'
+    | '/admin/dashboard'
+    | '/admin/events'
     | '/courses/$slug'
     | '/student/courses'
     | '/student/dashboard'
     | '/student/leaderboard'
     | '/student/live-classes'
+    | '/teacher/dashboard'
+    | '/teacher/students'
     | '/courses'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/ai-learning'
     | '/coding-practice'
     | '/contact'
@@ -199,17 +266,23 @@ export interface FileRouteTypes {
     | '/programs'
     | '/register'
     | '/student'
+    | '/teacher'
+    | '/admin/dashboard'
+    | '/admin/events'
     | '/courses/$slug'
     | '/student/courses'
     | '/student/dashboard'
     | '/student/leaderboard'
     | '/student/live-classes'
+    | '/teacher/dashboard'
+    | '/teacher/students'
     | '/courses/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AiLearningRoute: typeof AiLearningRoute
   CodingPracticeRoute: typeof CodingPracticeRoute
   ContactRoute: typeof ContactRoute
@@ -217,6 +290,7 @@ export interface RootRouteChildren {
   ProgramsRoute: typeof ProgramsRoute
   RegisterRoute: typeof RegisterRoute
   StudentRoute: typeof StudentRouteWithChildren
+  TeacherRoute: typeof TeacherRouteWithChildren
   CoursesSlugRoute: typeof CoursesSlugRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
 }
@@ -235,6 +309,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ai-learning': {
@@ -286,6 +367,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teacher': {
+      id: '/teacher'
+      path: '/teacher'
+      fullPath: '/teacher'
+      preLoaderRoute: typeof TeacherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/events': {
+      id: '/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AdminEventsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/courses/': {
       id: '/courses/'
       path: '/courses'
@@ -328,8 +430,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentLiveClassesRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/teacher/dashboard': {
+      id: '/teacher/dashboard'
+      path: '/dashboard'
+      fullPath: '/teacher/dashboard'
+      preLoaderRoute: typeof TeacherDashboardRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/students': {
+      id: '/teacher/students'
+      path: '/students'
+      fullPath: '/teacher/students'
+      preLoaderRoute: typeof TeacherStudentsRouteImport
+      parentRoute: typeof TeacherRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminEventsRoute: typeof AdminEventsRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminEventsRoute: AdminEventsRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface StudentRouteChildren {
   StudentCoursesRoute: typeof StudentCoursesRoute
@@ -348,9 +476,23 @@ const StudentRouteChildren: StudentRouteChildren = {
 const StudentRouteWithChildren =
   StudentRoute._addFileChildren(StudentRouteChildren)
 
+interface TeacherRouteChildren {
+  TeacherDashboardRoute: typeof TeacherDashboardRoute
+  TeacherStudentsRoute: typeof TeacherStudentsRoute
+}
+
+const TeacherRouteChildren: TeacherRouteChildren = {
+  TeacherDashboardRoute: TeacherDashboardRoute,
+  TeacherStudentsRoute: TeacherStudentsRoute,
+}
+
+const TeacherRouteWithChildren =
+  TeacherRoute._addFileChildren(TeacherRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
   AiLearningRoute: AiLearningRoute,
   CodingPracticeRoute: CodingPracticeRoute,
   ContactRoute: ContactRoute,
@@ -358,6 +500,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProgramsRoute: ProgramsRoute,
   RegisterRoute: RegisterRoute,
   StudentRoute: StudentRouteWithChildren,
+  TeacherRoute: TeacherRouteWithChildren,
   CoursesSlugRoute: CoursesSlugRoute,
   CoursesIndexRoute: CoursesIndexRoute,
 }
