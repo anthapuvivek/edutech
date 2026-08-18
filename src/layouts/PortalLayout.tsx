@@ -4,7 +4,6 @@ import type { LucideIcon } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 import { Logo } from "@/components/site/Logo";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -141,9 +140,9 @@ export function PortalLayout({
               <Bell className="size-4" />
             </Button>
             <div className="flex items-center gap-2">
-              <Avatar className="size-8">
-                <AvatarFallback>{initials}</AvatarFallback>
-              </Avatar>
+              <span className="grid size-8 place-items-center rounded-full bg-muted text-xs font-medium">
+                {initials}
+              </span>
               <span className="hidden text-sm font-medium sm:inline">{user?.name}</span>
             </div>
             <Button variant="outline" size="sm" className="lg:hidden" onClick={handleSignOut}>
