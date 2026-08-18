@@ -24,6 +24,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as TeacherRouteImport } from './routes/teacher'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminArticlesRouteImport } from './routes/admin.articles'
 import { Route as AdminAttendanceRouteImport } from './routes/admin.attendance'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
@@ -135,6 +136,11 @@ const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
   path: '/verify-email',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminArticlesRoute = AdminArticlesRouteImport.update({
   id: '/articles',
@@ -335,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRouteWithChildren
   '/teacher': typeof TeacherRouteWithChildren
   '/verify-email': typeof VerifyEmailRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/articles': typeof AdminArticlesRoute
   '/admin/attendance': typeof AdminAttendanceRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
@@ -388,6 +395,7 @@ export interface FileRoutesByTo {
   '/student': typeof StudentRouteWithChildren
   '/teacher': typeof TeacherRouteWithChildren
   '/verify-email': typeof VerifyEmailRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/articles': typeof AdminArticlesRoute
   '/admin/attendance': typeof AdminAttendanceRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
@@ -441,6 +449,7 @@ export interface FileRoutesById {
   '/student': typeof StudentRouteWithChildren
   '/teacher': typeof TeacherRouteWithChildren
   '/verify-email': typeof VerifyEmailRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/articles': typeof AdminArticlesRoute
   '/admin/attendance': typeof AdminAttendanceRoute
   '/admin/audit-logs': typeof AdminAuditLogsRoute
@@ -496,6 +505,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/teacher'
     | '/verify-email'
+    | '/admin/analytics'
     | '/admin/articles'
     | '/admin/attendance'
     | '/admin/audit-logs'
@@ -549,6 +559,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/teacher'
     | '/verify-email'
+    | '/admin/analytics'
     | '/admin/articles'
     | '/admin/attendance'
     | '/admin/audit-logs'
@@ -601,6 +612,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/teacher'
     | '/verify-email'
+    | '/admin/analytics'
     | '/admin/articles'
     | '/admin/attendance'
     | '/admin/audit-logs'
@@ -765,6 +777,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/verify-email'
       preLoaderRoute: typeof VerifyEmailRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/articles': {
       id: '/admin/articles'
@@ -1022,6 +1041,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminArticlesRoute: typeof AdminArticlesRoute
   AdminAttendanceRoute: typeof AdminAttendanceRoute
   AdminAuditLogsRoute: typeof AdminAuditLogsRoute
@@ -1047,6 +1067,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminArticlesRoute: AdminArticlesRoute,
   AdminAttendanceRoute: AdminAttendanceRoute,
   AdminAuditLogsRoute: AdminAuditLogsRoute,
