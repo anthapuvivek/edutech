@@ -17,8 +17,13 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProgramsRouteImport } from './routes/programs'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as StudentRouteImport } from './routes/student'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
+import { Route as StudentCoursesRouteImport } from './routes/student.courses'
+import { Route as StudentDashboardRouteImport } from './routes/student.dashboard'
+import { Route as StudentLeaderboardRouteImport } from './routes/student.leaderboard'
+import { Route as StudentLiveClassesRouteImport } from './routes/student.live-classes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -60,6 +65,11 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudentRoute = StudentRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CoursesIndexRoute = CoursesIndexRouteImport.update({
   id: '/courses/',
   path: '/courses/',
@@ -69,6 +79,26 @@ const CoursesSlugRoute = CoursesSlugRouteImport.update({
   id: '/courses/$slug',
   path: '/courses/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const StudentCoursesRoute = StudentCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentDashboardRoute = StudentDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentLeaderboardRoute = StudentLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentLiveClassesRoute = StudentLiveClassesRouteImport.update({
+  id: '/live-classes',
+  path: '/live-classes',
+  getParentRoute: () => StudentRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -80,7 +110,12 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
+  '/student': typeof StudentRouteWithChildren
   '/courses/$slug': typeof CoursesSlugRoute
+  '/student/courses': typeof StudentCoursesRoute
+  '/student/dashboard': typeof StudentDashboardRoute
+  '/student/leaderboard': typeof StudentLeaderboardRoute
+  '/student/live-classes': typeof StudentLiveClassesRoute
   '/courses/': typeof CoursesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -92,7 +127,12 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
+  '/student': typeof StudentRouteWithChildren
   '/courses/$slug': typeof CoursesSlugRoute
+  '/student/courses': typeof StudentCoursesRoute
+  '/student/dashboard': typeof StudentDashboardRoute
+  '/student/leaderboard': typeof StudentLeaderboardRoute
+  '/student/live-classes': typeof StudentLiveClassesRoute
   '/courses': typeof CoursesIndexRoute
 }
 export interface FileRoutesById {
@@ -105,7 +145,12 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/programs': typeof ProgramsRoute
   '/register': typeof RegisterRoute
+  '/student': typeof StudentRouteWithChildren
   '/courses/$slug': typeof CoursesSlugRoute
+  '/student/courses': typeof StudentCoursesRoute
+  '/student/dashboard': typeof StudentDashboardRoute
+  '/student/leaderboard': typeof StudentLeaderboardRoute
+  '/student/live-classes': typeof StudentLiveClassesRoute
   '/courses/': typeof CoursesIndexRoute
 }
 export interface FileRouteTypes {
@@ -119,7 +164,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/programs'
     | '/register'
+    | '/student'
     | '/courses/$slug'
+    | '/student/courses'
+    | '/student/dashboard'
+    | '/student/leaderboard'
+    | '/student/live-classes'
     | '/courses/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -131,7 +181,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/programs'
     | '/register'
+    | '/student'
     | '/courses/$slug'
+    | '/student/courses'
+    | '/student/dashboard'
+    | '/student/leaderboard'
+    | '/student/live-classes'
     | '/courses'
   id:
     | '__root__'
@@ -143,7 +198,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/programs'
     | '/register'
+    | '/student'
     | '/courses/$slug'
+    | '/student/courses'
+    | '/student/dashboard'
+    | '/student/leaderboard'
+    | '/student/live-classes'
     | '/courses/'
   fileRoutesById: FileRoutesById
 }
@@ -156,6 +216,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ProgramsRoute: typeof ProgramsRoute
   RegisterRoute: typeof RegisterRoute
+  StudentRoute: typeof StudentRouteWithChildren
   CoursesSlugRoute: typeof CoursesSlugRoute
   CoursesIndexRoute: typeof CoursesIndexRoute
 }
@@ -218,6 +279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/student': {
+      id: '/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof StudentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/courses/': {
       id: '/courses/'
       path: '/courses'
@@ -232,8 +300,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/student/courses': {
+      id: '/student/courses'
+      path: '/courses'
+      fullPath: '/student/courses'
+      preLoaderRoute: typeof StudentCoursesRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/dashboard': {
+      id: '/student/dashboard'
+      path: '/dashboard'
+      fullPath: '/student/dashboard'
+      preLoaderRoute: typeof StudentDashboardRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/leaderboard': {
+      id: '/student/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/student/leaderboard'
+      preLoaderRoute: typeof StudentLeaderboardRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/live-classes': {
+      id: '/student/live-classes'
+      path: '/live-classes'
+      fullPath: '/student/live-classes'
+      preLoaderRoute: typeof StudentLiveClassesRouteImport
+      parentRoute: typeof StudentRoute
+    }
   }
 }
+
+interface StudentRouteChildren {
+  StudentCoursesRoute: typeof StudentCoursesRoute
+  StudentDashboardRoute: typeof StudentDashboardRoute
+  StudentLeaderboardRoute: typeof StudentLeaderboardRoute
+  StudentLiveClassesRoute: typeof StudentLiveClassesRoute
+}
+
+const StudentRouteChildren: StudentRouteChildren = {
+  StudentCoursesRoute: StudentCoursesRoute,
+  StudentDashboardRoute: StudentDashboardRoute,
+  StudentLeaderboardRoute: StudentLeaderboardRoute,
+  StudentLiveClassesRoute: StudentLiveClassesRoute,
+}
+
+const StudentRouteWithChildren =
+  StudentRoute._addFileChildren(StudentRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -244,6 +357,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ProgramsRoute: ProgramsRoute,
   RegisterRoute: RegisterRoute,
+  StudentRoute: StudentRouteWithChildren,
   CoursesSlugRoute: CoursesSlugRoute,
   CoursesIndexRoute: CoursesIndexRoute,
 }
