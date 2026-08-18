@@ -47,7 +47,7 @@ export function SiteHeader() {
         <div className="hidden items-center gap-2 lg:flex">
           {isAuthenticated && user ? (
             <Button size="sm" asChild>
-              <Link to={roleHome[user.role]}>
+              <Link to={portalHome}>
                 {user.role === "student" ? "Student Dashboard" : "Go to portal"}
               </Link>
             </Button>
@@ -83,12 +83,20 @@ export function SiteHeader() {
                 </Link>
               ))}
               <div className="mt-6 flex flex-col gap-2">
-                <Button variant="outline" asChild onClick={() => setOpen(false)}>
-                  <Link to="/login">Log in</Link>
-                </Button>
-                <Button asChild onClick={() => setOpen(false)}>
-                  <Link to="/register">Get started</Link>
-                </Button>
+                {isAuthenticated ? (
+                  <Button asChild onClick={() => setOpen(false)}>
+                    <Link to={portalHome}>Student Dashboard</Link>
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="outline" asChild onClick={() => setOpen(false)}>
+                      <Link to="/login">Student Login</Link>
+                    </Button>
+                    <Button asChild onClick={() => setOpen(false)}>
+                      <Link to="/register">Get started</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </SheetContent>
