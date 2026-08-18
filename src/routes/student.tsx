@@ -4,12 +4,18 @@ import {
   BarChart3,
   BookOpen,
   Bot,
+  Briefcase,
+  Building2,
+  ClipboardList,
   Code2,
   FileCheck2,
+  FileText,
   GraduationCap,
+  Handshake,
   LayoutDashboard,
   ListChecks,
   Settings,
+  Target,
   Trophy,
   User,
   Video,
@@ -26,12 +32,19 @@ const nav: PortalNavItem[] = [
   { label: "Quizzes", icon: ListChecks },
   { label: "Assignments", icon: FileCheck2 },
   { label: "Achievements", icon: Award },
+  { label: "Career", to: "/student/career", icon: Briefcase },
+  { label: "Jobs", to: "/student/career/jobs", icon: Building2 },
+  { label: "Applications", to: "/student/career/applications", icon: ClipboardList },
+  { label: "Career Profile", to: "/student/career/profile", icon: Target },
+  { label: "Resume Builder", icon: FileText },
+  { label: "Referrals", icon: Handshake },
   { label: "AI Tutor", icon: Bot },
   { label: "Certificates", icon: GraduationCap },
   { label: "Analytics", icon: BarChart3 },
   { label: "Profile", icon: User },
   { label: "Settings", icon: Settings },
 ];
+
 
 export const Route = createFileRoute("/student")({
   component: () => (

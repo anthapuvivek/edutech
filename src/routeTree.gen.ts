@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AiLearningRouteImport } from './routes/ai-learning'
+import { Route as CareerRouteImport } from './routes/career'
 import { Route as CodingPracticeRouteImport } from './routes/coding-practice'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -27,12 +28,18 @@ import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
+import { Route as StudentCareerRouteImport } from './routes/student.career'
 import { Route as StudentCoursesRouteImport } from './routes/student.courses'
 import { Route as StudentDashboardRouteImport } from './routes/student.dashboard'
 import { Route as StudentLeaderboardRouteImport } from './routes/student.leaderboard'
 import { Route as StudentLiveClassesRouteImport } from './routes/student.live-classes'
 import { Route as TeacherDashboardRouteImport } from './routes/teacher.dashboard'
 import { Route as TeacherStudentsRouteImport } from './routes/teacher.students'
+import { Route as StudentCareerIndexRouteImport } from './routes/student.career.index'
+import { Route as StudentCareerApplicationsRouteImport } from './routes/student.career.applications'
+import { Route as StudentCareerJobsRouteImport } from './routes/student.career.jobs'
+import { Route as StudentCareerOnboardingRouteImport } from './routes/student.career.onboarding'
+import { Route as StudentCareerProfileRouteImport } from './routes/student.career.profile'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +59,11 @@ const AdminRoute = AdminRouteImport.update({
 const AiLearningRoute = AiLearningRouteImport.update({
   id: '/ai-learning',
   path: '/ai-learning',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareerRoute = CareerRouteImport.update({
+  id: '/career',
+  path: '/career',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CodingPracticeRoute = CodingPracticeRouteImport.update({
@@ -124,6 +136,11 @@ const CoursesSlugRoute = CoursesSlugRouteImport.update({
   path: '/courses/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudentCareerRoute = StudentCareerRouteImport.update({
+  id: '/career',
+  path: '/career',
+  getParentRoute: () => StudentRoute,
+} as any)
 const StudentCoursesRoute = StudentCoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
@@ -154,12 +171,39 @@ const TeacherStudentsRoute = TeacherStudentsRouteImport.update({
   path: '/students',
   getParentRoute: () => TeacherRoute,
 } as any)
+const StudentCareerIndexRoute = StudentCareerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StudentCareerRoute,
+} as any)
+const StudentCareerApplicationsRoute =
+  StudentCareerApplicationsRouteImport.update({
+    id: '/applications',
+    path: '/applications',
+    getParentRoute: () => StudentCareerRoute,
+  } as any)
+const StudentCareerJobsRoute = StudentCareerJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => StudentCareerRoute,
+} as any)
+const StudentCareerOnboardingRoute = StudentCareerOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => StudentCareerRoute,
+} as any)
+const StudentCareerProfileRoute = StudentCareerProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => StudentCareerRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/ai-learning': typeof AiLearningRoute
+  '/career': typeof CareerRoute
   '/coding-practice': typeof CodingPracticeRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -173,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
   '/courses/$slug': typeof CoursesSlugRoute
+  '/student/career': typeof StudentCareerRouteWithChildren
   '/student/courses': typeof StudentCoursesRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/leaderboard': typeof StudentLeaderboardRoute
@@ -180,12 +225,18 @@ export interface FileRoutesByFullPath {
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
+  '/student/career/applications': typeof StudentCareerApplicationsRoute
+  '/student/career/jobs': typeof StudentCareerJobsRoute
+  '/student/career/onboarding': typeof StudentCareerOnboardingRoute
+  '/student/career/profile': typeof StudentCareerProfileRoute
+  '/student/career/': typeof StudentCareerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/ai-learning': typeof AiLearningRoute
+  '/career': typeof CareerRoute
   '/coding-practice': typeof CodingPracticeRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -206,6 +257,11 @@ export interface FileRoutesByTo {
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses': typeof CoursesIndexRoute
+  '/student/career/applications': typeof StudentCareerApplicationsRoute
+  '/student/career/jobs': typeof StudentCareerJobsRoute
+  '/student/career/onboarding': typeof StudentCareerOnboardingRoute
+  '/student/career/profile': typeof StudentCareerProfileRoute
+  '/student/career': typeof StudentCareerIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -213,6 +269,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/ai-learning': typeof AiLearningRoute
+  '/career': typeof CareerRoute
   '/coding-practice': typeof CodingPracticeRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -226,6 +283,7 @@ export interface FileRoutesById {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
   '/courses/$slug': typeof CoursesSlugRoute
+  '/student/career': typeof StudentCareerRouteWithChildren
   '/student/courses': typeof StudentCoursesRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/leaderboard': typeof StudentLeaderboardRoute
@@ -233,6 +291,11 @@ export interface FileRoutesById {
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
+  '/student/career/applications': typeof StudentCareerApplicationsRoute
+  '/student/career/jobs': typeof StudentCareerJobsRoute
+  '/student/career/onboarding': typeof StudentCareerOnboardingRoute
+  '/student/career/profile': typeof StudentCareerProfileRoute
+  '/student/career/': typeof StudentCareerIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -241,6 +304,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/ai-learning'
+    | '/career'
     | '/coding-practice'
     | '/contact'
     | '/forgot-password'
@@ -254,6 +318,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/events'
     | '/courses/$slug'
+    | '/student/career'
     | '/student/courses'
     | '/student/dashboard'
     | '/student/leaderboard'
@@ -261,12 +326,18 @@ export interface FileRouteTypes {
     | '/teacher/dashboard'
     | '/teacher/students'
     | '/courses/'
+    | '/student/career/applications'
+    | '/student/career/jobs'
+    | '/student/career/onboarding'
+    | '/student/career/profile'
+    | '/student/career/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/admin'
     | '/ai-learning'
+    | '/career'
     | '/coding-practice'
     | '/contact'
     | '/forgot-password'
@@ -287,12 +358,18 @@ export interface FileRouteTypes {
     | '/teacher/dashboard'
     | '/teacher/students'
     | '/courses'
+    | '/student/career/applications'
+    | '/student/career/jobs'
+    | '/student/career/onboarding'
+    | '/student/career/profile'
+    | '/student/career'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/admin'
     | '/ai-learning'
+    | '/career'
     | '/coding-practice'
     | '/contact'
     | '/forgot-password'
@@ -306,6 +383,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/events'
     | '/courses/$slug'
+    | '/student/career'
     | '/student/courses'
     | '/student/dashboard'
     | '/student/leaderboard'
@@ -313,6 +391,11 @@ export interface FileRouteTypes {
     | '/teacher/dashboard'
     | '/teacher/students'
     | '/courses/'
+    | '/student/career/applications'
+    | '/student/career/jobs'
+    | '/student/career/onboarding'
+    | '/student/career/profile'
+    | '/student/career/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -320,6 +403,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AiLearningRoute: typeof AiLearningRoute
+  CareerRoute: typeof CareerRoute
   CodingPracticeRoute: typeof CodingPracticeRoute
   ContactRoute: typeof ContactRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -362,6 +446,13 @@ declare module '@tanstack/react-router' {
       path: '/ai-learning'
       fullPath: '/ai-learning'
       preLoaderRoute: typeof AiLearningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/career': {
+      id: '/career'
+      path: '/career'
+      fullPath: '/career'
+      preLoaderRoute: typeof CareerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/coding-practice': {
@@ -462,6 +553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/student/career': {
+      id: '/student/career'
+      path: '/career'
+      fullPath: '/student/career'
+      preLoaderRoute: typeof StudentCareerRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/student/courses': {
       id: '/student/courses'
       path: '/courses'
@@ -504,6 +602,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeacherStudentsRouteImport
       parentRoute: typeof TeacherRoute
     }
+    '/student/career/': {
+      id: '/student/career/'
+      path: '/'
+      fullPath: '/student/career/'
+      preLoaderRoute: typeof StudentCareerIndexRouteImport
+      parentRoute: typeof StudentCareerRoute
+    }
+    '/student/career/applications': {
+      id: '/student/career/applications'
+      path: '/applications'
+      fullPath: '/student/career/applications'
+      preLoaderRoute: typeof StudentCareerApplicationsRouteImport
+      parentRoute: typeof StudentCareerRoute
+    }
+    '/student/career/jobs': {
+      id: '/student/career/jobs'
+      path: '/jobs'
+      fullPath: '/student/career/jobs'
+      preLoaderRoute: typeof StudentCareerJobsRouteImport
+      parentRoute: typeof StudentCareerRoute
+    }
+    '/student/career/onboarding': {
+      id: '/student/career/onboarding'
+      path: '/onboarding'
+      fullPath: '/student/career/onboarding'
+      preLoaderRoute: typeof StudentCareerOnboardingRouteImport
+      parentRoute: typeof StudentCareerRoute
+    }
+    '/student/career/profile': {
+      id: '/student/career/profile'
+      path: '/profile'
+      fullPath: '/student/career/profile'
+      preLoaderRoute: typeof StudentCareerProfileRouteImport
+      parentRoute: typeof StudentCareerRoute
+    }
   }
 }
 
@@ -519,7 +652,28 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface StudentCareerRouteChildren {
+  StudentCareerApplicationsRoute: typeof StudentCareerApplicationsRoute
+  StudentCareerJobsRoute: typeof StudentCareerJobsRoute
+  StudentCareerOnboardingRoute: typeof StudentCareerOnboardingRoute
+  StudentCareerProfileRoute: typeof StudentCareerProfileRoute
+  StudentCareerIndexRoute: typeof StudentCareerIndexRoute
+}
+
+const StudentCareerRouteChildren: StudentCareerRouteChildren = {
+  StudentCareerApplicationsRoute: StudentCareerApplicationsRoute,
+  StudentCareerJobsRoute: StudentCareerJobsRoute,
+  StudentCareerOnboardingRoute: StudentCareerOnboardingRoute,
+  StudentCareerProfileRoute: StudentCareerProfileRoute,
+  StudentCareerIndexRoute: StudentCareerIndexRoute,
+}
+
+const StudentCareerRouteWithChildren = StudentCareerRoute._addFileChildren(
+  StudentCareerRouteChildren,
+)
+
 interface StudentRouteChildren {
+  StudentCareerRoute: typeof StudentCareerRouteWithChildren
   StudentCoursesRoute: typeof StudentCoursesRoute
   StudentDashboardRoute: typeof StudentDashboardRoute
   StudentLeaderboardRoute: typeof StudentLeaderboardRoute
@@ -527,6 +681,7 @@ interface StudentRouteChildren {
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
+  StudentCareerRoute: StudentCareerRouteWithChildren,
   StudentCoursesRoute: StudentCoursesRoute,
   StudentDashboardRoute: StudentDashboardRoute,
   StudentLeaderboardRoute: StudentLeaderboardRoute,
@@ -554,6 +709,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AiLearningRoute: AiLearningRoute,
+  CareerRoute: CareerRoute,
   CodingPracticeRoute: CodingPracticeRoute,
   ContactRoute: ContactRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
