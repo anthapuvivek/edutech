@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/site/Logo";
+import { useAuth } from "@/hooks/useAuth";
+import { roleHome } from "@/services/auth.service";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -18,6 +20,8 @@ const navItems = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+  const portalHome = user ? roleHome[user.role] : "/login";
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-background/85 backdrop-blur-md">
@@ -41,12 +45,22 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/login">Log in</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link to="/register">Get started</Link>
-          </Button>
+          {isAuthenticated && user ? (
+            <Button size="sm" asChild>
+              <Link to={portalHome}>
+                {user.role === "student" ? "Student Dashboard" : "Go to portal"}
+              </Link>
+            </Button>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/login">Student Login</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to="/register">Get started</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <Sheet open={open} onOpenChange={setOpen}>
@@ -69,12 +83,20 @@ export function SiteHeader() {
                 </Link>
               ))}
               <div className="mt-6 flex flex-col gap-2">
-                <Button variant="outline" asChild onClick={() => setOpen(false)}>
-                  <Link to="/login">Log in</Link>
-                </Button>
-                <Button asChild onClick={() => setOpen(false)}>
-                  <Link to="/register">Get started</Link>
-                </Button>
+                {isAuthenticated ? (
+                  <Button asChild onClick={() => setOpen(false)}>
+                    <Link to={portalHome}>Student Dashboard</Link>
+                  </Button>
+                ) : (
+                  <>
+                    <Button variant="outline" asChild onClick={() => setOpen(false)}>
+                      <Link to="/login">Student Login</Link>
+                    </Button>
+                    <Button asChild onClick={() => setOpen(false)}>
+                      <Link to="/register">Get started</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </SheetContent>
