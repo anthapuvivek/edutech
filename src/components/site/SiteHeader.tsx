@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/site/Logo";
+import { useAuth } from "@/hooks/useAuth";
+import { roleHome } from "@/services/auth.service";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -41,12 +43,22 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/login">Log in</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link to="/register">Get started</Link>
-          </Button>
+          {isAuthenticated && user ? (
+            <Button size="sm" asChild>
+              <Link to={roleHome[user.role]}>
+                {user.role === "student" ? "Student Dashboard" : "Go to portal"}
+              </Link>
+            </Button>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/login">Student Login</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to="/register">Get started</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <Sheet open={open} onOpenChange={setOpen}>
