@@ -16,7 +16,12 @@ export interface PortalNavItem {
   label: string;
   to?: string | undefined;
   icon: LucideIcon;
+  /** Renders a small heading above this item — used to group large sidebars. */
+  section?: string | undefined;
+  /** Indents the item under its section (sub-navigation). */
+  indent?: boolean | undefined;
 }
+
 
 const roleLabel: Record<Role, string> = {
   student: "Student Portal",
@@ -56,37 +61,47 @@ export function PortalLayout({
   }
 
   const sidebar = (
-    <nav aria-label={roleLabel[role]} className="flex flex-1 flex-col gap-0.5 px-3">
-      {nav.map((item) =>
-        item.to ? (
-          <Link
-            key={item.label}
-            to={item.to}
-            onClick={() => setOpen(false)}
-            className={cn(
-              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-ink-foreground/65 transition-colors hover:bg-ink-foreground/10 hover:text-ink-foreground",
-              pathname === item.to && "bg-ink-foreground/12 text-ink-foreground",
-            )}
-          >
-            <item.icon className="size-4 shrink-0" aria-hidden />
-            {item.label}
-          </Link>
-        ) : (
-          <span
-            key={item.label}
-            className="flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm font-medium text-ink-foreground/35"
-            title="Available in an upcoming phase"
-          >
-            <span className="flex items-center gap-3">
+    <nav aria-label={roleLabel[role]} className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4">
+      {nav.map((item) => (
+        <div key={item.label} className="contents">
+          {item.section ? (
+            <p className="mt-4 px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-foreground/35">
+              {item.section}
+            </p>
+          ) : null}
+          {item.to ? (
+            <Link
+              to={item.to}
+              onClick={() => setOpen(false)}
+              className={cn(
+                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-ink-foreground/65 transition-colors hover:bg-ink-foreground/10 hover:text-ink-foreground",
+                item.indent && "pl-8",
+                pathname === item.to && "bg-ink-foreground/12 text-ink-foreground",
+              )}
+            >
               <item.icon className="size-4 shrink-0" aria-hidden />
               {item.label}
+            </Link>
+          ) : (
+            <span
+              className={cn(
+                "flex items-center justify-between gap-3 rounded-md px-3 py-2 text-sm font-medium text-ink-foreground/35",
+                item.indent && "pl-8",
+              )}
+              title="Available in an upcoming phase"
+            >
+              <span className="flex items-center gap-3">
+                <item.icon className="size-4 shrink-0" aria-hidden />
+                {item.label}
+              </span>
+              <span className="text-[10px] uppercase tracking-wide">soon</span>
             </span>
-            <span className="text-[10px] uppercase tracking-wide">soon</span>
-          </span>
-        ),
-      )}
+          )}
+        </div>
+      ))}
     </nav>
   );
+
 
   const initials = (user?.name ?? "U")
     .split(" ")
