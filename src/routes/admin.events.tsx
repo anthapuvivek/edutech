@@ -40,7 +40,7 @@ export const Route = createFileRoute("/admin/events")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: AdminEvents;
+  component: AdminEvents,
 });
 
 const eventTypes = ["Regular Class", "Demo Class", "Webinar", "Workshop", "Placement Program", "Orientation", "Other"];
