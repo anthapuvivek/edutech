@@ -20,6 +20,8 @@ const navItems = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+  const portalHome = user ? roleHome[user.role] : "/login";
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-background/85 backdrop-blur-md">
