@@ -55,6 +55,7 @@ import { Route as AdminCareerReferralsRouteImport } from './routes/admin.career.
 import { Route as AdminCareerResourcesRouteImport } from './routes/admin.career.resources'
 import { Route as AdminCareerResumeTemplatesRouteImport } from './routes/admin.career.resume-templates'
 import { Route as AdminCrmIndexRouteImport } from './routes/admin.crm.index'
+import { Route as AdminCrmLeadIdRouteImport } from './routes/admin.crm.$leadId'
 import { Route as AdminMarketingCouponsRouteImport } from './routes/admin.marketing.coupons'
 import { Route as AdminStudentsIndexRouteImport } from './routes/admin.students.index'
 import { Route as AdminStudentsStudentIdRouteImport } from './routes/admin.students.$studentId'
@@ -295,6 +296,11 @@ const AdminCrmIndexRoute = AdminCrmIndexRouteImport.update({
   path: '/crm/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCrmLeadIdRoute = AdminCrmLeadIdRouteImport.update({
+  id: '/crm/$leadId',
+  path: '/crm/$leadId',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMarketingCouponsRoute = AdminMarketingCouponsRouteImport.update({
   id: '/marketing/coupons',
   path: '/marketing/coupons',
@@ -383,6 +389,7 @@ export interface FileRoutesByFullPath {
   '/admin/career/referrals': typeof AdminCareerReferralsRoute
   '/admin/career/resources': typeof AdminCareerResourcesRoute
   '/admin/career/resume-templates': typeof AdminCareerResumeTemplatesRoute
+  '/admin/crm/$leadId': typeof AdminCrmLeadIdRoute
   '/admin/marketing/coupons': typeof AdminMarketingCouponsRoute
   '/admin/students/$studentId': typeof AdminStudentsStudentIdRoute
   '/student/career/applications': typeof StudentCareerApplicationsRoute
@@ -438,6 +445,7 @@ export interface FileRoutesByTo {
   '/admin/career/referrals': typeof AdminCareerReferralsRoute
   '/admin/career/resources': typeof AdminCareerResourcesRoute
   '/admin/career/resume-templates': typeof AdminCareerResumeTemplatesRoute
+  '/admin/crm/$leadId': typeof AdminCrmLeadIdRoute
   '/admin/marketing/coupons': typeof AdminMarketingCouponsRoute
   '/admin/students/$studentId': typeof AdminStudentsStudentIdRoute
   '/student/career/applications': typeof StudentCareerApplicationsRoute
@@ -495,6 +503,7 @@ export interface FileRoutesById {
   '/admin/career/referrals': typeof AdminCareerReferralsRoute
   '/admin/career/resources': typeof AdminCareerResourcesRoute
   '/admin/career/resume-templates': typeof AdminCareerResumeTemplatesRoute
+  '/admin/crm/$leadId': typeof AdminCrmLeadIdRoute
   '/admin/marketing/coupons': typeof AdminMarketingCouponsRoute
   '/admin/students/$studentId': typeof AdminStudentsStudentIdRoute
   '/student/career/applications': typeof StudentCareerApplicationsRoute
@@ -553,6 +562,7 @@ export interface FileRouteTypes {
     | '/admin/career/referrals'
     | '/admin/career/resources'
     | '/admin/career/resume-templates'
+    | '/admin/crm/$leadId'
     | '/admin/marketing/coupons'
     | '/admin/students/$studentId'
     | '/student/career/applications'
@@ -608,6 +618,7 @@ export interface FileRouteTypes {
     | '/admin/career/referrals'
     | '/admin/career/resources'
     | '/admin/career/resume-templates'
+    | '/admin/crm/$leadId'
     | '/admin/marketing/coupons'
     | '/admin/students/$studentId'
     | '/student/career/applications'
@@ -664,6 +675,7 @@ export interface FileRouteTypes {
     | '/admin/career/referrals'
     | '/admin/career/resources'
     | '/admin/career/resume-templates'
+    | '/admin/crm/$leadId'
     | '/admin/marketing/coupons'
     | '/admin/students/$studentId'
     | '/student/career/applications'
@@ -1019,6 +1031,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCrmIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/crm/$leadId': {
+      id: '/admin/crm/$leadId'
+      path: '/crm/$leadId'
+      fullPath: '/admin/crm/$leadId'
+      preLoaderRoute: typeof AdminCrmLeadIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/marketing/coupons': {
       id: '/admin/marketing/coupons'
       path: '/marketing/coupons'
@@ -1100,6 +1119,7 @@ interface AdminRouteChildren {
   AdminCareerReferralsRoute: typeof AdminCareerReferralsRoute
   AdminCareerResourcesRoute: typeof AdminCareerResourcesRoute
   AdminCareerResumeTemplatesRoute: typeof AdminCareerResumeTemplatesRoute
+  AdminCrmLeadIdRoute: typeof AdminCrmLeadIdRoute
   AdminMarketingCouponsRoute: typeof AdminMarketingCouponsRoute
   AdminStudentsStudentIdRoute: typeof AdminStudentsStudentIdRoute
   AdminCrmIndexRoute: typeof AdminCrmIndexRoute
@@ -1128,6 +1148,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCareerReferralsRoute: AdminCareerReferralsRoute,
   AdminCareerResourcesRoute: AdminCareerResourcesRoute,
   AdminCareerResumeTemplatesRoute: AdminCareerResumeTemplatesRoute,
+  AdminCrmLeadIdRoute: AdminCrmLeadIdRoute,
   AdminMarketingCouponsRoute: AdminMarketingCouponsRoute,
   AdminStudentsStudentIdRoute: AdminStudentsStudentIdRoute,
   AdminCrmIndexRoute: AdminCrmIndexRoute,
