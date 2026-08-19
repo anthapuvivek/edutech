@@ -97,6 +97,7 @@ function LoginPage() {
       <div className="mt-4 rounded-md border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
         <p className="font-medium text-foreground">Demo accounts (mock auth)</p>
         <p>student@learntrix.com · teacher@learntrix.com · admin@learntrix.com</p>
+        <p>mentor@learntrix.com · placement@learntrix.com</p>
         <p>Password: password</p>
       </div>
 
