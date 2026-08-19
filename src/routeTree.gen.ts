@@ -54,6 +54,7 @@ import { Route as AdminCareerPreparationRouteImport } from './routes/admin.caree
 import { Route as AdminCareerReferralsRouteImport } from './routes/admin.career.referrals'
 import { Route as AdminCareerResourcesRouteImport } from './routes/admin.career.resources'
 import { Route as AdminCareerResumeTemplatesRouteImport } from './routes/admin.career.resume-templates'
+import { Route as AdminCrmIndexRouteImport } from './routes/admin.crm.index'
 import { Route as AdminMarketingCouponsRouteImport } from './routes/admin.marketing.coupons'
 import { Route as AdminStudentsIndexRouteImport } from './routes/admin.students.index'
 import { Route as AdminStudentsStudentIdRouteImport } from './routes/admin.students.$studentId'
@@ -289,6 +290,11 @@ const AdminCareerResumeTemplatesRoute =
     path: '/career/resume-templates',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminCrmIndexRoute = AdminCrmIndexRouteImport.update({
+  id: '/crm/',
+  path: '/crm/',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminMarketingCouponsRoute = AdminMarketingCouponsRouteImport.update({
   id: '/marketing/coupons',
   path: '/marketing/coupons',
@@ -383,6 +389,7 @@ export interface FileRoutesByFullPath {
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/admin/crm/': typeof AdminCrmIndexRoute
   '/admin/students/': typeof AdminStudentsIndexRoute
   '/student/career/': typeof StudentCareerIndexRoute
 }
@@ -437,6 +444,7 @@ export interface FileRoutesByTo {
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/admin/crm': typeof AdminCrmIndexRoute
   '/admin/students': typeof AdminStudentsIndexRoute
   '/student/career': typeof StudentCareerIndexRoute
 }
@@ -493,6 +501,7 @@ export interface FileRoutesById {
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/admin/crm/': typeof AdminCrmIndexRoute
   '/admin/students/': typeof AdminStudentsIndexRoute
   '/student/career/': typeof StudentCareerIndexRoute
 }
@@ -550,6 +559,7 @@ export interface FileRouteTypes {
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/admin/crm/'
     | '/admin/students/'
     | '/student/career/'
   fileRoutesByTo: FileRoutesByTo
@@ -604,6 +614,7 @@ export interface FileRouteTypes {
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/admin/crm'
     | '/admin/students'
     | '/student/career'
   id:
@@ -659,6 +670,7 @@ export interface FileRouteTypes {
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/admin/crm/'
     | '/admin/students/'
     | '/student/career/'
   fileRoutesById: FileRoutesById
@@ -1000,6 +1012,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCareerResumeTemplatesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/crm/': {
+      id: '/admin/crm/'
+      path: '/crm'
+      fullPath: '/admin/crm/'
+      preLoaderRoute: typeof AdminCrmIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/marketing/coupons': {
       id: '/admin/marketing/coupons'
       path: '/marketing/coupons'
@@ -1083,6 +1102,7 @@ interface AdminRouteChildren {
   AdminCareerResumeTemplatesRoute: typeof AdminCareerResumeTemplatesRoute
   AdminMarketingCouponsRoute: typeof AdminMarketingCouponsRoute
   AdminStudentsStudentIdRoute: typeof AdminStudentsStudentIdRoute
+  AdminCrmIndexRoute: typeof AdminCrmIndexRoute
   AdminStudentsIndexRoute: typeof AdminStudentsIndexRoute
 }
 
@@ -1110,6 +1130,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminCareerResumeTemplatesRoute: AdminCareerResumeTemplatesRoute,
   AdminMarketingCouponsRoute: AdminMarketingCouponsRoute,
   AdminStudentsStudentIdRoute: AdminStudentsStudentIdRoute,
+  AdminCrmIndexRoute: AdminCrmIndexRoute,
   AdminStudentsIndexRoute: AdminStudentsIndexRoute,
 }
 
