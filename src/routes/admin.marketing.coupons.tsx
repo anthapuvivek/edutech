@@ -239,7 +239,7 @@ function CouponDialog({ onCreated }: { onCreated: () => void }) {
           <Textarea value={form.description ?? ""} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} />
         </Field>
         <Field label="Discount type">
-          <Select value={form.discountType} onValueChange={(v) => setForm({ ...form, discountType: v as DiscountType })}>
+          <Select value={form.discountType ?? "percentage"} onValueChange={(v) => setForm({ ...form, discountType: v as DiscountType })}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -280,7 +280,7 @@ function CouponDialog({ onCreated }: { onCreated: () => void }) {
           <Input type="number" value={form.usagePerStudent ?? ""} onChange={(e) => setForm({ ...form, usagePerStudent: Number(e.target.value) })} />
         </Field>
         <Field label="Status">
-          <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as CouponStatus })}>
+          <Select value={form.status ?? "draft"} onValueChange={(v) => setForm({ ...form, status: v as CouponStatus })}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
