@@ -27,6 +27,11 @@ const roleLabel: Record<Role, string> = {
   student: "Student Portal",
   teacher: "Trainer Portal",
   admin: "Admin Console",
+  super_admin: "Admin Console",
+  mentor: "Mentor Portal",
+  placement_officer: "Placement Office",
+  support_agent: "Support Desk",
+  counsellor: "Counsellor Desk",
 };
 
 export function PortalLayout({

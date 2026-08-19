@@ -3,7 +3,19 @@
  * so swapping mock services for real HTTP calls requires no UI changes.
  */
 
-export type UserRole = "student" | "teacher" | "admin" | "mentor" | "content_manager" | "reviewer" | "support" | "corporate";
+export type UserRole =
+  | "student"
+  | "teacher"
+  | "admin"
+  | "super_admin"
+  | "mentor"
+  | "placement_officer"
+  | "support_agent"
+  | "counsellor"
+  | "content_manager"
+  | "reviewer"
+  | "support"
+  | "corporate";
 
 export interface User {
   id: string;

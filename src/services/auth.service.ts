@@ -90,4 +90,9 @@ export const roleHome: Record<Role, string> = {
   student: "/student/dashboard",
   teacher: "/teacher/dashboard",
   admin: "/admin/dashboard",
+  super_admin: "/admin/dashboard",
+  mentor: "/mentor/dashboard",
+  placement_officer: "/placement/dashboard",
+  support_agent: "/admin/support",
+  counsellor: "/admin/crm",
 };
