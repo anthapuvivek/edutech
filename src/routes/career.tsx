@@ -27,7 +27,8 @@ export const Route = createFileRoute("/career")({
       { property: "og:title", content: "Career & Placement Services — Learntrix" },
       {
         property: "og:description",
-        content: "Job portal, resume builder, company preparation and mock interviews for eligible enrolled students.",
+        content:
+          "Job portal, resume builder, company preparation and mock interviews for eligible enrolled students.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -37,17 +38,60 @@ export const Route = createFileRoute("/career")({
 });
 
 const services = [
-  { icon: Briefcase, title: "Job & internship portal", body: "Curated openings matched to your course, skills and coding performance." },
-  { icon: Building2, title: "Company preparation tracks", body: "Role-wise preparation plans, question banks and coding sets per company." },
-  { icon: FileText, title: "Resume builder", body: "ATS-friendly templates recommended from your enrolled programme." },
-  { icon: ScanSearch, title: "ATS resume analysis", body: "Keyword, skills and formatting feedback against a target job description." },
-  { icon: MessagesSquare, title: "Mock interviews", body: "Technical, HR, behavioural and coding rounds with a scored report." },
-  { icon: Handshake, title: "Referral opportunities", body: "Admin-verified referral openings with a transparent request workflow." },
-  { icon: RouteIcon, title: "Career roadmaps", body: "Step-by-step paths from your current skills to your target role." },
-  { icon: Target, title: "Skill gap analysis", body: "See exactly what to learn, practise and build next." },
+  {
+    icon: Briefcase,
+    title: "Job & internship portal",
+    body: "Curated openings matched to your course, skills and coding performance.",
+  },
+  {
+    icon: Building2,
+    title: "Company preparation tracks",
+    body: "Role-wise preparation plans, question banks and coding sets per company.",
+  },
+  {
+    icon: FileText,
+    title: "Resume builder",
+    body: "ATS-friendly templates recommended from your enrolled programme.",
+  },
+  {
+    icon: ScanSearch,
+    title: "ATS resume analysis",
+    body: "Keyword, skills and formatting feedback against a target job description.",
+  },
+  {
+    icon: MessagesSquare,
+    title: "Mock interviews",
+    body: "Technical, HR, behavioural and coding rounds with a scored report.",
+  },
+  {
+    icon: Handshake,
+    title: "Referral opportunities",
+    body: "Admin-verified referral openings with a transparent request workflow.",
+  },
+  {
+    icon: RouteIcon,
+    title: "Career roadmaps",
+    body: "Step-by-step paths from your current skills to your target role.",
+  },
+  {
+    icon: Target,
+    title: "Skill gap analysis",
+    body: "See exactly what to learn, practise and build next.",
+  },
 ];
 
-const preparationCompanies = ["Google", "Microsoft", "Amazon", "Wipro", "Bosch", "Capgemini", "Infosys", "TCS", "Accenture", "Cognizant"];
+const preparationCompanies = [
+  "Google",
+  "Microsoft",
+  "Amazon",
+  "Wipro",
+  "Bosch",
+  "Capgemini",
+  "Infosys",
+  "TCS",
+  "Accenture",
+  "Cognizant",
+];
 
 function PublicCareerPage() {
   return (
@@ -61,9 +105,9 @@ function PublicCareerPage() {
             Career support that runs from your first lesson to your first offer
           </h1>
           <p className="mt-4 max-w-2xl text-muted-foreground">
-            Learntrix career services combine a curated job portal, company preparation tracks, resume and portfolio
-            tooling, mock interviews and referral support inside the student portal. We support your preparation — we
-            never guarantee employment.
+            Learntrix career services combine a curated job portal, company preparation tracks,
+            resume and portfolio tooling, mock interviews and referral support inside the student
+            portal. We support your preparation — we never guarantee employment.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg">
@@ -113,8 +157,8 @@ function PublicCareerPage() {
       <section className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
         <h2 className="text-display text-3xl">Ready to start?</h2>
         <p className="mt-3 text-muted-foreground">
-          Career services, private job listings and referral opportunities are available to eligible enrolled students
-          only. Enrol in a career programme to activate your career dashboard.
+          Career services, private job listings and referral opportunities are available to eligible
+          enrolled students only. Enrol in a career programme to activate your career dashboard.
         </p>
         <Button asChild size="lg" className="mt-6">
           <Link to="/courses">Explore courses</Link>

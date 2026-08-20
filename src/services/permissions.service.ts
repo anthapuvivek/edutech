@@ -21,14 +21,16 @@ export const permissionsService = {
   },
 
   async updateStaffStatus(id: string, status: StaffMember["status"]): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>(`/rbac/staff/${id}/status`, { method: "PATCH", body: { status } });
+    if (!env.useMocks)
+      return apiRequest<void>(`/rbac/staff/${id}/status`, { method: "PATCH", body: { status } });
     const member = mockStaff.find((s) => s.id === id);
     if (member) member.status = status;
     return mockDelay(undefined, 150);
   },
 
   async updateRolePermissions(role: PlatformRole, permissions: Permission[]): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>(`/rbac/roles/${role}`, { method: "PATCH", body: { permissions } });
+    if (!env.useMocks)
+      return apiRequest<void>(`/rbac/roles/${role}`, { method: "PATCH", body: { permissions } });
     const def = mockRoleDefinitions.find((r) => r.role === role);
     if (def) def.permissions = permissions;
     return mockDelay(undefined, 150);

@@ -12,7 +12,11 @@ export const Route = createFileRoute("/admin/career/resume-templates")({
   head: () => ({
     meta: [
       { title: "Resume Templates — Learntrix Admin" },
-      { name: "description", content: "Manage ATS-friendly resume templates and map them to courses, roles and experience levels." },
+      {
+        name: "description",
+        content:
+          "Manage ATS-friendly resume templates and map them to courses, roles and experience levels.",
+      },
       { property: "og:title", content: "Resume Templates — Learntrix Admin" },
       { property: "og:description", content: "Resume template library and course mapping." },
       { name: "robots", content: "noindex" },
@@ -22,9 +26,33 @@ export const Route = createFileRoute("/admin/career/resume-templates")({
 });
 
 const templates = [
-  { id: "t1", name: "Fresher — Software Engineer", level: "Fresher", courses: ["Full Stack Engineering Program"], atsScore: 96, active: true, uses: 1240 },
-  { id: "t2", name: "Data Science Practitioner", level: "0–2 years", courses: ["Generative AI & LLM Systems", "Applied Machine Learning"], atsScore: 93, active: true, uses: 618 },
-  { id: "t3", name: "Experienced Backend Engineer", level: "3+ years", courses: ["Full Stack Engineering Program"], atsScore: 91, active: false, uses: 210 },
+  {
+    id: "t1",
+    name: "Fresher — Software Engineer",
+    level: "Fresher",
+    courses: ["Full Stack Engineering Program"],
+    atsScore: 96,
+    active: true,
+    uses: 1240,
+  },
+  {
+    id: "t2",
+    name: "Data Science Practitioner",
+    level: "0–2 years",
+    courses: ["Generative AI & LLM Systems", "Applied Machine Learning"],
+    atsScore: 93,
+    active: true,
+    uses: 618,
+  },
+  {
+    id: "t3",
+    name: "Experienced Backend Engineer",
+    level: "3+ years",
+    courses: ["Full Stack Engineering Program"],
+    atsScore: 91,
+    active: false,
+    uses: 210,
+  },
 ];
 
 function AdminResumeTemplates() {
@@ -43,13 +71,23 @@ function AdminResumeTemplates() {
       <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Templates" value={templates.length} icon={FileText} />
         <StatCard label="Active" value={templates.filter((t) => t.active).length} />
-        <StatCard label="Resumes generated" value={templates.reduce((s, t) => s + t.uses, 0).toLocaleString()} />
-        <StatCard label="Average ATS score" value={`${Math.round(templates.reduce((s, t) => s + t.atsScore, 0) / templates.length)}%`} />
+        <StatCard
+          label="Resumes generated"
+          value={templates.reduce((s, t) => s + t.uses, 0).toLocaleString()}
+        />
+        <StatCard
+          label="Average ATS score"
+          value={`${Math.round(templates.reduce((s, t) => s + t.atsScore, 0) / templates.length)}%`}
+        />
       </section>
 
       <div className="grid gap-4 md:grid-cols-3">
         {templates.map((t) => (
-          <Panel key={t.id} title={t.name} description={`${t.level} · ${t.uses.toLocaleString()} resumes generated`}>
+          <Panel
+            key={t.id}
+            title={t.name}
+            description={`${t.level} · ${t.uses.toLocaleString()} resumes generated`}
+          >
             <div className="flex flex-wrap gap-1.5">
               {t.courses.map((c) => (
                 <Badge key={c} variant="outline">
@@ -61,7 +99,11 @@ function AdminResumeTemplates() {
               <Badge variant="success">ATS {t.atsScore}%</Badge>
               <label className="flex items-center gap-2 text-xs">
                 Active
-                <Switch defaultChecked={t.active} onCheckedChange={() => toast.success(`${t.name} updated.`)} aria-label={`Active for ${t.name}`} />
+                <Switch
+                  defaultChecked={t.active}
+                  onCheckedChange={() => toast.success(`${t.name} updated.`)}
+                  aria-label={`Active for ${t.name}`}
+                />
               </label>
             </div>
           </Panel>

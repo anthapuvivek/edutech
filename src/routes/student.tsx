@@ -45,7 +45,6 @@ const nav: PortalNavItem[] = [
   { label: "Settings", icon: Settings },
 ];
 
-
 export const Route = createFileRoute("/student")({
   component: () => (
     <PortalLayout role="student" nav={nav}>

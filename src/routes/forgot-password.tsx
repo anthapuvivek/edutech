@@ -11,7 +11,10 @@ export const Route = createFileRoute("/forgot-password")({
   head: () => ({
     meta: [
       { title: "Reset your Learntrix password" },
-      { name: "description", content: "Request a secure password reset link for your Learntrix learning account." },
+      {
+        name: "description",
+        content: "Request a secure password reset link for your Learntrix learning account.",
+      },
       { property: "og:title", content: "Reset your Learntrix password" },
       { property: "og:description", content: "Request a password reset link for your account." },
     ],
@@ -64,7 +67,10 @@ function ForgotPasswordPage() {
             {state === "loading" ? "Sending…" : "Send reset link"}
           </Button>
           <p className="text-center text-sm text-muted-foreground">
-            <Link to="/login" className="font-medium text-foreground underline-offset-4 hover:underline">
+            <Link
+              to="/login"
+              className="font-medium text-foreground underline-offset-4 hover:underline"
+            >
               Back to login
             </Link>
           </p>

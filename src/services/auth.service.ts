@@ -31,9 +31,12 @@ export const authService = {
   },
 
   async login(payload: LoginPayload): Promise<AuthSession> {
-    if (!env.useMocks) return apiRequest<AuthSession>("/auth/login", { method: "POST", body: payload });
+    if (!env.useMocks)
+      return apiRequest<AuthSession>("/auth/login", { method: "POST", body: payload });
 
-    const account = mockAccounts.find((a) => a.email.toLowerCase() === payload.email.trim().toLowerCase());
+    const account = mockAccounts.find(
+      (a) => a.email.toLowerCase() === payload.email.trim().toLowerCase(),
+    );
     if (!account || payload.password.length < 4) {
       await mockDelay(null, 400);
       throw new Error("Invalid email or password.");
@@ -43,7 +46,8 @@ export const authService = {
   },
 
   async register(payload: RegisterPayload): Promise<AuthSession> {
-    if (!env.useMocks) return apiRequest<AuthSession>("/auth/register", { method: "POST", body: payload });
+    if (!env.useMocks)
+      return apiRequest<AuthSession>("/auth/register", { method: "POST", body: payload });
 
     const user: AuthUser = {
       id: `u-${Date.now()}`,
@@ -58,12 +62,14 @@ export const authService = {
   },
 
   async requestPasswordReset(email: string): Promise<{ sent: boolean }> {
-    if (!env.useMocks) return apiRequest("/auth/forgot-password", { method: "POST", body: { email } });
+    if (!env.useMocks)
+      return apiRequest("/auth/forgot-password", { method: "POST", body: { email } });
     return mockDelay({ sent: true }, 500);
   },
 
   async resetPassword(token: string, password: string): Promise<{ ok: boolean }> {
-    if (!env.useMocks) return apiRequest("/auth/reset-password", { method: "POST", body: { token, password } });
+    if (!env.useMocks)
+      return apiRequest("/auth/reset-password", { method: "POST", body: { token, password } });
     return mockDelay({ ok: true }, 500);
   },
 

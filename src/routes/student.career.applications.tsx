@@ -5,7 +5,14 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { PageHeader } from "@/components/portal/StatCard";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { jobService } from "@/services/job.service";
 import type { ApplicationStatus } from "@/types/career";
@@ -14,7 +21,10 @@ export const Route = createFileRoute("/student/career/applications")({
   head: () => ({
     meta: [
       { title: "Application Tracker — Learntrix Careers" },
-      { name: "description", content: "Track every job application from saved to offer with deadlines and next actions." },
+      {
+        name: "description",
+        content: "Track every job application from saved to offer with deadlines and next actions.",
+      },
       { property: "og:title", content: "Application Tracker — Learntrix Careers" },
       { property: "og:description", content: "A personal CRM for your placement applications." },
       { name: "robots", content: "noindex" },
@@ -40,7 +50,10 @@ function columnFor(status: ApplicationStatus): ApplicationStatus {
 }
 
 function ApplicationsPage() {
-  const apps = useQuery({ queryKey: ["career", "applications"], queryFn: () => jobService.applications() });
+  const apps = useQuery({
+    queryKey: ["career", "applications"],
+    queryFn: () => jobService.applications(),
+  });
 
   if (apps.isLoading) return <Skeleton className="h-64 w-full" />;
   const rows = apps.data ?? [];
@@ -53,7 +66,10 @@ function ApplicationsPage() {
       />
 
       {!rows.length ? (
-        <EmptyState title="No applications yet" description="Apply from the job portal to start tracking progress here." />
+        <EmptyState
+          title="No applications yet"
+          description="Apply from the job portal to start tracking progress here."
+        />
       ) : (
         <Tabs defaultValue="board">
           <TabsList className="mb-4">
@@ -83,7 +99,9 @@ function ApplicationsPage() {
                           ) : null}
                         </li>
                       ))}
-                      {!items.length ? <li className="text-xs text-muted-foreground">Nothing here yet</li> : null}
+                      {!items.length ? (
+                        <li className="text-xs text-muted-foreground">Nothing here yet</li>
+                      ) : null}
                     </ul>
                   </section>
                 );

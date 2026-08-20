@@ -9,7 +9,13 @@ import { PageHeader } from "@/components/portal/StatCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { crmService } from "@/services/crm.service";
@@ -19,7 +25,11 @@ export const Route = createFileRoute("/admin/crm/$leadId")({
   head: () => ({
     meta: [
       { title: "Lead profile — Learntrix CRM" },
-      { name: "description", content: "Full lead history: communication, notes, follow-ups, demos, payments and enrollment status." },
+      {
+        name: "description",
+        content:
+          "Full lead history: communication, notes, follow-ups, demos, payments and enrollment status.",
+      },
       { property: "og:title", content: "Lead profile — Learntrix CRM" },
       { property: "og:description", content: "Single-view lead record for counsellors." },
       { name: "robots", content: "noindex" },
@@ -31,7 +41,10 @@ export const Route = createFileRoute("/admin/crm/$leadId")({
 function LeadProfile() {
   const { leadId } = Route.useParams();
   const qc = useQueryClient();
-  const lead = useQuery({ queryKey: ["crm", "lead", leadId], queryFn: () => crmService.detail(leadId) });
+  const lead = useQuery({
+    queryKey: ["crm", "lead", leadId],
+    queryFn: () => crmService.detail(leadId),
+  });
   const staff = useQuery({ queryKey: ["crm", "staff"], queryFn: () => crmService.staff() });
   const [note, setNote] = useState("");
   const [followUp, setFollowUp] = useState({ date: "", time: "", notes: "", nextAction: "Call" });
@@ -56,7 +69,11 @@ function LeadProfile() {
             <Button variant="outline" size="sm" onClick={() => toast.success("Call logged.")}>
               <Phone className="size-4" /> Call
             </Button>
-            <Button variant="outline" size="sm" onClick={() => toast.success("WhatsApp message queued.")}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => toast.success("WhatsApp message queued.")}
+            >
               <MessageSquare className="size-4" /> WhatsApp
             </Button>
             <Button variant="outline" size="sm" onClick={() => toast.success("Email queued.")}>
@@ -94,7 +111,12 @@ function LeadProfile() {
                 </li>
               ))}
             </ul>
-            <Textarea rows={3} placeholder="Add a note…" value={note} onChange={(e) => setNote(e.target.value)} />
+            <Textarea
+              rows={3}
+              placeholder="Add a note…"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
             <Button
               className="mt-2"
               size="sm"
@@ -111,7 +133,10 @@ function LeadProfile() {
           <Panel title="Follow-ups">
             <ul className="mb-4 space-y-2">
               {data.followUps.map((f) => (
-                <li key={f.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3 text-sm">
+                <li
+                  key={f.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3 text-sm"
+                >
                   <div>
                     <p className="font-medium">
                       {f.date} · {f.time}
@@ -127,15 +152,27 @@ function LeadProfile() {
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <Label className="mb-1.5 block text-xs">Follow-up date</Label>
-                <Input type="date" value={followUp.date} onChange={(e) => setFollowUp({ ...followUp, date: e.target.value })} />
+                <Input
+                  type="date"
+                  value={followUp.date}
+                  onChange={(e) => setFollowUp({ ...followUp, date: e.target.value })}
+                />
               </div>
               <div>
                 <Label className="mb-1.5 block text-xs">Follow-up time</Label>
-                <Input type="time" value={followUp.time} onChange={(e) => setFollowUp({ ...followUp, time: e.target.value })} />
+                <Input
+                  type="time"
+                  value={followUp.time}
+                  onChange={(e) => setFollowUp({ ...followUp, time: e.target.value })}
+                />
               </div>
               <div className="sm:col-span-2">
                 <Label className="mb-1.5 block text-xs">Notes</Label>
-                <Textarea rows={2} value={followUp.notes} onChange={(e) => setFollowUp({ ...followUp, notes: e.target.value })} />
+                <Textarea
+                  rows={2}
+                  value={followUp.notes}
+                  onChange={(e) => setFollowUp({ ...followUp, notes: e.target.value })}
+                />
               </div>
             </div>
             <Button
@@ -221,7 +258,10 @@ function LeadProfile() {
               ))}
               {data.paymentHistory.length ? (
                 data.paymentHistory.map((p) => (
-                  <li key={p.id} className="flex items-center justify-between rounded-md border border-border p-2 text-xs">
+                  <li
+                    key={p.id}
+                    className="flex items-center justify-between rounded-md border border-border p-2 text-xs"
+                  >
                     <span>₹{p.amount.toLocaleString("en-IN")}</span>
                     <StatusBadge value={p.status} />
                   </li>

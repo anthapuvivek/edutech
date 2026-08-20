@@ -6,7 +6,14 @@ import type { User, UserRole } from "@/types";
 
 export type Role = Extract<
   UserRole,
-  "student" | "teacher" | "admin" | "super_admin" | "mentor" | "placement_officer" | "support_agent" | "counsellor"
+  | "student"
+  | "teacher"
+  | "admin"
+  | "super_admin"
+  | "mentor"
+  | "placement_officer"
+  | "support_agent"
+  | "counsellor"
 >;
 
 export interface AuthSession {
@@ -33,12 +40,7 @@ export interface RegisterPayload {
 }
 
 export type EnrollmentStatus =
-  | "not_enrolled"
-  | "payment_pending"
-  | "enrolled"
-  | "active"
-  | "completed"
-  | "expired";
+  "not_enrolled" | "payment_pending" | "enrolled" | "active" | "completed" | "expired";
 
 export interface Enrollment {
   id: string;

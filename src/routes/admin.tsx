@@ -47,7 +47,12 @@ const nav: PortalNavItem[] = [
   { label: "Applications", to: "/admin/career/applications", icon: ClipboardList, indent: true },
   { label: "Referrals", to: "/admin/career/referrals", icon: Handshake, indent: true },
   { label: "Interview Preparation", to: "/admin/career/preparation", icon: Target, indent: true },
-  { label: "Resume Templates", to: "/admin/career/resume-templates", icon: LayoutTemplate, indent: true },
+  {
+    label: "Resume Templates",
+    to: "/admin/career/resume-templates",
+    icon: LayoutTemplate,
+    indent: true,
+  },
   { label: "Career Resources", to: "/admin/career/resources", icon: Library, indent: true },
   { label: "Eligibility Rules", to: "/admin/career/eligibility", icon: ShieldCheck, indent: true },
   { label: "Placement", icon: Award, indent: true },
@@ -58,9 +63,21 @@ const nav: PortalNavItem[] = [
   { label: "FAQs", icon: ListChecks, indent: true },
   { label: "Announcements", icon: Megaphone, indent: true },
 
-  { section: "Events", label: "Live Classes & Events", to: "/admin/events", icon: Video, indent: true },
+  {
+    section: "Events",
+    label: "Live Classes & Events",
+    to: "/admin/events",
+    icon: Video,
+    indent: true,
+  },
 
-  { section: "Communication", label: "WhatsApp", to: "/admin/communication", icon: MessageSquare, indent: true },
+  {
+    section: "Communication",
+    label: "WhatsApp",
+    to: "/admin/communication",
+    icon: MessageSquare,
+    indent: true,
+  },
   { label: "Notifications", to: "/admin/notifications", icon: Bell, indent: true },
   { label: "Email", icon: Mail, indent: true },
 

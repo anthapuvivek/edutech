@@ -18,18 +18,38 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { adminService } from "@/services/admin.service";
 
 export const Route = createFileRoute("/admin/batches")({
   head: () => ({
     meta: [
       { title: "Batches — Learntrix Admin" },
-      { name: "description", content: "Create, schedule, publish and archive batches with trainers, capacity and meeting links." },
+      {
+        name: "description",
+        content:
+          "Create, schedule, publish and archive batches with trainers, capacity and meeting links.",
+      },
       { property: "og:title", content: "Batches — Learntrix Admin" },
-      { property: "og:description", content: "Batch scheduling and capacity management for every program." },
+      {
+        property: "og:description",
+        content: "Batch scheduling and capacity management for every program.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -37,7 +57,10 @@ export const Route = createFileRoute("/admin/batches")({
 });
 
 function AdminBatches() {
-  const batches = useQuery({ queryKey: ["admin", "batches"], queryFn: () => adminService.batches() });
+  const batches = useQuery({
+    queryKey: ["admin", "batches"],
+    queryFn: () => adminService.batches(),
+  });
   const [open, setOpen] = useState(false);
   const data = batches.data ?? [];
 
@@ -56,7 +79,10 @@ function AdminBatches() {
             <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Create batch</DialogTitle>
-                <DialogDescription>Meeting credentials are stored server side and revealed only to permitted students.</DialogDescription>
+                <DialogDescription>
+                  Meeting credentials are stored server side and revealed only to permitted
+                  students.
+                </DialogDescription>
               </DialogHeader>
               <form
                 id="create-batch"
@@ -87,8 +113,16 @@ function AdminBatches() {
                 ))}
                 {[
                   { id: "mode", label: "Mode", options: ["Online", "Offline", "Hybrid"] },
-                  { id: "platform", label: "Platform", options: ["Google Meet", "Zoom", "Microsoft Teams", "Other"] },
-                  { id: "status", label: "Status", options: ["Upcoming", "Active", "Completed", "Cancelled"] },
+                  {
+                    id: "platform",
+                    label: "Platform",
+                    options: ["Google Meet", "Zoom", "Microsoft Teams", "Other"],
+                  },
+                  {
+                    id: "status",
+                    label: "Status",
+                    options: ["Upcoming", "Active", "Completed", "Cancelled"],
+                  },
                 ].map((f) => (
                   <div key={f.id} className="space-y-1.5">
                     <Label htmlFor={f.id}>{f.label}</Label>
@@ -121,7 +155,10 @@ function AdminBatches() {
         <StatCard label="Batches" value={data.length} />
         <StatCard label="Active" value={data.filter((b) => b.status === "Active").length} />
         <StatCard label="Upcoming" value={data.filter((b) => b.status === "Upcoming").length} />
-        <StatCard label="Seats filled" value={`${data.reduce((s, b) => s + b.enrolled, 0)}/${data.reduce((s, b) => s + b.capacity, 0)}`} />
+        <StatCard
+          label="Seats filled"
+          value={`${data.reduce((s, b) => s + b.enrolled, 0)}/${data.reduce((s, b) => s + b.capacity, 0)}`}
+        />
       </section>
 
       <Panel title="All batches">
@@ -170,13 +207,19 @@ function AdminBatches() {
                       <StatusBadge value={b.published ? "published" : "draft"} />
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
-                      <Button size="sm" variant="outline" onClick={() => toast.success("Batch duplicated as a draft.")}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toast.success("Batch duplicated as a draft.")}
+                      >
                         Duplicate
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => toast.success(b.published ? "Batch unpublished." : "Batch published.")}
+                        onClick={() =>
+                          toast.success(b.published ? "Batch unpublished." : "Batch published.")
+                        }
                       >
                         {b.published ? "Unpublish" : "Publish"}
                       </Button>

@@ -30,7 +30,12 @@ const problems = [
   { title: "LRU Cache Design", difficulty: "Medium", topic: "Design", acceptance: "48%" },
   { title: "Word Ladder", difficulty: "Hard", topic: "Graphs", acceptance: "31%" },
   { title: "Kth Largest in Stream", difficulty: "Medium", topic: "Heaps", acceptance: "55%" },
-  { title: "Median of Two Sorted Arrays", difficulty: "Hard", topic: "Binary Search", acceptance: "27%" },
+  {
+    title: "Median of Two Sorted Arrays",
+    difficulty: "Hard",
+    topic: "Binary Search",
+    acceptance: "27%",
+  },
 ];
 
 const difficultyVariant: Record<string, "success" | "warning" | "destructive"> = {
@@ -82,7 +87,10 @@ function CodingPracticePage() {
         <SectionHeading eyebrow="Problem set preview" title="A taste of the practice library" />
         <div className="surface-panel mt-8 divide-y divide-border">
           {problems.map((problem) => (
-            <div key={problem.title} className="flex flex-wrap items-center justify-between gap-3 p-5">
+            <div
+              key={problem.title}
+              className="flex flex-wrap items-center justify-between gap-3 p-5"
+            >
               <div>
                 <p className="font-medium">{problem.title}</p>
                 <p className="text-sm text-muted-foreground">{problem.topic}</p>

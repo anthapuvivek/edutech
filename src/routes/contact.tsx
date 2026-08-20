@@ -117,7 +117,10 @@ function ContactPage() {
               <Textarea id="c-message" name="message" rows={5} required />
             </div>
             {mutation.isError ? (
-              <p role="alert" className="sm:col-span-2 rounded-md border border-destructive/30 bg-destructive/8 p-3 text-sm text-destructive">
+              <p
+                role="alert"
+                className="sm:col-span-2 rounded-md border border-destructive/30 bg-destructive/8 p-3 text-sm text-destructive"
+              >
                 Your message could not be sent. Please try again.
               </p>
             ) : null}

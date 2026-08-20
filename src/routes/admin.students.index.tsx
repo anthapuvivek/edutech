@@ -18,18 +18,38 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { adminService } from "@/services/admin.service";
 
 export const Route = createFileRoute("/admin/students/")({
   head: () => ({
     meta: [
       { title: "Students — Learntrix Admin" },
-      { name: "description", content: "Search, onboard and manage every student across registration, enrollment, attendance and placement." },
+      {
+        name: "description",
+        content:
+          "Search, onboard and manage every student across registration, enrollment, attendance and placement.",
+      },
       { property: "og:title", content: "Students — Learntrix Admin" },
-      { property: "og:description", content: "Complete student lifecycle management for the Learntrix platform." },
+      {
+        property: "og:description",
+        content: "Complete student lifecycle management for the Learntrix platform.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -39,7 +59,10 @@ export const Route = createFileRoute("/admin/students/")({
 const ALL = "all";
 
 function AdminStudents() {
-  const students = useQuery({ queryKey: ["admin", "students"], queryFn: () => adminService.students() });
+  const students = useQuery({
+    queryKey: ["admin", "students"],
+    queryFn: () => adminService.students(),
+  });
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState(ALL);
   const [career, setCareer] = useState(ALL);
@@ -95,7 +118,10 @@ function AdminStudents() {
         description="Registration → enrollment → batch → attendance → learning → career eligibility → placement."
         action={
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={() => toast.info("Export is queued on the backend and emailed when ready.")}>
+            <Button
+              variant="outline"
+              onClick={() => toast.info("Export is queued on the backend and emailed when ready.")}
+            >
               <Download className="size-4" aria-hidden /> Export
             </Button>
             <Dialog open={open} onOpenChange={setOpen}>
@@ -108,10 +134,15 @@ function AdminStudents() {
                 <DialogHeader>
                   <DialogTitle>Onboard a student</DialogTitle>
                   <DialogDescription>
-                    The backend validates uniqueness, issues the student ID and sends the activation email.
+                    The backend validates uniqueness, issues the student ID and sends the activation
+                    email.
                   </DialogDescription>
                 </DialogHeader>
-                <form id="add-student" onSubmit={handleCreate} className="grid gap-4 sm:grid-cols-2">
+                <form
+                  id="add-student"
+                  onSubmit={handleCreate}
+                  className="grid gap-4 sm:grid-cols-2"
+                >
                   {[
                     { name: "fullName", label: "Full name", required: true },
                     { name: "email", label: "Email", type: "email", required: true },
@@ -191,7 +222,8 @@ function AdminStudents() {
       {lowAttendance > 0 ? (
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
           <p className="text-sm">
-            <span className="font-medium">⚠ {lowAttendance} students</span> have attendance below the configured 80% threshold.
+            <span className="font-medium">⚠ {lowAttendance} students</span> have attendance below
+            the configured 80% threshold.
           </p>
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={() => setAttendance("below80")}>
@@ -204,10 +236,16 @@ function AdminStudents() {
         </div>
       ) : null}
 
-      <Panel title="Student directory" description={`${rows.length} of ${students.data?.length ?? 0} students`}>
+      <Panel
+        title="Student directory"
+        description={`${rows.length} of ${students.data?.length ?? 0} students`}
+      >
         <div className="mb-4 grid gap-2 md:grid-cols-2 xl:grid-cols-5">
           <div className="relative xl:col-span-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden
+            />
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -218,10 +256,30 @@ function AdminStudents() {
             />
           </div>
           {[
-            { value: status, set: setStatus, label: "Status", options: ["pending", "active", "suspended", "inactive", "archived"] },
-            { value: career, set: setCareer, label: "Career", options: ["eligible", "conditional", "not_eligible", "under_review"] },
-            { value: payment, set: setPayment, label: "Payment", options: ["paid", "partial", "pending", "refunded"] },
-            { value: attendance, set: setAttendance, label: "Attendance", options: ["below80", "above80"] },
+            {
+              value: status,
+              set: setStatus,
+              label: "Status",
+              options: ["pending", "active", "suspended", "inactive", "archived"],
+            },
+            {
+              value: career,
+              set: setCareer,
+              label: "Career",
+              options: ["eligible", "conditional", "not_eligible", "under_review"],
+            },
+            {
+              value: payment,
+              set: setPayment,
+              label: "Payment",
+              options: ["paid", "partial", "pending", "refunded"],
+            },
+            {
+              value: attendance,
+              set: setAttendance,
+              label: "Attendance",
+              options: ["below80", "above80"],
+            },
           ].map((filter) => (
             <Select key={filter.label} value={filter.value} onValueChange={filter.set}>
               <SelectTrigger aria-label={filter.label}>
@@ -231,7 +289,10 @@ function AdminStudents() {
                 <SelectItem value={ALL}>All {filter.label.toLowerCase()}</SelectItem>
                 {filter.options.map((o) => (
                   <SelectItem key={o} value={o} className="capitalize">
-                    {o.replace(/_/g, " ").replace("below80", "Below 80%").replace("above80", "80% and above")}
+                    {o
+                      .replace(/_/g, " ")
+                      .replace("below80", "Below 80%")
+                      .replace("above80", "80% and above")}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -269,7 +330,9 @@ function AdminStudents() {
                       <div className="text-xs text-muted-foreground">{s.batchName}</div>
                     </TableCell>
                     <TableCell className="text-sm">{s.trainerName}</TableCell>
-                    <TableCell className={`text-right text-sm font-medium ${s.attendancePercent < 80 ? "text-destructive" : ""}`}>
+                    <TableCell
+                      className={`text-right text-sm font-medium ${s.attendancePercent < 80 ? "text-destructive" : ""}`}
+                    >
                       {s.attendancePercent}%
                     </TableCell>
                     <TableCell className="text-right text-sm">{s.progressPercent}%</TableCell>
@@ -293,7 +356,11 @@ function AdminStudents() {
                 ))}
               </TableBody>
             </Table>
-            {rows.length === 0 ? <p className="py-8 text-center text-sm text-muted-foreground">No students match these filters.</p> : null}
+            {rows.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                No students match these filters.
+              </p>
+            ) : null}
           </div>
         )}
       </Panel>

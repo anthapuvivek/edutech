@@ -299,8 +299,23 @@ export const mockCareerDashboard: CareerDashboard = {
     { label: "Interview preparation", status: "in_progress", detail: "60% complete" },
   ],
   notifications: [
-    { id: "cn-1", kind: "job", title: "New Java Developer opportunity matches your profile", createdAt: "2026-08-18T05:30:00.000Z" },
-    { id: "cn-2", kind: "interview", title: "Microsoft interview on 25 Aug, 10:00 AM", createdAt: "2026-08-17T12:00:00.000Z" },
-    { id: "cn-3", kind: "deadline", title: "Capgemini assessment closes 27 Aug", createdAt: "2026-08-17T09:00:00.000Z" },
+    {
+      id: "cn-1",
+      kind: "job",
+      title: "New Java Developer opportunity matches your profile",
+      createdAt: "2026-08-18T05:30:00.000Z",
+    },
+    {
+      id: "cn-2",
+      kind: "interview",
+      title: "Microsoft interview on 25 Aug, 10:00 AM",
+      createdAt: "2026-08-17T12:00:00.000Z",
+    },
+    {
+      id: "cn-3",
+      kind: "deadline",
+      title: "Capgemini assessment closes 27 Aug",
+      createdAt: "2026-08-17T09:00:00.000Z",
+    },
   ],
 };

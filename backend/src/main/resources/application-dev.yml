@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/edtech_dev}
+    username: ${DB_USERNAME:edtech}
+    password: ${DB_PASSWORD:edtech}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  jpa:
+    show-sql: true
+
+app:
+  jwt:
+    secret: dev-secret-key-change-in-production-min-256-bits-long-string-here
+    access-token-expiration: 900000
+    refresh-token-expiration: 604800000
+
+logging:
+  level:
+    com.learntrix: DEBUG
+
+# Redis is optional for the current local backend scaffold. Keep the database
+# health signal authoritative until Redis-backed features are introduced.
+management:
+  health:
+    redis:
+      enabled: false

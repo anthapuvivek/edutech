@@ -36,6 +36,7 @@ import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AdminTeachersRouteImport } from './routes/admin.teachers'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
@@ -198,6 +199,11 @@ const AdminPerformanceRoute = AdminPerformanceRouteImport.update({
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSupportRoute = AdminSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminTeachersRoute = AdminTeachersRouteImport.update({
@@ -371,6 +377,7 @@ export interface FileRoutesByFullPath {
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/student/career': typeof StudentCareerRouteWithChildren
@@ -428,6 +435,7 @@ export interface FileRoutesByTo {
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/student/courses': typeof StudentCoursesRoute
@@ -485,6 +493,7 @@ export interface FileRoutesById {
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/student/career': typeof StudentCareerRouteWithChildren
@@ -544,6 +553,7 @@ export interface FileRouteTypes {
     | '/admin/notifications'
     | '/admin/performance'
     | '/admin/settings'
+    | '/admin/support'
     | '/admin/teachers'
     | '/courses/$slug'
     | '/student/career'
@@ -601,6 +611,7 @@ export interface FileRouteTypes {
     | '/admin/notifications'
     | '/admin/performance'
     | '/admin/settings'
+    | '/admin/support'
     | '/admin/teachers'
     | '/courses/$slug'
     | '/student/courses'
@@ -657,6 +668,7 @@ export interface FileRouteTypes {
     | '/admin/notifications'
     | '/admin/performance'
     | '/admin/settings'
+    | '/admin/support'
     | '/admin/teachers'
     | '/courses/$slug'
     | '/student/career'
@@ -898,6 +910,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/support': {
+      id: '/admin/support'
+      path: '/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AdminSupportRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/teachers': {
       id: '/admin/teachers'
       path: '/teachers'
@@ -1110,6 +1129,7 @@ interface AdminRouteChildren {
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSupportRoute: typeof AdminSupportRoute
   AdminTeachersRoute: typeof AdminTeachersRoute
   AdminCareerApplicationsRoute: typeof AdminCareerApplicationsRoute
   AdminCareerCompaniesRoute: typeof AdminCareerCompaniesRoute
@@ -1139,6 +1159,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminSupportRoute: AdminSupportRoute,
   AdminTeachersRoute: AdminTeachersRoute,
   AdminCareerApplicationsRoute: AdminCareerApplicationsRoute,
   AdminCareerCompaniesRoute: AdminCareerCompaniesRoute,

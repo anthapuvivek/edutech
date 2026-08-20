@@ -9,7 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { adminService } from "@/services/admin.service";
 
@@ -17,19 +24,37 @@ export const Route = createFileRoute("/admin/career/applications")({
   head: () => ({
     meta: [
       { title: "Applications — Learntrix Admin" },
-      { name: "description", content: "Track every student job application from applied to offer across board and table views." },
+      {
+        name: "description",
+        content:
+          "Track every student job application from applied to offer across board and table views.",
+      },
       { property: "og:title", content: "Applications — Learntrix Admin" },
-      { property: "og:description", content: "Placement pipeline tracking for the whole platform." },
+      {
+        property: "og:description",
+        content: "Placement pipeline tracking for the whole platform.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
   component: AdminApplications,
 });
 
-const stages = ["Applied", "Shortlisted", "Assessment", "Interview", "Final Round", "Offer", "Rejected"] as const;
+const stages = [
+  "Applied",
+  "Shortlisted",
+  "Assessment",
+  "Interview",
+  "Final Round",
+  "Offer",
+  "Rejected",
+] as const;
 
 function AdminApplications() {
-  const apps = useQuery({ queryKey: ["admin", "applications"], queryFn: () => adminService.applications() });
+  const apps = useQuery({
+    queryKey: ["admin", "applications"],
+    queryFn: () => adminService.applications(),
+  });
   const [q, setQ] = useState("");
   const data = apps.data ?? [];
   const rows = useMemo(() => {
@@ -42,13 +67,23 @@ function AdminApplications() {
 
   return (
     <>
-      <PageHeader title="Applications" description="Status changes here are recorded by the backend and reflected in the student's tracker." />
+      <PageHeader
+        title="Applications"
+        description="Status changes here are recorded by the backend and reflected in the student's tracker."
+      />
 
       <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Applications" value={data.length} />
-        <StatCard label="Interviews" value={data.filter((a) => a.status === "Interview" || a.status === "Final Round").length} />
+        <StatCard
+          label="Interviews"
+          value={data.filter((a) => a.status === "Interview" || a.status === "Final Round").length}
+        />
         <StatCard label="Offers" value={data.filter((a) => a.status === "Offer").length} />
-        <StatCard label="Ineligible applies" value={data.filter((a) => !a.eligible).length} hint="Flagged for review" />
+        <StatCard
+          label="Ineligible applies"
+          value={data.filter((a) => !a.eligible).length}
+          hint="Flagged for review"
+        />
       </section>
 
       <Tabs defaultValue="board">
@@ -76,8 +111,12 @@ function AdminApplications() {
                 {stages.map((stage) => (
                   <div key={stage} className="surface-panel min-w-56 p-3">
                     <div className="mb-2 flex items-center justify-between">
-                      <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">{stage}</p>
-                      <Badge variant="outline">{rows.filter((a) => a.status === stage).length}</Badge>
+                      <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                        {stage}
+                      </p>
+                      <Badge variant="outline">
+                        {rows.filter((a) => a.status === stage).length}
+                      </Badge>
                     </div>
                     <div className="space-y-2">
                       {rows
@@ -122,7 +161,9 @@ function AdminApplications() {
                           <TableCell className="font-medium">{a.studentName}</TableCell>
                           <TableCell>{a.jobTitle}</TableCell>
                           <TableCell>{a.companyName}</TableCell>
-                          <TableCell className="text-sm">{new Date(a.appliedAt).toLocaleDateString()}</TableCell>
+                          <TableCell className="text-sm">
+                            {new Date(a.appliedAt).toLocaleDateString()}
+                          </TableCell>
                           <TableCell>
                             <StatusBadge value={a.eligible ? "eligible" : "not_eligible"} />
                           </TableCell>
@@ -130,7 +171,11 @@ function AdminApplications() {
                             <StatusBadge value={a.status} />
                           </TableCell>
                           <TableCell className="text-right">
-                            <Button size="sm" variant="outline" onClick={() => toast.success("Stage update submitted.")}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => toast.success("Stage update submitted.")}
+                            >
                               Move stage
                             </Button>
                           </TableCell>

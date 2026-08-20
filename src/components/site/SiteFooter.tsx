@@ -76,8 +76,12 @@ export function SiteFooter() {
         <div className="container-page flex flex-col gap-3 py-6 text-xs text-ink-foreground/55 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Learntrix. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="transition-colors hover:text-accent">Privacy Policy</a>
-            <a href="#" className="transition-colors hover:text-accent">Terms of Service</a>
+            <a href="#" className="transition-colors hover:text-accent">
+              Privacy Policy
+            </a>
+            <a href="#" className="transition-colors hover:text-accent">
+              Terms of Service
+            </a>
           </div>
         </div>
       </div>

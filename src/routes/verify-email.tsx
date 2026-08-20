@@ -9,9 +9,15 @@ export const Route = createFileRoute("/verify-email")({
   head: () => ({
     meta: [
       { title: "Verify your Learntrix email" },
-      { name: "description", content: "Confirm your email address to activate your Learntrix learning account." },
+      {
+        name: "description",
+        content: "Confirm your email address to activate your Learntrix learning account.",
+      },
       { property: "og:title", content: "Verify your Learntrix email" },
-      { property: "og:description", content: "Confirm your email address to activate your account." },
+      {
+        property: "og:description",
+        content: "Confirm your email address to activate your account.",
+      },
     ],
   }),
   component: VerifyEmailPage,
@@ -39,7 +45,12 @@ function VerifyEmailPage() {
           : "Your account is active. You can now sign in and start learning."
       }
     >
-      <Button size="lg" className="w-full" disabled={state === "verifying"} asChild={state === "done"}>
+      <Button
+        size="lg"
+        className="w-full"
+        disabled={state === "verifying"}
+        asChild={state === "done"}
+      >
         {state === "done" ? <Link to="/login">Continue to login</Link> : <span>Verifying…</span>}
       </Button>
     </AuthShell>

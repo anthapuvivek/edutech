@@ -12,7 +12,10 @@ export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
       { title: "Set a new Learntrix password" },
-      { name: "description", content: "Choose a new password for your Learntrix account and get back to learning." },
+      {
+        name: "description",
+        content: "Choose a new password for your Learntrix account and get back to learning.",
+      },
       { property: "og:title", content: "Set a new Learntrix password" },
       { property: "og:description", content: "Choose a new password for your account." },
     ],
@@ -27,7 +30,10 @@ function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
 
   return (
-    <AuthShell title="Set a new password" description="Choose a strong password you haven't used before.">
+    <AuthShell
+      title="Set a new password"
+      description="Choose a strong password you haven't used before."
+    >
       <form
         className="space-y-4"
         onSubmit={async (e) => {
@@ -71,7 +77,10 @@ function ResetPasswordPage() {
           {loading ? "Updating…" : "Update password"}
         </Button>
         <p className="text-center text-sm text-muted-foreground">
-          <Link to="/login" className="font-medium text-foreground underline-offset-4 hover:underline">
+          <Link
+            to="/login"
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
             Back to login
           </Link>
         </p>

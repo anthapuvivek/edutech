@@ -54,7 +54,8 @@ export const mentorService = {
   },
 
   async createSession(payload: Partial<MentorSession>): Promise<MentorSession> {
-    if (!env.useMocks) return apiRequest<MentorSession>("/mentor/sessions", { method: "POST", body: payload });
+    if (!env.useMocks)
+      return apiRequest<MentorSession>("/mentor/sessions", { method: "POST", body: payload });
     const session: MentorSession = {
       id: `ses-${Date.now()}`,
       title: payload.title ?? "Mentoring session",
@@ -76,7 +77,8 @@ export const mentorService = {
   },
 
   async updateSession(id: string, patch: Partial<MentorSession>): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>(`/mentor/sessions/${id}`, { method: "PATCH", body: patch });
+    if (!env.useMocks)
+      return apiRequest<void>(`/mentor/sessions/${id}`, { method: "PATCH", body: patch });
     sessions = sessions.map((s) => (s.id === id ? { ...s, ...patch } : s));
     return mockDelay(undefined, 150);
   },
@@ -110,7 +112,8 @@ export const mentorService = {
   },
 
   async addActionItem(payload: Partial<MentorActionItem>): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>("/mentor/action-items", { method: "POST", body: payload });
+    if (!env.useMocks)
+      return apiRequest<void>("/mentor/action-items", { method: "POST", body: payload });
     actionItems = [
       {
         id: `ai-${Date.now()}`,
@@ -136,14 +139,26 @@ export const mentorService = {
     return mockDelay(assignments);
   },
 
-  async createAssignment(payload: Omit<MentorAssignment, "id" | "assignedAt" | "assignedBy">): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>("/admin/mentor-assignments", { method: "POST", body: payload });
-    assignments = [{ ...payload, id: `ma-${Date.now()}`, assignedAt: new Date().toISOString(), assignedBy: "Admin" }, ...assignments];
+  async createAssignment(
+    payload: Omit<MentorAssignment, "id" | "assignedAt" | "assignedBy">,
+  ): Promise<void> {
+    if (!env.useMocks)
+      return apiRequest<void>("/admin/mentor-assignments", { method: "POST", body: payload });
+    assignments = [
+      {
+        ...payload,
+        id: `ma-${Date.now()}`,
+        assignedAt: new Date().toISOString(),
+        assignedBy: "Admin",
+      },
+      ...assignments,
+    ];
     return mockDelay(undefined, 150);
   },
 
   async removeAssignment(id: string): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>(`/admin/mentor-assignments/${id}`, { method: "DELETE" });
+    if (!env.useMocks)
+      return apiRequest<void>(`/admin/mentor-assignments/${id}`, { method: "DELETE" });
     assignments = assignments.filter((a) => a.id !== id);
     return mockDelay(undefined, 150);
   },
@@ -155,7 +170,9 @@ export const mentorService = {
     const mine = sessions.filter((s) => s.studentId === "stu-1");
     return mockDelay({
       mentor,
-      nextSession: mine.find((s) => s.status === "Scheduled") ?? sessions.find((s) => s.status === "Scheduled"),
+      nextSession:
+        mine.find((s) => s.status === "Scheduled") ??
+        sessions.find((s) => s.status === "Scheduled"),
       sessions: mine.length ? mine : sessions.slice(0, 4),
       actionItems: actionItems.filter((a) => a.studentId === "stu-1"),
     });

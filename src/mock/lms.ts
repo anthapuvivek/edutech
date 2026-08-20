@@ -101,17 +101,48 @@ export const mockEnrollments: Enrollment[] = mockCourses.slice(0, 5).map((course
     lessonsCompleted: Math.round((progress / 100) * total),
     lessonsTotal: total,
     lastLessonTitle: progress ? `Module ${Math.ceil(progress / 25)} · Recap` : undefined,
-    nextLessonTitle: progress < 100 ? `Module ${Math.ceil(progress / 25) + 1} · Deep dive` : undefined,
+    nextLessonTitle:
+      progress < 100 ? `Module ${Math.ceil(progress / 25) + 1} · Deep dive` : undefined,
     enrolledAt: "2026-05-02T09:00:00.000Z",
   };
 });
 
 export const mockActivity: ActivityItem[] = [
-  { id: "a1", kind: "lesson", title: "Completed Python Lesson 12", points: 10, occurredAt: "2026-08-18T08:15:00.000Z" },
-  { id: "a2", kind: "coding", title: "Solved Two Sum", points: 10, occurredAt: "2026-08-18T06:40:00.000Z" },
-  { id: "a3", kind: "class", title: "Attended Live Class · Spring Boot APIs", points: 20, occurredAt: "2026-08-17T13:00:00.000Z" },
-  { id: "a4", kind: "quiz", title: "Scored 90% in Module 4 Quiz", points: 50, occurredAt: "2026-08-17T10:20:00.000Z" },
-  { id: "a5", kind: "achievement", title: "Unlocked badge · 7 Day Streak", points: 25, occurredAt: "2026-08-16T18:05:00.000Z" },
+  {
+    id: "a1",
+    kind: "lesson",
+    title: "Completed Python Lesson 12",
+    points: 10,
+    occurredAt: "2026-08-18T08:15:00.000Z",
+  },
+  {
+    id: "a2",
+    kind: "coding",
+    title: "Solved Two Sum",
+    points: 10,
+    occurredAt: "2026-08-18T06:40:00.000Z",
+  },
+  {
+    id: "a3",
+    kind: "class",
+    title: "Attended Live Class · Spring Boot APIs",
+    points: 20,
+    occurredAt: "2026-08-17T13:00:00.000Z",
+  },
+  {
+    id: "a4",
+    kind: "quiz",
+    title: "Scored 90% in Module 4 Quiz",
+    points: 50,
+    occurredAt: "2026-08-17T10:20:00.000Z",
+  },
+  {
+    id: "a5",
+    kind: "achievement",
+    title: "Unlocked badge · 7 Day Streak",
+    points: 25,
+    occurredAt: "2026-08-16T18:05:00.000Z",
+  },
 ];
 
 export const mockEvents: PlatformEvent[] = [
@@ -213,8 +244,12 @@ export const mockTeacherStudents: TeacherStudentRow[] = studentNames.map((name, 
   problemsSolved: [126, 210, 48, 143, 19, 188, 92, 7][i]!,
   points: [8450, 12450, 3120, 9180, 1240, 11980, 6040, 480][i]!,
   rank: [12, 1, 84, 9, 172, 2, 38, 240][i]!,
-  lastActive: ["2h ago", "20m ago", "5d ago", "1h ago", "12d ago", "35m ago", "1d ago", "22d ago"][i]!,
-  status: (["active", "active", "at_risk", "active", "inactive", "active", "active", "inactive"] as const)[i]!,
+  lastActive: ["2h ago", "20m ago", "5d ago", "1h ago", "12d ago", "35m ago", "1d ago", "22d ago"][
+    i
+  ]!,
+  status: (
+    ["active", "active", "at_risk", "active", "inactive", "active", "active", "inactive"] as const
+  )[i]!,
 }));
 
 export const mockAdminStats: AdminStats = {
@@ -240,6 +275,9 @@ export const mockLeaderboard: LeaderboardEntry[] = mockTeacherStudents
     quizScore: s.quizScore,
     attendance: 78 + ((i * 3) % 20),
     streak: [17, 34, 2, 11, 0, 26, 8, 0][i] ?? 0,
-    level: ["Elite", "Expert", "Learner", "Advanced", "Beginner", "Expert", "Intermediate", "Beginner"][i] ?? "Learner",
+    level:
+      ["Elite", "Expert", "Learner", "Advanced", "Beginner", "Expert", "Intermediate", "Beginner"][
+        i
+      ] ?? "Learner",
     isCurrentUser: s.name === "Aarav Sharma",
   }));

@@ -25,10 +25,26 @@ export const Route = createFileRoute("/ai-learning")({
 });
 
 const assistants = [
-  { icon: BrainCircuit, title: "General AI Tutor", body: "Ask anything across the curriculum and get structured, source-aware explanations." },
-  { icon: MessagesSquare, title: "Course AI Tutor", body: "Scoped to the course you are studying, including transcripts and resources." },
-  { icon: Terminal, title: "AI Coding Coach", body: "Diagnoses failed submissions, suggests approaches and reviews complexity." },
-  { icon: RouteIcon, title: "Interview Coach", body: "Runs mock interviews and gives calibrated feedback on your answers." },
+  {
+    icon: BrainCircuit,
+    title: "General AI Tutor",
+    body: "Ask anything across the curriculum and get structured, source-aware explanations.",
+  },
+  {
+    icon: MessagesSquare,
+    title: "Course AI Tutor",
+    body: "Scoped to the course you are studying, including transcripts and resources.",
+  },
+  {
+    icon: Terminal,
+    title: "AI Coding Coach",
+    body: "Diagnoses failed submissions, suggests approaches and reviews complexity.",
+  },
+  {
+    icon: RouteIcon,
+    title: "Interview Coach",
+    body: "Runs mock interviews and gives calibrated feedback on your answers.",
+  },
 ];
 
 function AiLearningPage() {

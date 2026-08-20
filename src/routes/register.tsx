@@ -14,9 +14,16 @@ export const Route = createFileRoute("/register")({
   head: () => ({
     meta: [
       { title: "Create your Learntrix account" },
-      { name: "description", content: "Create a free Learntrix account to start technology courses, coding practice and AI-assisted learning." },
+      {
+        name: "description",
+        content:
+          "Create a free Learntrix account to start technology courses, coding practice and AI-assisted learning.",
+      },
       { property: "og:title", content: "Create your Learntrix account" },
-      { property: "og:description", content: "Start courses, coding practice and AI-assisted learning with a free account." },
+      {
+        property: "og:description",
+        content: "Start courses, coding practice and AI-assisted learning with a free account.",
+      },
     ],
   }),
   component: RegisterPage,
@@ -83,7 +90,9 @@ function RegisterPage() {
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
-          <p className="text-xs text-muted-foreground">Minimum 8 characters with a number and a symbol.</p>
+          <p className="text-xs text-muted-foreground">
+            Minimum 8 characters with a number and a symbol.
+          </p>
         </div>
         <Button type="submit" className="w-full" size="lg" disabled={loading}>
           {loading ? "Creating account…" : "Create account"}
@@ -94,7 +103,10 @@ function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Already registered?{" "}
-        <Link to="/login" className="font-medium text-foreground underline-offset-4 hover:underline">
+        <Link
+          to="/login"
+          className="font-medium text-foreground underline-offset-4 hover:underline"
+        >
           Log in
         </Link>
       </p>

@@ -5,16 +5,33 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { enquiryService } from "@/services/enquiry.service";
 import type { EnquiryPayload } from "@/types";
 
-const experienceLevels: EnquiryPayload["experienceLevel"][] = ["Fresher", "0-2 years", "2-5 years", "5+ years"];
-const learningModes: EnquiryPayload["learningMode"][] = ["Live Online", "Self Paced", "Hybrid", "Corporate"];
+const experienceLevels: EnquiryPayload["experienceLevel"][] = [
+  "Fresher",
+  "0-2 years",
+  "2-5 years",
+  "5+ years",
+];
+const learningModes: EnquiryPayload["learningMode"][] = [
+  "Live Online",
+  "Self Paced",
+  "Hybrid",
+  "Corporate",
+];
 
 export function EnquiryForm({ courseId, courseTitle }: { courseId: string; courseTitle: string }) {
-  const [experienceLevel, setExperienceLevel] = useState<EnquiryPayload["experienceLevel"]>("Fresher");
+  const [experienceLevel, setExperienceLevel] =
+    useState<EnquiryPayload["experienceLevel"]>("Fresher");
   const [learningMode, setLearningMode] = useState<EnquiryPayload["learningMode"]>("Live Online");
 
   const mutation = useMutation({
@@ -60,11 +77,24 @@ export function EnquiryForm({ courseId, courseTitle }: { courseId: string; cours
       </div>
       <div className="space-y-2">
         <Label htmlFor="enq-email">Email</Label>
-        <Input id="enq-email" name="email" type="email" required autoComplete="email" placeholder="you@example.com" />
+        <Input
+          id="enq-email"
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+          placeholder="you@example.com"
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="enq-phone">Phone</Label>
-        <Input id="enq-phone" name="phone" required autoComplete="tel" placeholder="+91 90000 00000" />
+        <Input
+          id="enq-phone"
+          name="phone"
+          required
+          autoComplete="tel"
+          placeholder="+91 90000 00000"
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="enq-course">Course</Label>
@@ -72,7 +102,10 @@ export function EnquiryForm({ courseId, courseTitle }: { courseId: string; cours
       </div>
       <div className="space-y-2">
         <Label htmlFor="enq-experience">Experience level</Label>
-        <Select value={experienceLevel} onValueChange={(v) => setExperienceLevel(v as EnquiryPayload["experienceLevel"])}>
+        <Select
+          value={experienceLevel}
+          onValueChange={(v) => setExperienceLevel(v as EnquiryPayload["experienceLevel"])}
+        >
           <SelectTrigger id="enq-experience">
             <SelectValue />
           </SelectTrigger>
@@ -87,7 +120,10 @@ export function EnquiryForm({ courseId, courseTitle }: { courseId: string; cours
       </div>
       <div className="space-y-2">
         <Label htmlFor="enq-mode">Preferred learning mode</Label>
-        <Select value={learningMode} onValueChange={(v) => setLearningMode(v as EnquiryPayload["learningMode"])}>
+        <Select
+          value={learningMode}
+          onValueChange={(v) => setLearningMode(v as EnquiryPayload["learningMode"])}
+        >
           <SelectTrigger id="enq-mode">
             <SelectValue />
           </SelectTrigger>
@@ -106,7 +142,10 @@ export function EnquiryForm({ courseId, courseTitle }: { courseId: string; cours
       </div>
 
       {mutation.isError ? (
-        <p role="alert" className="sm:col-span-2 rounded-md border border-destructive/30 bg-destructive/8 p-3 text-sm text-destructive">
+        <p
+          role="alert"
+          className="sm:col-span-2 rounded-md border border-destructive/30 bg-destructive/8 p-3 text-sm text-destructive"
+        >
           We couldn't submit your enquiry. Please try again.
         </p>
       ) : null}

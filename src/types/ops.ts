@@ -55,11 +55,7 @@ export interface CouponOverview {
 }
 
 export type CouponRejectionReason =
-  | "invalid"
-  | "expired"
-  | "not_applicable"
-  | "usage_limit"
-  | "minimum_purchase";
+  "invalid" | "expired" | "not_applicable" | "usage_limit" | "minimum_purchase";
 
 export interface CouponValidationResult {
   valid: boolean;
@@ -218,12 +214,7 @@ export type TicketCategory =
 export type TicketPriority = "Low" | "Medium" | "High" | "Urgent";
 
 export type TicketStatus =
-  | "Open"
-  | "Assigned"
-  | "In Progress"
-  | "Waiting for Student"
-  | "Resolved"
-  | "Closed";
+  "Open" | "Assigned" | "In Progress" | "Waiting for Student" | "Resolved" | "Closed";
 
 export interface TicketAttachment {
   id: string;
@@ -329,11 +320,7 @@ export interface MentorStats {
 export type SessionStatus = "Scheduled" | "Completed" | "Cancelled" | "Rescheduled";
 export type SessionPlatform = "Google Meet" | "Zoom" | "Microsoft Teams" | "Other";
 export type SessionKind =
-  | "Mentoring"
-  | "Career Session"
-  | "Project Review"
-  | "Interview Preparation"
-  | "Follow-up";
+  "Mentoring" | "Career Session" | "Project Review" | "Interview Preparation" | "Follow-up";
 
 export interface MentorSession {
   id: string;
@@ -357,7 +344,14 @@ export interface MentorNote {
   mentorId: string;
   studentId: string;
   studentName: string;
-  category: "Strengths" | "Weaknesses" | "Career Goals" | "Technical Gaps" | "Communication" | "Action Items" | "Next Steps";
+  category:
+    | "Strengths"
+    | "Weaknesses"
+    | "Career Goals"
+    | "Technical Gaps"
+    | "Communication"
+    | "Action Items"
+    | "Next Steps";
   body: string;
   at: string;
   /** Private notes stay with staff; students never see them. */
@@ -482,7 +476,8 @@ export interface PlacementApplication {
   driveId?: string | undefined;
 }
 
-export type InterviewRound = "Technical Interview" | "HR Interview" | "Managerial Interview" | "Mock Interview";
+export type InterviewRound =
+  "Technical Interview" | "HR Interview" | "Managerial Interview" | "Mock Interview";
 
 export interface PlacementInterview {
   id: string;
@@ -499,7 +494,8 @@ export interface PlacementInterview {
   status: "Scheduled" | "Completed" | "Cancelled" | "Rescheduled";
 }
 
-export type OfferStatus = "Offer Received" | "Accepted" | "Declined" | "Joined" | "Placement Verified";
+export type OfferStatus =
+  "Offer Received" | "Accepted" | "Declined" | "Joined" | "Placement Verified";
 
 export interface PlacementOffer {
   id: string;

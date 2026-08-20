@@ -9,7 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { adminService } from "@/services/admin.service";
 
@@ -17,7 +23,11 @@ export const Route = createFileRoute("/admin/notifications")({
   head: () => ({
     meta: [
       { title: "Notifications — Learntrix Admin" },
-      { name: "description", content: "Send targeted announcements to students, batches, trainers or career-eligible cohorts." },
+      {
+        name: "description",
+        content:
+          "Send targeted announcements to students, batches, trainers or career-eligible cohorts.",
+      },
       { property: "og:title", content: "Notifications — Learntrix Admin" },
       { property: "og:description", content: "Targeted in-app, email and WhatsApp announcements." },
       { name: "robots", content: "noindex" },
@@ -37,9 +47,30 @@ const audiences = [
 ];
 
 const recent = [
-  { id: "n1", title: "Placement drive · Wipro", audience: "Career eligible students", channel: "In-app + WhatsApp", sentAt: "2 hours ago", reach: 412 },
-  { id: "n2", title: "Attendance below 75% — action needed", audience: "Low attendance students", channel: "Email + WhatsApp", sentAt: "Yesterday", reach: 86 },
-  { id: "n3", title: "New module released · Spring Boot", audience: "Full Stack batch", channel: "In-app", sentAt: "3 days ago", reach: 150 },
+  {
+    id: "n1",
+    title: "Placement drive · Wipro",
+    audience: "Career eligible students",
+    channel: "In-app + WhatsApp",
+    sentAt: "2 hours ago",
+    reach: 412,
+  },
+  {
+    id: "n2",
+    title: "Attendance below 75% — action needed",
+    audience: "Low attendance students",
+    channel: "Email + WhatsApp",
+    sentAt: "Yesterday",
+    reach: 86,
+  },
+  {
+    id: "n3",
+    title: "New module released · Spring Boot",
+    audience: "Full Stack batch",
+    channel: "In-app",
+    sentAt: "3 days ago",
+    reach: 150,
+  },
 ];
 
 function AdminNotifications() {
@@ -48,7 +79,10 @@ function AdminNotifications() {
 
   return (
     <>
-      <PageHeader title="Notifications" description="Compose once, deliver across in-app, email and WhatsApp channels." />
+      <PageHeader
+        title="Notifications"
+        description="Compose once, deliver across in-app, email and WhatsApp channels."
+      />
 
       <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Sent this month" value={148} />
@@ -69,7 +103,9 @@ function AdminNotifications() {
                 toast.error("Title is required.");
                 return;
               }
-              void adminService.sendNotification({ title, audience, channel }).then(() => toast.success("Announcement queued for delivery."));
+              void adminService
+                .sendNotification({ title, audience, channel })
+                .then(() => toast.success("Announcement queued for delivery."));
             }}
           >
             <div className="space-y-1.5">

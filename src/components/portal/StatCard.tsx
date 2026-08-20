@@ -17,7 +17,9 @@ export function StatCard({
   return (
     <div className="surface-panel flex flex-col gap-2 p-5">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">{label}</p>
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          {label}
+        </p>
         {Icon ? <Icon className="size-4 text-muted-foreground" aria-hidden /> : null}
       </div>
       <p className="text-display text-3xl leading-none">{value}</p>

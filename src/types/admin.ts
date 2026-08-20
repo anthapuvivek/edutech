@@ -62,7 +62,12 @@ export interface AdminStudentDetail extends AdminStudentRow {
   gender: string;
   qualification: string;
   skills: string[];
-  links: { github?: string | undefined; linkedin?: string | undefined; leetcode?: string | undefined; hackerrank?: string | undefined };
+  links: {
+    github?: string | undefined;
+    linkedin?: string | undefined;
+    leetcode?: string | undefined;
+    hackerrank?: string | undefined;
+  };
   documents: StudentDocument[];
   timeline: StudentTimelineEntry[];
   enrollments: Array<{
@@ -76,10 +81,33 @@ export interface AdminStudentDetail extends AdminStudentRow {
     paymentStatus: PaymentStatus;
     careerEligible: boolean;
   }>;
-  attendance: Array<{ date: string; classTitle: string; batchName: string; status: AttendanceStatus }>;
-  assessments: Array<{ id: string; kind: "quiz" | "assignment" | "coding"; title: string; score: number; submittedAt: string }>;
-  applications: Array<{ id: string; company: string; role: string; appliedAt: string; status: string }>;
-  payments: Array<{ id: string; description: string; amount: number; status: PaymentStatus; paidAt: string }>;
+  attendance: Array<{
+    date: string;
+    classTitle: string;
+    batchName: string;
+    status: AttendanceStatus;
+  }>;
+  assessments: Array<{
+    id: string;
+    kind: "quiz" | "assignment" | "coding";
+    title: string;
+    score: number;
+    submittedAt: string;
+  }>;
+  applications: Array<{
+    id: string;
+    company: string;
+    role: string;
+    appliedAt: string;
+    status: string;
+  }>;
+  payments: Array<{
+    id: string;
+    description: string;
+    amount: number;
+    status: PaymentStatus;
+    paidAt: string;
+  }>;
   certificates: Array<{ id: string; title: string; issuedAt: string }>;
   activity: Array<{ id: string; label: string; occurredAt: string }>;
 }
@@ -215,7 +243,8 @@ export interface AdminReferral {
   studentName: string;
   referrerName: string;
   requestedAt: string;
-  status: "Requested" | "Under Review" | "Approved" | "Referred" | "Rejected" | "Expired" | "Completed";
+  status:
+    "Requested" | "Under Review" | "Approved" | "Referred" | "Rejected" | "Expired" | "Completed";
 }
 
 export interface AdminArticle {

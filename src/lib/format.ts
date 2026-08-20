@@ -7,7 +7,9 @@ export function formatPrice(amount: number, currency: "INR" | "USD" = "INR") {
 }
 
 export function formatCompact(value: number) {
-  return new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(value);
+  return new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(
+    value,
+  );
 }
 
 export function discountPercent(price: number, original?: number) {

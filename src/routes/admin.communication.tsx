@@ -18,7 +18,11 @@ export const Route = createFileRoute("/admin/communication")({
   head: () => ({
     meta: [
       { title: "WhatsApp & Communication — Learntrix Admin" },
-      { name: "description", content: "Configure the WhatsApp business number, floating button and pre-filled message templates used across the platform." },
+      {
+        name: "description",
+        content:
+          "Configure the WhatsApp business number, floating button and pre-filled message templates used across the platform.",
+      },
       { property: "og:title", content: "WhatsApp & Communication — Learntrix Admin" },
       { property: "og:description", content: "Central WhatsApp and communication configuration." },
       { name: "robots", content: "noindex" },
@@ -28,15 +32,30 @@ export const Route = createFileRoute("/admin/communication")({
 });
 
 const templateFields: Array<{ key: keyof WhatsAppSettings; label: string; hint: string }> = [
-  { key: "defaultMessage", label: "Default message", hint: "Used by the floating button on the public website." },
-  { key: "courseEnquiryMessage", label: "Course enquiry", hint: "Course detail pages. Supports {course} placeholder." },
+  {
+    key: "defaultMessage",
+    label: "Default message",
+    hint: "Used by the floating button on the public website.",
+  },
+  {
+    key: "courseEnquiryMessage",
+    label: "Course enquiry",
+    hint: "Course detail pages. Supports {course} placeholder.",
+  },
   { key: "studentSupportMessage", label: "Student support", hint: "Student portal help CTA." },
   { key: "careerSupportMessage", label: "Career support", hint: "Career dashboard CTA." },
-  { key: "jobEnquiryMessage", label: "Job enquiry", hint: "Job listings. Supports {job} placeholder." },
+  {
+    key: "jobEnquiryMessage",
+    label: "Job enquiry",
+    hint: "Job listings. Supports {job} placeholder.",
+  },
 ];
 
 function AdminCommunication() {
-  const settings = useQuery({ queryKey: ["admin", "whatsapp"], queryFn: () => adminService.whatsappSettings() });
+  const settings = useQuery({
+    queryKey: ["admin", "whatsapp"],
+    queryFn: () => adminService.whatsappSettings(),
+  });
   const [draft, setDraft] = useState<WhatsAppSettings | null>(null);
 
   useEffect(() => {
@@ -47,7 +66,10 @@ function AdminCommunication() {
 
   return (
     <>
-      <PageHeader title="WhatsApp & Communication" description="One number, one set of templates — reused by every WhatsApp CTA on the platform." />
+      <PageHeader
+        title="WhatsApp & Communication"
+        description="One number, one set of templates — reused by every WhatsApp CTA on the platform."
+      />
 
       <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Business number" value={draft.businessNumber} />
@@ -65,7 +87,9 @@ function AdminCommunication() {
             toast.error("Enter a valid WhatsApp business number with country code.");
             return;
           }
-          void adminService.saveWhatsappSettings(draft).then(() => toast.success("WhatsApp settings saved."));
+          void adminService
+            .saveWhatsappSettings(draft)
+            .then(() => toast.success("WhatsApp settings saved."));
         }}
       >
         <Panel title="Business account">
@@ -78,22 +102,33 @@ function AdminCommunication() {
                 maxLength={20}
                 onChange={(e) => setDraft({ ...draft, businessNumber: e.target.value })}
               />
-              <p className="text-xs text-muted-foreground">Include the country code, e.g. +91 90000 00000.</p>
+              <p className="text-xs text-muted-foreground">
+                Include the country code, e.g. +91 90000 00000.
+              </p>
             </div>
             <div className="flex items-start justify-between gap-4 rounded-lg border border-border p-4">
               <div>
                 <Label htmlFor="enabled" className="text-sm">
                   Floating WhatsApp button
                 </Label>
-                <p className="mt-1 text-xs text-muted-foreground">Shows on every public page and inside the student portal.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Shows on every public page and inside the student portal.
+                </p>
               </div>
-              <Switch id="enabled" checked={draft.enabled} onCheckedChange={(v) => setDraft({ ...draft, enabled: v })} />
+              <Switch
+                id="enabled"
+                checked={draft.enabled}
+                onCheckedChange={(v) => setDraft({ ...draft, enabled: v })}
+              />
             </div>
             <Button type="submit">Save communication settings</Button>
           </div>
         </Panel>
 
-        <Panel title="Message templates" description="Pre-filled text used when a user opens a WhatsApp chat.">
+        <Panel
+          title="Message templates"
+          description="Pre-filled text used when a user opens a WhatsApp chat."
+        >
           <div className="space-y-4">
             {templateFields.map((f) => (
               <div key={String(f.key)} className="space-y-1.5">

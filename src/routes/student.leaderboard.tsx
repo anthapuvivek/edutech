@@ -4,7 +4,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/portal/StatCard";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { studentService } from "@/services/student.service";
@@ -13,7 +20,11 @@ export const Route = createFileRoute("/student/leaderboard")({
   head: () => ({
     meta: [
       { title: "Leaderboard — Learntrix" },
-      { name: "description", content: "See how your Learntrix points, coding practice and quiz scores rank against your peers." },
+      {
+        name: "description",
+        content:
+          "See how your Learntrix points, coding practice and quiz scores rank against your peers.",
+      },
       { property: "og:title", content: "Leaderboard — Learntrix" },
       { property: "og:description", content: "Global, course, batch and weekly student rankings." },
       { name: "robots", content: "noindex" },
@@ -23,13 +34,19 @@ export const Route = createFileRoute("/student/leaderboard")({
 });
 
 function LeaderboardPage() {
-  const board = useQuery({ queryKey: ["student", "leaderboard"], queryFn: () => studentService.leaderboard() });
+  const board = useQuery({
+    queryKey: ["student", "leaderboard"],
+    queryFn: () => studentService.leaderboard(),
+  });
   const me = (board.data ?? []).find((e) => e.isCurrentUser);
   const above = me ? (board.data ?? []).find((e) => e.rank === me.rank - 1) : undefined;
 
   return (
     <>
-      <PageHeader title="Leaderboard" description="Ranks are computed by the backend ranking engine." />
+      <PageHeader
+        title="Leaderboard"
+        description="Ranks are computed by the backend ranking engine."
+      />
 
       <Tabs defaultValue="global" className="mb-6">
         <TabsList>
@@ -52,7 +69,9 @@ function LeaderboardPage() {
             <p className="text-display text-2xl">{me.points.toLocaleString()}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">To next rank</p>
+            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+              To next rank
+            </p>
             <p className="text-display text-2xl">
               {above ? (above.points - me.points + 1).toLocaleString() : "—"}
             </p>
@@ -63,7 +82,9 @@ function LeaderboardPage() {
       {board.isPending ? (
         <Skeleton className="h-72 w-full" />
       ) : board.isError ? (
-        <p className="text-sm text-destructive">Unable to load the leaderboard. Please try again.</p>
+        <p className="text-sm text-destructive">
+          Unable to load the leaderboard. Please try again.
+        </p>
       ) : (
         <div className="surface-panel overflow-x-auto">
           <Table>
@@ -85,7 +106,11 @@ function LeaderboardPage() {
                   <TableCell className="font-medium">#{row.rank}</TableCell>
                   <TableCell>
                     {row.name}
-                    {row.isCurrentUser ? <Badge variant="outline" className="ml-2">You</Badge> : null}
+                    {row.isCurrentUser ? (
+                      <Badge variant="outline" className="ml-2">
+                        You
+                      </Badge>
+                    ) : null}
                   </TableCell>
                   <TableCell className="text-right">{row.points.toLocaleString()}</TableCell>
                   <TableCell className="text-right">{row.problemsSolved}</TableCell>

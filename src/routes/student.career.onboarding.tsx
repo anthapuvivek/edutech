@@ -22,9 +22,16 @@ export const Route = createFileRoute("/student/career/onboarding")({
   head: () => ({
     meta: [
       { title: "Career Onboarding — Learntrix" },
-      { name: "description", content: "Set your target role, locations and companies to personalise career recommendations." },
+      {
+        name: "description",
+        content:
+          "Set your target role, locations and companies to personalise career recommendations.",
+      },
       { property: "og:title", content: "Career Onboarding — Learntrix" },
-      { property: "og:description", content: "Tell Learntrix your career goals to unlock personalised guidance." },
+      {
+        property: "og:description",
+        content: "Tell Learntrix your career goals to unlock personalised guidance.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -46,7 +53,8 @@ function CareerOnboardingPage() {
   const queryClient = useQueryClient();
   const [targetRole, setTargetRole] = useState("Software Engineer");
   const [preferredLocation, setPreferredLocation] = useState("Bengaluru");
-  const [experienceLevel, setExperienceLevel] = useState<CareerProfile["experienceLevel"]>("Fresher");
+  const [experienceLevel, setExperienceLevel] =
+    useState<CareerProfile["experienceLevel"]>("Fresher");
   const [workMode, setWorkMode] = useState<WorkMode>("Hybrid");
   const [targetCompanies, setTargetCompanies] = useState("Microsoft, Google, Amazon");
   const [careerGoal, setCareerGoal] = useState("");
@@ -68,7 +76,10 @@ function CareerOnboardingPage() {
       preferredLocation,
       experienceLevel,
       workMode,
-      targetCompanies: targetCompanies.split(",").map((c) => c.trim()).filter(Boolean),
+      targetCompanies: targetCompanies
+        .split(",")
+        .map((c) => c.trim())
+        .filter(Boolean),
       careerGoal,
     });
   }
@@ -85,11 +96,21 @@ function CareerOnboardingPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="target-role">Target role</Label>
-              <Input id="target-role" value={targetRole} onChange={(e) => setTargetRole(e.target.value)} required />
+              <Input
+                id="target-role"
+                value={targetRole}
+                onChange={(e) => setTargetRole(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="location">Preferred location</Label>
-              <Input id="location" value={preferredLocation} onChange={(e) => setPreferredLocation(e.target.value)} required />
+              <Input
+                id="location"
+                value={preferredLocation}
+                onChange={(e) => setPreferredLocation(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="experience">Experience level</Label>

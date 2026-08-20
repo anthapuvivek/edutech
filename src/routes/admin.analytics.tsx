@@ -1,6 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import { Panel } from "@/components/portal/AdminBits";
 import { PageHeader, StatCard } from "@/components/portal/StatCard";
@@ -12,9 +24,16 @@ export const Route = createFileRoute("/admin/analytics")({
   head: () => ({
     meta: [
       { title: "Analytics — Learntrix Admin" },
-      { name: "description", content: "Enterprise reporting on enrolments, attendance, learning performance, placements and revenue." },
+      {
+        name: "description",
+        content:
+          "Enterprise reporting on enrolments, attendance, learning performance, placements and revenue.",
+      },
       { property: "og:title", content: "Analytics — Learntrix Admin" },
-      { property: "og:description", content: "Platform-wide reporting for the Learntrix admin team." },
+      {
+        property: "og:description",
+        content: "Platform-wide reporting for the Learntrix admin team.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -22,14 +41,20 @@ export const Route = createFileRoute("/admin/analytics")({
 });
 
 function AdminAnalytics() {
-  const overview = useQuery({ queryKey: ["admin", "overview"], queryFn: () => adminService.overview() });
+  const overview = useQuery({
+    queryKey: ["admin", "overview"],
+    queryFn: () => adminService.overview(),
+  });
 
   if (overview.isPending || !overview.data) return <Skeleton className="h-[70vh] w-full" />;
   const { metrics, studentGrowth, attendanceTrend, performance, placementFunnel } = overview.data;
 
   return (
     <>
-      <PageHeader title="Analytics" description="All figures are computed server-side; charts are read-only reporting views." />
+      <PageHeader
+        title="Analytics"
+        description="All figures are computed server-side; charts are read-only reporting views."
+      />
 
       <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Enrollments" value={metrics.enrollments.toLocaleString()} />
@@ -46,8 +71,20 @@ function AdminAnalytics() {
               <XAxis dataKey="month" fontSize={12} />
               <YAxis fontSize={12} />
               <Tooltip />
-              <Area type="monotone" dataKey="students" stroke="var(--color-primary)" fill="var(--color-primary)" fillOpacity={0.15} />
-              <Area type="monotone" dataKey="enrollments" stroke="var(--color-accent)" fill="var(--color-accent)" fillOpacity={0.15} />
+              <Area
+                type="monotone"
+                dataKey="students"
+                stroke="var(--color-primary)"
+                fill="var(--color-primary)"
+                fillOpacity={0.15}
+              />
+              <Area
+                type="monotone"
+                dataKey="enrollments"
+                stroke="var(--color-accent)"
+                fill="var(--color-accent)"
+                fillOpacity={0.15}
+              />
             </AreaChart>
           </ResponsiveContainer>
         </Panel>
@@ -59,8 +96,20 @@ function AdminAnalytics() {
               <XAxis dataKey="week" fontSize={12} />
               <YAxis fontSize={12} />
               <Tooltip />
-              <Line type="monotone" dataKey="attendance" stroke="var(--color-primary)" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="completion" stroke="var(--color-accent)" strokeWidth={2} dot={false} />
+              <Line
+                type="monotone"
+                dataKey="attendance"
+                stroke="var(--color-primary)"
+                strokeWidth={2}
+                dot={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="completion"
+                stroke="var(--color-accent)"
+                strokeWidth={2}
+                dot={false}
+              />
             </LineChart>
           </ResponsiveContainer>
         </Panel>
@@ -89,7 +138,10 @@ function AdminAnalytics() {
                     <span className="text-muted-foreground">{stage.value.toLocaleString()}</span>
                   </div>
                   <div className="h-2 rounded-full bg-muted">
-                    <div className="h-2 rounded-full bg-primary" style={{ width: `${(stage.value / max) * 100}%` }} />
+                    <div
+                      className="h-2 rounded-full bg-primary"
+                      style={{ width: `${(stage.value / max) * 100}%` }}
+                    />
                   </div>
                 </li>
               );

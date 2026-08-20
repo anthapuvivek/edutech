@@ -19,9 +19,22 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { adminService } from "@/services/admin.service";
 
@@ -29,9 +42,16 @@ export const Route = createFileRoute("/admin/career/jobs")({
   head: () => ({
     meta: [
       { title: "Jobs — Learntrix Admin" },
-      { name: "description", content: "Create, publish and expire job opportunities with course, attendance and coding eligibility criteria." },
+      {
+        name: "description",
+        content:
+          "Create, publish and expire job opportunities with course, attendance and coding eligibility criteria.",
+      },
       { property: "og:title", content: "Jobs — Learntrix Admin" },
-      { property: "og:description", content: "Full control of the career job portal and its eligibility criteria." },
+      {
+        property: "og:description",
+        content: "Full control of the career job portal and its eligibility criteria.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -45,7 +65,10 @@ function AdminJobs() {
   const [status, setStatus] = useState(ALL);
   const [open, setOpen] = useState(false);
   const data = jobs.data ?? [];
-  const rows = useMemo(() => data.filter((j) => status === ALL || j.status === status), [data, status]);
+  const rows = useMemo(
+    () => data.filter((j) => status === ALL || j.status === status),
+    [data, status],
+  );
 
   return (
     <>
@@ -62,7 +85,9 @@ function AdminJobs() {
             <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Create job</DialogTitle>
-                <DialogDescription>Set the eligibility criteria — the backend computes which students qualify.</DialogDescription>
+                <DialogDescription>
+                  Set the eligibility criteria — the backend computes which students qualify.
+                </DialogDescription>
               </DialogHeader>
               <form
                 id="create-job"
@@ -116,7 +141,11 @@ function AdminJobs() {
         <StatCard label="Jobs" value={data.length} />
         <StatCard label="Published" value={data.filter((j) => j.status === "Published").length} />
         <StatCard label="Applicants" value={data.reduce((s, j) => s + j.applicants, 0)} />
-        <StatCard label="Expiring soon" value={data.filter((j) => j.status === "Published").length} hint="Within 7 days" />
+        <StatCard
+          label="Expiring soon"
+          value={data.filter((j) => j.status === "Published").length}
+          hint="Within 7 days"
+        />
       </section>
 
       <Panel
@@ -184,10 +213,18 @@ function AdminJobs() {
                       <StatusBadge value={j.status} />
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
-                      <Button size="sm" variant="outline" onClick={() => toast.success("Status change submitted.")}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toast.success("Status change submitted.")}
+                      >
                         {j.status === "Published" ? "Unpublish" : "Publish"}
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => toast.info("Archived jobs stay available for reporting.")}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toast.info("Archived jobs stay available for reporting.")}
+                      >
                         Archive
                       </Button>
                     </TableCell>

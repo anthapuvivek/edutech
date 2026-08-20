@@ -12,9 +12,15 @@ export const Route = createFileRoute("/student/career/profile")({
   head: () => ({
     meta: [
       { title: "Career Profile — Learntrix" },
-      { name: "description", content: "Manage the career profile that powers job matching, resumes and referrals." },
+      {
+        name: "description",
+        content: "Manage the career profile that powers job matching, resumes and referrals.",
+      },
       { property: "og:title", content: "Career Profile — Learntrix" },
-      { property: "og:description", content: "Skills, preferences and coding profiles used for placement matching." },
+      {
+        property: "og:description",
+        content: "Skills, preferences and coding profiles used for placement matching.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -22,8 +28,14 @@ export const Route = createFileRoute("/student/career/profile")({
 });
 
 function CareerProfilePage() {
-  const profile = useQuery({ queryKey: ["career", "profile"], queryFn: () => careerService.profile() });
-  const skills = useQuery({ queryKey: ["career", "skill-gap"], queryFn: () => careerService.skillGap() });
+  const profile = useQuery({
+    queryKey: ["career", "profile"],
+    queryFn: () => careerService.profile(),
+  });
+  const skills = useQuery({
+    queryKey: ["career", "skill-gap"],
+    queryFn: () => careerService.skillGap(),
+  });
 
   if (profile.isLoading || !profile.data) {
     return (
@@ -39,7 +51,10 @@ function CareerProfilePage() {
 
   return (
     <>
-      <PageHeader title="Career profile" description="Recruiters and matching use only the details you publish here." />
+      <PageHeader
+        title="Career profile"
+        description="Recruiters and matching use only the details you publish here."
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         <section className="surface-panel space-y-5 p-6 lg:col-span-2">
@@ -72,7 +87,9 @@ function CareerProfilePage() {
           </dl>
 
           <div>
-            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Coding & professional profiles</p>
+            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+              Coding & professional profiles
+            </p>
             {links.length ? (
               <ul className="mt-2 space-y-1.5 text-sm">
                 {links.map(([key, value]) => (
@@ -96,7 +113,9 @@ function CareerProfilePage() {
 
         <aside className="space-y-6">
           <section className="surface-panel p-6">
-            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Profile completion</p>
+            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+              Profile completion
+            </p>
             <p className="text-display text-3xl leading-none">{p.completionPercent}%</p>
             <Progress value={p.completionPercent} className="mt-3" />
             <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">

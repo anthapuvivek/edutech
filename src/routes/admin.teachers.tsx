@@ -20,7 +20,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { adminService } from "@/services/admin.service";
 
@@ -28,9 +35,16 @@ export const Route = createFileRoute("/admin/teachers")({
   head: () => ({
     meta: [
       { title: "Trainers — Learntrix Admin" },
-      { name: "description", content: "Approve trainers, assign courses, batches and students, and review teaching performance." },
+      {
+        name: "description",
+        content:
+          "Approve trainers, assign courses, batches and students, and review teaching performance.",
+      },
       { property: "og:title", content: "Trainers — Learntrix Admin" },
-      { property: "og:description", content: "Trainer onboarding, approvals and performance in one place." },
+      {
+        property: "og:description",
+        content: "Trainer onboarding, approvals and performance in one place.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -38,7 +52,10 @@ export const Route = createFileRoute("/admin/teachers")({
 });
 
 function AdminTeachers() {
-  const trainers = useQuery({ queryKey: ["admin", "trainers"], queryFn: () => adminService.trainers() });
+  const trainers = useQuery({
+    queryKey: ["admin", "trainers"],
+    queryFn: () => adminService.trainers(),
+  });
   const [open, setOpen] = useState(false);
   const data = trainers.data ?? [];
   const pending = data.filter((t) => t.approvalStatus === "pending");
@@ -58,7 +75,9 @@ function AdminTeachers() {
             <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-xl">
               <DialogHeader>
                 <DialogTitle>Add a trainer</DialogTitle>
-                <DialogDescription>Trainers can complete their bio, CV, certifications and links after activation.</DialogDescription>
+                <DialogDescription>
+                  Trainers can complete their bio, CV, certifications and links after activation.
+                </DialogDescription>
               </DialogHeader>
               <form
                 id="add-trainer"
@@ -69,12 +88,14 @@ function AdminTeachers() {
                   setOpen(false);
                 }}
               >
-                {["Full name", "Email", "Phone", "Headline", "Experience (years)", "Skills"].map((label) => (
-                  <div key={label} className="space-y-1.5">
-                    <Label htmlFor={label}>{label}</Label>
-                    <Input id={label} name={label} maxLength={120} />
-                  </div>
-                ))}
+                {["Full name", "Email", "Phone", "Headline", "Experience (years)", "Skills"].map(
+                  (label) => (
+                    <div key={label} className="space-y-1.5">
+                      <Label htmlFor={label}>{label}</Label>
+                      <Input id={label} name={label} maxLength={120} />
+                    </div>
+                  ),
+                )}
                 <div className="space-y-1.5 sm:col-span-2">
                   <Label htmlFor="bio">Bio</Label>
                   <Textarea id="bio" name="bio" maxLength={600} />
@@ -98,7 +119,10 @@ function AdminTeachers() {
         <StatCard label="Trainers" value={data.length} />
         <StatCard label="Pending approval" value={pending.length} />
         <StatCard label="Students taught" value={data.reduce((s, t) => s + t.students, 0)} />
-        <StatCard label="Classes this month" value={data.reduce((s, t) => s + t.classesThisMonth, 0)} />
+        <StatCard
+          label="Classes this month"
+          value={data.reduce((s, t) => s + t.classesThisMonth, 0)}
+        />
       </section>
 
       <Panel title="Trainer directory">
@@ -147,12 +171,20 @@ function AdminTeachers() {
                       {t.approvalStatus === "pending" ? (
                         <Button
                           size="sm"
-                          onClick={() => void adminService.approveTrainer(t.id, true).then(() => toast.success("Trainer approved."))}
+                          onClick={() =>
+                            void adminService
+                              .approveTrainer(t.id, true)
+                              .then(() => toast.success("Trainer approved."))
+                          }
                         >
                           Approve
                         </Button>
                       ) : null}
-                      <Button size="sm" variant="outline" onClick={() => toast.info("Assignment editor opens the batch planner.")}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toast.info("Assignment editor opens the batch planner.")}
+                      >
                         Assign
                       </Button>
                     </TableCell>

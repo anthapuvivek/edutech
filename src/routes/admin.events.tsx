@@ -26,7 +26,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { adminService } from "@/services/admin.service";
 
@@ -34,16 +41,31 @@ export const Route = createFileRoute("/admin/events")({
   head: () => ({
     meta: [
       { title: "Live Classes & Events — Learntrix Admin" },
-      { name: "description", content: "Create and manage demo classes, webinars, workshops and regular classes across the platform." },
+      {
+        name: "description",
+        content:
+          "Create and manage demo classes, webinars, workshops and regular classes across the platform.",
+      },
       { property: "og:title", content: "Live Classes & Events — Learntrix Admin" },
-      { property: "og:description", content: "Schedule, publish and track platform events and registrations." },
+      {
+        property: "og:description",
+        content: "Schedule, publish and track platform events and registrations.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
   component: AdminEvents,
 });
 
-const eventTypes = ["Regular Class", "Demo Class", "Webinar", "Workshop", "Placement Program", "Orientation", "Other"];
+const eventTypes = [
+  "Regular Class",
+  "Demo Class",
+  "Webinar",
+  "Workshop",
+  "Placement Program",
+  "Orientation",
+  "Other",
+];
 const platforms = ["Google Meet", "Zoom", "Microsoft Teams", "Other"];
 
 function AdminEvents() {
@@ -74,7 +96,9 @@ function AdminEvents() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   setOpen(false);
-                  toast.success("Event drafted", { description: "It will be persisted once the backend is connected." });
+                  toast.success("Event drafted", {
+                    description: "It will be persisted once the backend is connected.",
+                  });
                 }}
               >
                 <div className="space-y-2">
@@ -113,10 +137,14 @@ function AdminEvents() {
                   <div className="space-y-2">
                     <Label>Event type</Label>
                     <Select defaultValue="Demo Class">
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
                       <SelectContent>
                         {eventTypes.map((t) => (
-                          <SelectItem key={t} value={t}>{t}</SelectItem>
+                          <SelectItem key={t} value={t}>
+                            {t}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -124,10 +152,14 @@ function AdminEvents() {
                   <div className="space-y-2">
                     <Label>Platform</Label>
                     <Select defaultValue="Google Meet">
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
                       <SelectContent>
                         {platforms.map((p) => (
-                          <SelectItem key={p} value={p}>{p}</SelectItem>
+                          <SelectItem key={p} value={p}>
+                            {p}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -146,10 +178,16 @@ function AdminEvents() {
                 <div className="space-y-2">
                   <Label>Visibility</Label>
                   <Select defaultValue="public">
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="public">Public — link visible after registration</SelectItem>
-                      <SelectItem value="restricted">Restricted — enrolled students only</SelectItem>
+                      <SelectItem value="public">
+                        Public — link visible after registration
+                      </SelectItem>
+                      <SelectItem value="restricted">
+                        Restricted — enrolled students only
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -164,11 +202,15 @@ function AdminEvents() {
 
       <div className="mb-5 max-w-56">
         <Select value={typeFilter} onValueChange={setTypeFilter}>
-          <SelectTrigger aria-label="Filter by event type"><SelectValue /></SelectTrigger>
+          <SelectTrigger aria-label="Filter by event type">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="All">All event types</SelectItem>
             {eventTypes.map((t) => (
-              <SelectItem key={t} value={t}>{t}</SelectItem>
+              <SelectItem key={t} value={t}>
+                {t}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -204,13 +246,17 @@ function AdminEvents() {
                   <TableCell>{e.type}</TableCell>
                   <TableCell className="max-w-44 truncate">{e.courseTitle}</TableCell>
                   <TableCell>{e.trainerName}</TableCell>
-                  <TableCell>{new Date(e.date).toLocaleDateString("en-IN", { dateStyle: "medium" })}</TableCell>
+                  <TableCell>
+                    {new Date(e.date).toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                  </TableCell>
                   <TableCell>{e.startTime}</TableCell>
                   <TableCell>{e.platform}</TableCell>
                   <TableCell className="text-right">{e.registrations}</TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
-                      <Badge variant={e.status === "Live Now" ? "default" : "outline"}>{e.status}</Badge>
+                      <Badge variant={e.status === "Live Now" ? "default" : "outline"}>
+                        {e.status}
+                      </Badge>
                       <span className="text-xs text-muted-foreground">
                         {e.published ? "Published" : "Draft"} · {e.visibility}
                       </span>

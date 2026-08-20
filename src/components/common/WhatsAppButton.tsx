@@ -18,11 +18,17 @@ function messageFor(settings: WhatsAppSettings, context: WhatsAppContext, subjec
           : context === "job"
             ? settings.jobEnquiryMessage
             : settings.defaultMessage;
-  return raw.replace("{course}", subject ?? "your programs").replace("{job}", subject ?? "this role");
+  return raw
+    .replace("{course}", subject ?? "your programs")
+    .replace("{job}", subject ?? "this role");
 }
 
 export function useWhatsAppLink(context: WhatsAppContext = "default", subject?: string) {
-  const settings = useQuery({ queryKey: ["admin", "whatsapp"], queryFn: () => adminService.whatsappSettings(), staleTime: 5 * 60_000 });
+  const settings = useQuery({
+    queryKey: ["admin", "whatsapp"],
+    queryFn: () => adminService.whatsappSettings(),
+    staleTime: 5 * 60_000,
+  });
   if (!settings.data?.enabled) return null;
   const digits = settings.data.businessNumber.replace(/\D/g, "");
   return `https://wa.me/${digits}?text=${encodeURIComponent(messageFor(settings.data, context, subject))}`;

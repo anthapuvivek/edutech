@@ -24,9 +24,16 @@ export const Route = createFileRoute("/student/dashboard")({
   head: () => ({
     meta: [
       { title: "Student Dashboard — Learntrix" },
-      { name: "description", content: "Track your courses, learning hours, coding practice, points and rank in the Learntrix student portal." },
+      {
+        name: "description",
+        content:
+          "Track your courses, learning hours, coding practice, points and rank in the Learntrix student portal.",
+      },
       { property: "og:title", content: "Student Dashboard — Learntrix" },
-      { property: "og:description", content: "Your learning progress, points and rank at a glance." },
+      {
+        property: "og:description",
+        content: "Your learning progress, points and rank at a glance.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -34,10 +41,19 @@ export const Route = createFileRoute("/student/dashboard")({
 });
 
 function StudentDashboard() {
-  const profile = useQuery({ queryKey: ["student", "profile"], queryFn: () => studentService.profile() });
+  const profile = useQuery({
+    queryKey: ["student", "profile"],
+    queryFn: () => studentService.profile(),
+  });
   const stats = useQuery({ queryKey: ["student", "stats"], queryFn: () => studentService.stats() });
-  const enrollments = useQuery({ queryKey: ["student", "enrollments"], queryFn: () => studentService.enrollments() });
-  const activity = useQuery({ queryKey: ["student", "activity"], queryFn: () => studentService.activity() });
+  const enrollments = useQuery({
+    queryKey: ["student", "enrollments"],
+    queryFn: () => studentService.enrollments(),
+  });
+  const activity = useQuery({
+    queryKey: ["student", "activity"],
+    queryFn: () => studentService.activity(),
+  });
 
   const continueLearning = (enrollments.data ?? []).filter(
     (e) => e.status === "active" && e.progressPercent < 100,
@@ -45,7 +61,10 @@ function StudentDashboard() {
 
   return (
     <>
-      <PageHeader title="Dashboard" description="Your learning, practice and performance in one place." />
+      <PageHeader
+        title="Dashboard"
+        description="Your learning, practice and performance in one place."
+      />
 
       <section className="surface-panel mb-6 flex flex-col gap-6 p-6 lg:flex-row lg:items-center lg:justify-between">
         {profile.isPending ? (
@@ -56,11 +75,17 @@ function StudentDashboard() {
           <>
             <div className="flex items-center gap-4">
               <span className="grid size-14 place-items-center rounded-full bg-ink text-lg text-ink-foreground">
-                {profile.data.name.split(" ").map((p) => p[0]).slice(0, 2).join("")}
+                {profile.data.name
+                  .split(" ")
+                  .map((p) => p[0])
+                  .slice(0, 2)
+                  .join("")}
               </span>
               <div>
                 <h2 className="text-xl">{profile.data.name}</h2>
-                <p className="text-sm text-muted-foreground">Student ID · {profile.data.studentId}</p>
+                <p className="text-sm text-muted-foreground">
+                  Student ID · {profile.data.studentId}
+                </p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Badge variant="secondary">Level: {profile.data.level}</Badge>
                   <Badge variant="outline">Rank #{profile.data.rank}</Badge>
@@ -73,12 +98,17 @@ function StudentDashboard() {
             <div className="w-full max-w-sm">
               <div className="flex items-baseline justify-between text-sm">
                 <span className="font-medium">{profile.data.points.toLocaleString()} points</span>
-                <span className="text-muted-foreground">{profile.data.nextLevelThreshold.toLocaleString()}</span>
+                <span className="text-muted-foreground">
+                  {profile.data.nextLevelThreshold.toLocaleString()}
+                </span>
               </div>
-              <Progress value={(profile.data.points / profile.data.nextLevelThreshold) * 100} className="mt-2" />
+              <Progress
+                value={(profile.data.points / profile.data.nextLevelThreshold) * 100}
+                className="mt-2"
+              />
               <p className="mt-2 text-xs text-muted-foreground">
-                {profile.data.pointsToNextLevel.toLocaleString()} points to {profile.data.nextLevel}. Points and rank are
-                calculated by the platform backend.
+                {profile.data.pointsToNextLevel.toLocaleString()} points to {profile.data.nextLevel}
+                . Points and rank are calculated by the platform backend.
               </p>
             </div>
           </>
@@ -86,22 +116,28 @@ function StudentDashboard() {
       </section>
 
       <section className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.isPending
-          ? Array.from({ length: 8 }).map((_, i) => <StatCardSkeleton key={i} />)
-          : stats.isError || !stats.data
-            ? <p className="text-sm text-destructive">Unable to load your progress. Please try again.</p>
-            : (
-              <>
-                <StatCard label="Total Courses" value={stats.data.totalCourses} icon={BookOpen} />
-                <StatCard label="Active Courses" value={stats.data.activeCourses} icon={Sparkles} />
-                <StatCard label="Completed" value={stats.data.completedCourses} icon={CheckCircle2} />
-                <StatCard label="Learning Hours" value={stats.data.learningHours} icon={Clock} />
-                <StatCard label="Problems Solved" value={stats.data.problemsSolved} icon={Code2} />
-                <StatCard label="Quiz Average" value={`${stats.data.quizAverage}%`} icon={ListChecks} />
-                <StatCard label="Current Points" value={stats.data.points.toLocaleString()} icon={Star} />
-                <StatCard label="Current Rank" value={`#${stats.data.rank}`} icon={Trophy} />
-              </>
-            )}
+        {stats.isPending ? (
+          Array.from({ length: 8 }).map((_, i) => <StatCardSkeleton key={i} />)
+        ) : stats.isError || !stats.data ? (
+          <p className="text-sm text-destructive">
+            Unable to load your progress. Please try again.
+          </p>
+        ) : (
+          <>
+            <StatCard label="Total Courses" value={stats.data.totalCourses} icon={BookOpen} />
+            <StatCard label="Active Courses" value={stats.data.activeCourses} icon={Sparkles} />
+            <StatCard label="Completed" value={stats.data.completedCourses} icon={CheckCircle2} />
+            <StatCard label="Learning Hours" value={stats.data.learningHours} icon={Clock} />
+            <StatCard label="Problems Solved" value={stats.data.problemsSolved} icon={Code2} />
+            <StatCard label="Quiz Average" value={`${stats.data.quizAverage}%`} icon={ListChecks} />
+            <StatCard
+              label="Current Points"
+              value={stats.data.points.toLocaleString()}
+              icon={Star}
+            />
+            <StatCard label="Current Rank" value={`#${stats.data.rank}`} icon={Trophy} />
+          </>
+        )}
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
@@ -113,7 +149,9 @@ function StudentDashboard() {
               <Skeleton className="h-28 w-full" />
             </div>
           ) : enrollments.isError ? (
-            <p className="text-sm text-destructive">Unable to load your courses. Please try again.</p>
+            <p className="text-sm text-destructive">
+              Unable to load your courses. Please try again.
+            </p>
           ) : continueLearning.length === 0 ? (
             <EmptyState
               icon={BookOpen}
@@ -128,7 +166,10 @@ function StudentDashboard() {
           ) : (
             <div className="space-y-4">
               {continueLearning.map((e) => (
-                <article key={e.id} className="surface-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+                <article
+                  key={e.id}
+                  className="surface-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-center"
+                >
                   <img
                     src={e.thumbnailUrl}
                     alt=""
@@ -140,7 +181,8 @@ function StudentDashboard() {
                     <p className="text-sm text-muted-foreground">{e.instructorName}</p>
                     <Progress value={e.progressPercent} className="mt-3" />
                     <p className="mt-2 text-xs text-muted-foreground">
-                      {e.progressPercent}% · {e.lessonsCompleted}/{e.lessonsTotal} lessons · Next: {e.nextLessonTitle}
+                      {e.progressPercent}% · {e.lessonsCompleted}/{e.lessonsTotal} lessons · Next:{" "}
+                      {e.nextLessonTitle}
                     </p>
                   </div>
                   <Button asChild className="shrink-0">
@@ -169,10 +211,15 @@ function StudentDashboard() {
                   <div>
                     <p className="text-sm">{a.title}</p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(a.occurredAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+                      {new Date(a.occurredAt).toLocaleString("en-IN", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
                     </p>
                   </div>
-                  <Badge variant="outline" className="shrink-0">+{a.points}</Badge>
+                  <Badge variant="outline" className="shrink-0">
+                    +{a.points}
+                  </Badge>
                 </div>
               ))
             )}

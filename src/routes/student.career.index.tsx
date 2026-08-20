@@ -26,10 +26,14 @@ export const Route = createFileRoute("/student/career/")({
       { title: "Career Dashboard — Learntrix" },
       {
         name: "description",
-        content: "Track career readiness, recommended jobs, applications, interviews and referral opportunities.",
+        content:
+          "Track career readiness, recommended jobs, applications, interviews and referral opportunities.",
       },
       { property: "og:title", content: "Career Dashboard — Learntrix" },
-      { property: "og:description", content: "Your placement readiness cockpit inside the Learntrix student portal." },
+      {
+        property: "og:description",
+        content: "Your placement readiness cockpit inside the Learntrix student portal.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -37,7 +41,10 @@ export const Route = createFileRoute("/student/career/")({
 });
 
 function CareerDashboardPage() {
-  const dash = useQuery({ queryKey: ["career", "dashboard"], queryFn: () => careerService.dashboard() });
+  const dash = useQuery({
+    queryKey: ["career", "dashboard"],
+    queryFn: () => careerService.dashboard(),
+  });
   const data = dash.data;
 
   return (
@@ -65,7 +72,9 @@ function CareerDashboardPage() {
           <section className="surface-panel p-6">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Career readiness</p>
+                <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                  Career readiness
+                </p>
                 <p className="text-display text-4xl leading-none">{data.readiness.overall}%</p>
               </div>
               <p className="text-xs text-muted-foreground">
@@ -88,9 +97,17 @@ function CareerDashboardPage() {
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard label="Applications" value={data.applications.length} icon={Briefcase} />
-            <StatCard label="Interviews" value={data.upcomingInterviews.length} icon={CalendarClock} />
+            <StatCard
+              label="Interviews"
+              value={data.upcomingInterviews.length}
+              icon={CalendarClock}
+            />
             <StatCard label="Saved jobs" value={data.savedJobs.length} icon={Bookmark} />
-            <StatCard label="Referral options" value={data.referralOpportunities.length} icon={Handshake} />
+            <StatCard
+              label="Referral options"
+              value={data.referralOpportunities.length}
+              icon={Handshake}
+            />
           </div>
 
           <div className="grid gap-6 lg:grid-cols-3">
@@ -103,7 +120,10 @@ function CareerDashboardPage() {
               </div>
               <ul className="divide-y divide-border">
                 {data.recommendedJobs.map((job) => (
-                  <li key={job.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                  <li
+                    key={job.id}
+                    className="flex flex-wrap items-center justify-between gap-3 py-3"
+                  >
                     <div>
                       <p className="font-medium">
                         {job.title} — {job.companyName}
@@ -117,7 +137,8 @@ function CareerDashboardPage() {
                 ))}
               </ul>
               <p className="mt-4 text-xs text-muted-foreground">
-                Match scores are guidance only and are not a guarantee of shortlisting or employment.
+                Match scores are guidance only and are not a guarantee of shortlisting or
+                employment.
               </p>
             </section>
 
@@ -135,7 +156,9 @@ function CareerDashboardPage() {
                     )}
                     <span>
                       {item.label}
-                      {item.detail ? <span className="block text-xs text-muted-foreground">{item.detail}</span> : null}
+                      {item.detail ? (
+                        <span className="block text-xs text-muted-foreground">{item.detail}</span>
+                      ) : null}
                     </span>
                   </li>
                 ))}
@@ -152,7 +175,9 @@ function CareerDashboardPage() {
                         {a.companyName} — {a.role}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {a.interviewAt ? new Date(a.interviewAt).toLocaleString() : "Date to be confirmed"}
+                        {a.interviewAt
+                          ? new Date(a.interviewAt).toLocaleString()
+                          : "Date to be confirmed"}
                       </p>
                     </li>
                   ))}
@@ -199,7 +224,10 @@ function CareerDashboardPage() {
               </h2>
               <ul className="divide-y divide-border">
                 {data.referralOpportunities.map((r) => (
-                  <li key={r.id} className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
+                  <li
+                    key={r.id}
+                    className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm"
+                  >
                     <div>
                       <p className="font-medium">
                         {r.role} — {r.companyName}
@@ -224,7 +252,9 @@ function CareerDashboardPage() {
                 {data.notifications.map((n) => (
                   <li key={n.id}>
                     <p>{n.title}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(n.createdAt).toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(n.createdAt).toLocaleString()}
+                    </p>
                   </li>
                 ))}
               </ul>

@@ -15,9 +15,16 @@ export const Route = createFileRoute("/admin/cms")({
   head: () => ({
     meta: [
       { title: "Website Content — Learntrix Admin" },
-      { name: "description", content: "Manage homepage banners, highlights, testimonials, FAQs and public site copy without a code change." },
+      {
+        name: "description",
+        content:
+          "Manage homepage banners, highlights, testimonials, FAQs and public site copy without a code change.",
+      },
       { property: "og:title", content: "Website Content — Learntrix Admin" },
-      { property: "og:description", content: "Content management for the public Learntrix website." },
+      {
+        property: "og:description",
+        content: "Content management for the public Learntrix website.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -39,10 +46,17 @@ const testimonials = [
 function AdminCms() {
   return (
     <>
-      <PageHeader title="Website Content" description="Everything on the public site that changes often is editable here." />
+      <PageHeader
+        title="Website Content"
+        description="Everything on the public site that changes often is editable here."
+      />
 
       <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Banners" value={banners.length} hint={`${banners.filter((b) => b.live).length} live`} />
+        <StatCard
+          label="Banners"
+          value={banners.length}
+          hint={`${banners.filter((b) => b.live).length} live`}
+        />
         <StatCard label="Testimonials" value={testimonials.length} />
         <StatCard label="Pending approval" value={testimonials.filter((t) => !t.approved).length} />
         <StatCard label="FAQ entries" value={18} />
@@ -66,7 +80,11 @@ function AdminCms() {
                   </div>
                   <label className="flex items-center gap-2 text-xs">
                     Live
-                    <Switch defaultChecked={b.live} onCheckedChange={() => toast.success("Banner visibility updated.")} aria-label={`Live for ${b.title}`} />
+                    <Switch
+                      defaultChecked={b.live}
+                      onCheckedChange={() => toast.success("Banner visibility updated.")}
+                      aria-label={`Live for ${b.title}`}
+                    />
                   </label>
                 </li>
               ))}
@@ -84,8 +102,14 @@ function AdminCms() {
                     <p className="text-xs text-muted-foreground">{t.role}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant={t.approved ? "success" : "outline"}>{t.approved ? "Approved" : "Pending"}</Badge>
-                    <Button size="sm" variant="outline" onClick={() => toast.success("Testimonial updated.")}>
+                    <Badge variant={t.approved ? "success" : "outline"}>
+                      {t.approved ? "Approved" : "Pending"}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => toast.success("Testimonial updated.")}
+                    >
                       {t.approved ? "Unpublish" : "Approve"}
                     </Button>
                   </div>
@@ -106,11 +130,20 @@ function AdminCms() {
             >
               <div className="space-y-1.5">
                 <Label htmlFor="heroTitle">Hero title</Label>
-                <Input id="heroTitle" defaultValue="Learn with rigour. Get placed with confidence." maxLength={120} />
+                <Input
+                  id="heroTitle"
+                  defaultValue="Learn with rigour. Get placed with confidence."
+                  maxLength={120}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="heroSubtitle">Hero subtitle</Label>
-                <Textarea id="heroSubtitle" rows={3} maxLength={400} defaultValue="Industry-grade programs, live mentorship and a placement ecosystem built for outcomes." />
+                <Textarea
+                  id="heroSubtitle"
+                  rows={3}
+                  maxLength={400}
+                  defaultValue="Industry-grade programs, live mentorship and a placement ecosystem built for outcomes."
+                />
               </div>
               <div>
                 <Button type="submit">Save copy</Button>

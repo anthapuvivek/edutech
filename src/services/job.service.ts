@@ -1,12 +1,12 @@
 import { env } from "@/lib/env";
-import { mockApplications, mockCompanies, mockJobs, mockReferralOpportunities } from "@/mock/career";
+import {
+  mockApplications,
+  mockCompanies,
+  mockJobs,
+  mockReferralOpportunities,
+} from "@/mock/career";
 import { apiRequest, mockDelay } from "@/services/api-client";
-import type {
-  Company,
-  Job,
-  JobApplication,
-  ReferralOpportunity,
-} from "@/types/career";
+import type { Company, Job, JobApplication, ReferralOpportunity } from "@/types/career";
 
 export interface JobQuery {
   search?: string | undefined;
@@ -27,7 +27,8 @@ export const jobService = {
         job.companyName.toLowerCase().includes(search) ||
         job.skills.some((s) => s.toLowerCase().includes(search));
       const matchesType = !query.type || query.type === "all" || job.type === query.type;
-      const matchesMode = !query.workMode || query.workMode === "all" || job.workMode === query.workMode;
+      const matchesMode =
+        !query.workMode || query.workMode === "all" || job.workMode === query.workMode;
       return matchesSearch && matchesType && matchesMode;
     });
     const sorted = [...rows].sort((a, b) => {

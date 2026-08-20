@@ -21,9 +21,22 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { formatPrice } from "@/lib/format";
@@ -34,7 +47,11 @@ export const Route = createFileRoute("/admin/students/$studentId")({
   head: () => ({
     meta: [
       { title: "Student 360 — Learntrix Admin" },
-      { name: "description", content: "Complete student journey: profile, enrollment, attendance, learning, career eligibility, applications and payments." },
+      {
+        name: "description",
+        content:
+          "Complete student journey: profile, enrollment, attendance, learning, career eligibility, applications and payments.",
+      },
       { property: "og:title", content: "Student 360 — Learntrix Admin" },
       { property: "og:description", content: "One page for the full student lifecycle." },
       { name: "robots", content: "noindex" },
@@ -47,11 +64,15 @@ const statusActions: StudentAccountStatus[] = ["active", "inactive", "suspended"
 
 function StudentDetail() {
   const { studentId } = Route.useParams();
-  const student = useQuery({ queryKey: ["admin", "student", studentId], queryFn: () => adminService.student(studentId) });
+  const student = useQuery({
+    queryKey: ["admin", "student", studentId],
+    queryFn: () => adminService.student(studentId),
+  });
   const [reason, setReason] = useState("");
 
   if (student.isPending) return <Skeleton className="h-[70vh] w-full" />;
-  if (student.isError || !student.data) return <p className="text-sm text-destructive">Unable to load this student.</p>;
+  if (student.isError || !student.data)
+    return <p className="text-sm text-destructive">Unable to load this student.</p>;
 
   const s = student.data;
 
@@ -81,7 +102,12 @@ function StudentDetail() {
             {statusActions.map((action) => (
               <AlertDialog key={action}>
                 <AlertDialogTrigger asChild>
-                  <Button size="sm" variant={action === "suspended" || action === "archived" ? "destructive" : "outline"}>
+                  <Button
+                    size="sm"
+                    variant={
+                      action === "suspended" || action === "archived" ? "destructive" : "outline"
+                    }
+                  >
                     {humanize(action === "active" ? "activate" : action)}
                   </Button>
                 </AlertDialogTrigger>
@@ -89,7 +115,8 @@ function StudentDetail() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Set status to {humanize(action)}?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This affects portal access and career eligibility. The action and reason are written to the audit log.
+                      This affects portal access and career eligibility. The action and reason are
+                      written to the audit log.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <div className="space-y-1.5">
@@ -104,7 +131,9 @@ function StudentDetail() {
                   </div>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => void applyStatus(action)}>Confirm</AlertDialogAction>
+                    <AlertDialogAction onClick={() => void applyStatus(action)}>
+                      Confirm
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -138,7 +167,16 @@ function StudentDetail() {
 
       <Tabs defaultValue="overview">
         <TabsList className="mb-4 flex h-auto flex-wrap justify-start gap-1">
-          {["overview", "enrollment", "attendance", "performance", "career", "documents", "payments", "activity"].map((t) => (
+          {[
+            "overview",
+            "enrollment",
+            "attendance",
+            "performance",
+            "career",
+            "documents",
+            "payments",
+            "activity",
+          ].map((t) => (
             <TabsTrigger key={t} value={t} className="capitalize">
               {t}
             </TabsTrigger>
@@ -165,7 +203,8 @@ function StudentDetail() {
               ))}
             </dl>
             <p className="mt-4 text-xs text-muted-foreground">
-              Contact details are private. Trainers only see students assigned to them; students only see their own record.
+              Contact details are private. Trainers only see students assigned to them; students
+              only see their own record.
             </p>
           </Panel>
 
@@ -182,7 +221,12 @@ function StudentDetail() {
                 url ? (
                   <li key={key}>
                     <span className="capitalize text-muted-foreground">{key}: </span>
-                    <a href={url} target="_blank" rel="noreferrer noopener" className="underline underline-offset-4">
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="underline underline-offset-4"
+                    >
                       {url}
                     </a>
                   </li>
@@ -195,13 +239,21 @@ function StudentDetail() {
             </div>
           </Panel>
 
-          <Panel title="Student journey" className="lg:col-span-2" description="Registration through verified placement">
+          <Panel
+            title="Student journey"
+            className="lg:col-span-2"
+            description="Registration through verified placement"
+          >
             <ol className="space-y-3">
               {s.timeline.map((step) => (
                 <li key={step.id} className="flex items-start gap-3">
                   <span
                     className={`mt-1 size-2.5 shrink-0 rounded-full ${
-                      step.state === "done" ? "bg-accent" : step.state === "current" ? "bg-primary" : "bg-muted"
+                      step.state === "done"
+                        ? "bg-accent"
+                        : step.state === "current"
+                          ? "bg-primary"
+                          : "bg-muted"
                     }`}
                   />
                   <div>
@@ -221,7 +273,12 @@ function StudentDetail() {
             title="Enrollments"
             description="Course, batch, trainer, dates, payment and career eligibility are all admin-controlled."
             action={
-              <Button size="sm" onClick={() => toast.info("Enrollment creation posts to the backend enrollment service.")}>
+              <Button
+                size="sm"
+                onClick={() =>
+                  toast.info("Enrollment creation posts to the backend enrollment service.")
+                }
+              >
                 Create enrollment
               </Button>
             }
@@ -265,7 +322,10 @@ function StudentDetail() {
         </TabsContent>
 
         <TabsContent value="attendance">
-          <Panel title="Attendance history" description="Trainer-marked, admin-correctable. Every correction is audited.">
+          <Panel
+            title="Attendance history"
+            description="Trainer-marked, admin-correctable. Every correction is audited."
+          >
             <Table>
               <TableHeader>
                 <TableRow>
@@ -294,7 +354,10 @@ function StudentDetail() {
                             .then(() => toast.success("Attendance correction submitted."))
                         }
                       >
-                        <SelectTrigger className="ml-auto w-36" aria-label={`Correct attendance for ${a.date}`}>
+                        <SelectTrigger
+                          className="ml-auto w-36"
+                          aria-label={`Correct attendance for ${a.date}`}
+                        >
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -348,22 +411,30 @@ function StudentDetail() {
         </TabsContent>
 
         <TabsContent value="career" className="grid gap-4 lg:grid-cols-2">
-          <Panel title="Career eligibility" description="Evaluated by the backend against the configured rule sets.">
+          <Panel
+            title="Career eligibility"
+            description="Evaluated by the backend against the configured rule sets."
+          >
             <StatusBadge value={s.careerStatus} />
             {s.attendancePercent < 80 ? (
               <div className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm">
                 <p className="flex items-center gap-2 font-medium">
-                  <ShieldAlert className="size-4 text-destructive" aria-hidden /> Attendance below required threshold
+                  <ShieldAlert className="size-4 text-destructive" aria-hidden /> Attendance below
+                  required threshold
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Current attendance: {s.attendancePercent}% · Required: 80%. Recommended action: attend upcoming classes to restore
-                  eligibility.
+                  Current attendance: {s.attendancePercent}% · Required: 80%. Recommended action:
+                  attend upcoming classes to restore eligibility.
                 </p>
               </div>
             ) : null}
             <div className="mt-4 space-y-2">
               <Label htmlFor="override">Manual override reason</Label>
-              <Textarea id="override" maxLength={300} placeholder="e.g. medical leave documented — place under review" />
+              <Textarea
+                id="override"
+                maxLength={300}
+                placeholder="e.g. medical leave documented — place under review"
+              />
               <div className="flex flex-wrap gap-2">
                 {["eligible", "conditional", "under_review", "not_eligible"].map((v) => (
                   <Button
@@ -373,7 +444,9 @@ function StudentDetail() {
                     onClick={() =>
                       void adminService
                         .overrideEligibility(studentId, { status: v })
-                        .then(() => toast.success("Override submitted and recorded in the audit log."))
+                        .then(() =>
+                          toast.success("Override submitted and recorded in the audit log."),
+                        )
                     }
                   >
                     {humanize(v)}
@@ -409,7 +482,10 @@ function StudentDetail() {
         </TabsContent>
 
         <TabsContent value="documents">
-          <Panel title="Documents" description="Review, approve, replace or remove student uploads.">
+          <Panel
+            title="Documents"
+            description="Review, approve, replace or remove student uploads."
+          >
             <Table>
               <TableHeader>
                 <TableRow>
@@ -430,10 +506,18 @@ function StudentDetail() {
                       <StatusBadge value={d.reviewStatus} />
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
-                      <Button size="sm" variant="outline" onClick={() => toast.success("Approval submitted.")}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toast.success("Approval submitted.")}
+                      >
                         Approve
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => toast.info("Removal requires backend confirmation.")}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toast.info("Removal requires backend confirmation.")}
+                      >
                         Remove
                       </Button>
                     </TableCell>
@@ -449,7 +533,10 @@ function StudentDetail() {
         </TabsContent>
 
         <TabsContent value="payments" className="grid gap-4 lg:grid-cols-2">
-          <Panel title="Payments" description="Verification is performed by the backend payment service.">
+          <Panel
+            title="Payments"
+            description="Verification is performed by the backend payment service."
+          >
             <Table>
               <TableHeader>
                 <TableRow>
@@ -476,7 +563,10 @@ function StudentDetail() {
           <Panel title="Certificates">
             <ul className="space-y-2 text-sm">
               {s.certificates.map((c) => (
-                <li key={c.id} className="flex items-center justify-between rounded-md border border-border px-3 py-2">
+                <li
+                  key={c.id}
+                  className="flex items-center justify-between rounded-md border border-border px-3 py-2"
+                >
                   <span>{c.title}</span>
                   <span className="text-xs text-muted-foreground">{c.issuedAt}</span>
                 </li>

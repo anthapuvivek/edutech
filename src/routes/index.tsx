@@ -48,20 +48,61 @@ export const Route = createFileRoute("/")({
 });
 
 const whyChooseUs = [
-  { icon: GraduationCap, title: "Industry-focused curriculum", body: "Programs designed with senior engineers and refreshed every quarter." },
-  { icon: Braces, title: "Hands-on projects", body: "Ship production-style projects reviewed against real engineering standards." },
-  { icon: Terminal, title: "Integrated coding practice", body: "Thousands of curated problems mapped directly to your course modules." },
-  { icon: BrainCircuit, title: "AI-powered learning", body: "Context-aware tutoring that understands the lesson you are studying." },
-  { icon: ShieldCheck, title: "Expert instructors", body: "Practitioners from leading product companies, not career trainers." },
-  { icon: Briefcase, title: "Career support", body: "Interview preparation, resume reviews and structured placement guidance." },
-  { icon: Award, title: "Verified certificates", body: "Shareable credentials backed by assessed projects and evaluations." },
-  { icon: LineChart, title: "Progress tracking", body: "Granular analytics across lessons, quizzes, projects and problem solving." },
+  {
+    icon: GraduationCap,
+    title: "Industry-focused curriculum",
+    body: "Programs designed with senior engineers and refreshed every quarter.",
+  },
+  {
+    icon: Braces,
+    title: "Hands-on projects",
+    body: "Ship production-style projects reviewed against real engineering standards.",
+  },
+  {
+    icon: Terminal,
+    title: "Integrated coding practice",
+    body: "Thousands of curated problems mapped directly to your course modules.",
+  },
+  {
+    icon: BrainCircuit,
+    title: "AI-powered learning",
+    body: "Context-aware tutoring that understands the lesson you are studying.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Expert instructors",
+    body: "Practitioners from leading product companies, not career trainers.",
+  },
+  {
+    icon: Briefcase,
+    title: "Career support",
+    body: "Interview preparation, resume reviews and structured placement guidance.",
+  },
+  {
+    icon: Award,
+    title: "Verified certificates",
+    body: "Shareable credentials backed by assessed projects and evaluations.",
+  },
+  {
+    icon: LineChart,
+    title: "Progress tracking",
+    body: "Granular analytics across lessons, quizzes, projects and problem solving.",
+  },
 ];
 
 function HomePage() {
-  const featured = useQuery({ queryKey: ["courses", "featured"], queryFn: () => courseService.featured(6) });
-  const categories = useQuery({ queryKey: ["categories"], queryFn: () => courseService.categories() });
-  const testimonials = useQuery({ queryKey: ["testimonials"], queryFn: () => courseService.testimonials() });
+  const featured = useQuery({
+    queryKey: ["courses", "featured"],
+    queryFn: () => courseService.featured(6),
+  });
+  const categories = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => courseService.categories(),
+  });
+  const testimonials = useQuery({
+    queryKey: ["testimonials"],
+    queryFn: () => courseService.testimonials(),
+  });
   const stats = useQuery({ queryKey: ["stats"], queryFn: () => courseService.stats() });
 
   return (
@@ -91,12 +132,14 @@ function HomePage() {
               </Button>
             </div>
             <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-ink-foreground/70">
-              {["Career-track programs", "Live mentor support", "Placement guidance"].map((item) => (
-                <li key={item} className="inline-flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-accent" aria-hidden />
-                  {item}
-                </li>
-              ))}
+              {["Career-track programs", "Live mentor support", "Placement guidance"].map(
+                (item) => (
+                  <li key={item} className="inline-flex items-center gap-2">
+                    <CheckCircle2 className="size-4 text-accent" aria-hidden />
+                    {item}
+                  </li>
+                ),
+              )}
             </ul>
           </div>
 
@@ -113,7 +156,9 @@ function HomePage() {
             <div className="absolute -bottom-6 -left-4 hidden rounded-lg border border-ink-foreground/10 bg-card p-5 text-card-foreground shadow-[var(--shadow-float)] sm:block">
               <p className="eyebrow">Weekly progress</p>
               <p className="mt-2 text-display text-3xl">92%</p>
-              <p className="text-xs text-muted-foreground">Course completion across active cohorts</p>
+              <p className="text-xs text-muted-foreground">
+                Course completion across active cohorts
+              </p>
             </div>
           </div>
         </div>
@@ -178,7 +223,9 @@ function HomePage() {
               >
                 <div>
                   <p className="font-medium">{category.name}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">{category.courseCount} courses</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {category.courseCount} courses
+                  </p>
                 </div>
                 <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
               </Link>
@@ -241,10 +288,26 @@ function HomePage() {
             <h2 className="mt-3 text-3xl">Guidance that adapts to every lesson</h2>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {[
-                { icon: Sparkles, title: "AI Tutor", body: "Explains concepts using your current course context." },
-                { icon: Terminal, title: "AI Coding Coach", body: "Reviews failed submissions and suggests approaches." },
-                { icon: MessagesSquare, title: "Course Assistant", body: "Answers lesson questions with cited material." },
-                { icon: LineChart, title: "Personalised paths", body: "Recommends what to study next based on performance." },
+                {
+                  icon: Sparkles,
+                  title: "AI Tutor",
+                  body: "Explains concepts using your current course context.",
+                },
+                {
+                  icon: Terminal,
+                  title: "AI Coding Coach",
+                  body: "Reviews failed submissions and suggests approaches.",
+                },
+                {
+                  icon: MessagesSquare,
+                  title: "Course Assistant",
+                  body: "Answers lesson questions with cited material.",
+                },
+                {
+                  icon: LineChart,
+                  title: "Personalised paths",
+                  body: "Recommends what to study next based on performance.",
+                },
               ].map((item) => (
                 <div key={item.title} className="rounded-lg border border-border p-4">
                   <item.icon className="size-4 text-primary" aria-hidden />
@@ -272,10 +335,22 @@ function HomePage() {
           />
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { title: "Portfolio projects", body: "Four graded, production-style builds per career track." },
-              { title: "Skill development", body: "Competency mapping against real hiring requirements." },
-              { title: "Interview preparation", body: "Mock interviews, DSA sprints and system design drills." },
-              { title: "Resume & profile support", body: "Reviews from hiring managers and recruiters." },
+              {
+                title: "Portfolio projects",
+                body: "Four graded, production-style builds per career track.",
+              },
+              {
+                title: "Skill development",
+                body: "Competency mapping against real hiring requirements.",
+              },
+              {
+                title: "Interview preparation",
+                body: "Mock interviews, DSA sprints and system design drills.",
+              },
+              {
+                title: "Resume & profile support",
+                body: "Reviews from hiring managers and recruiters.",
+              },
             ].map((item) => (
               <div key={item.title} className="surface-panel p-6">
                 <h3 className="text-lg">{item.title}</h3>
@@ -288,7 +363,11 @@ function HomePage() {
 
       {/* Testimonials */}
       <section className="container-page py-20">
-        <SectionHeading eyebrow="Student outcomes" title="Trusted by engineers building serious careers" align="center" />
+        <SectionHeading
+          eyebrow="Student outcomes"
+          title="Trusted by engineers building serious careers"
+          align="center"
+        />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {(testimonials.data ?? []).map((item) => (
             <figure key={item.id} className="surface-panel flex h-full flex-col p-6">

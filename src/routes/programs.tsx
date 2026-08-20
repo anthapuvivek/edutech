@@ -18,7 +18,8 @@ export const Route = createFileRoute("/programs")({
       { property: "og:title", content: "Career Programs at Learntrix" },
       {
         property: "og:description",
-        content: "Multi-month career tracks with mentorship, graded projects and placement guidance.",
+        content:
+          "Multi-month career tracks with mentorship, graded projects and placement guidance.",
       },
     ],
   }),
@@ -30,7 +31,8 @@ const programs = [
     name: "Full Stack Engineering",
     months: 9,
     cohort: "Mar 2026",
-    summary: "React, TypeScript, FastAPI, PostgreSQL and cloud deployment with four portfolio builds.",
+    summary:
+      "React, TypeScript, FastAPI, PostgreSQL and cloud deployment with four portfolio builds.",
     outcomes: ["4 graded projects", "Weekly mentor reviews", "DSA interview sprint"],
   },
   {

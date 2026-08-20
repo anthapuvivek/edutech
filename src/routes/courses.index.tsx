@@ -15,7 +15,13 @@ import {
   PaginationItem,
   PaginationLink,
 } from "@/components/ui/pagination";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { PublicLayout } from "@/layouts/PublicLayout";
 import { formatPrice } from "@/lib/format";
@@ -74,7 +80,10 @@ function CourseCataloguePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchInput]);
 
-  const categories = useQuery({ queryKey: ["categories"], queryFn: () => courseService.categories() });
+  const categories = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => courseService.categories(),
+  });
 
   const query: CourseQuery = {
     search: search.search,
@@ -127,7 +136,10 @@ function CourseCataloguePage() {
             <div className="space-y-2">
               <Label htmlFor="course-search">Search</Label>
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+                <Search
+                  className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                  aria-hidden
+                />
                 <Input
                   id="course-search"
                   value={searchInput}
@@ -267,7 +279,10 @@ function CourseCataloguePage() {
                 title="No courses match these filters"
                 description="Try widening your price range or clearing a filter."
                 action={
-                  <Button variant="outline" onClick={() => void navigate({ search: {}, replace: true })}>
+                  <Button
+                    variant="outline"
+                    onClick={() => void navigate({ search: {}, replace: true })}
+                  >
                     Clear filters
                   </Button>
                 }

@@ -9,16 +9,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { teacherService } from "@/services/teacher.service";
 
 export const Route = createFileRoute("/teacher/students")({
   head: () => ({
     meta: [
       { title: "Student Tracking — Learntrix Trainer" },
-      { name: "description", content: "Track course progress, quiz scores, coding practice and engagement for every student in your batches." },
+      {
+        name: "description",
+        content:
+          "Track course progress, quiz scores, coding practice and engagement for every student in your batches.",
+      },
       { property: "og:title", content: "Student Tracking — Learntrix Trainer" },
-      { property: "og:description", content: "Per-student progress across lessons, quizzes and coding practice." },
+      {
+        property: "og:description",
+        content: "Per-student progress across lessons, quizzes and coding practice.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -29,7 +43,10 @@ const statusVariant = { active: "default", at_risk: "outline", inactive: "second
 
 function TeacherStudents() {
   const [search, setSearch] = useState("");
-  const students = useQuery({ queryKey: ["teacher", "students"], queryFn: () => teacherService.students() });
+  const students = useQuery({
+    queryKey: ["teacher", "students"],
+    queryFn: () => teacherService.students(),
+  });
   const rows = (students.data ?? []).filter(
     (s) =>
       s.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -38,7 +55,10 @@ function TeacherStudents() {
 
   return (
     <>
-      <PageHeader title="Students" description="Students enrolled in the courses assigned to you." />
+      <PageHeader
+        title="Students"
+        description="Students enrolled in the courses assigned to you."
+      />
 
       <div className="mb-5 max-w-sm">
         <Input
@@ -54,7 +74,10 @@ function TeacherStudents() {
       ) : students.isError ? (
         <p className="text-sm text-destructive">Unable to load your students. Please try again.</p>
       ) : rows.length === 0 ? (
-        <EmptyState title="No students found" description="Try a different search term or course filter." />
+        <EmptyState
+          title="No students found"
+          description="Try a different search term or course filter."
+        />
       ) : (
         <div className="surface-panel overflow-x-auto">
           <Table>

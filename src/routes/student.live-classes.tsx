@@ -15,9 +15,15 @@ export const Route = createFileRoute("/student/live-classes")({
   head: () => ({
     meta: [
       { title: "Live Classes — Learntrix" },
-      { name: "description", content: "Today's, upcoming and past live classes with your Learntrix trainers." },
+      {
+        name: "description",
+        content: "Today's, upcoming and past live classes with your Learntrix trainers.",
+      },
       { property: "og:title", content: "Live Classes — Learntrix" },
-      { property: "og:description", content: "Join your scheduled live sessions and review past classes." },
+      {
+        property: "og:description",
+        content: "Join your scheduled live sessions and review past classes.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -25,7 +31,10 @@ export const Route = createFileRoute("/student/live-classes")({
 });
 
 function LiveClasses() {
-  const classes = useQuery({ queryKey: ["student", "live-classes"], queryFn: () => studentService.liveClasses() });
+  const classes = useQuery({
+    queryKey: ["student", "live-classes"],
+    queryFn: () => studentService.liveClasses(),
+  });
   const items = classes.data ?? [];
   const today = items.filter((e) => e.status === "Live Now");
   const upcoming = items.filter((e) => e.status === "Upcoming");
@@ -33,7 +42,10 @@ function LiveClasses() {
 
   return (
     <>
-      <PageHeader title="Live Classes" description="Meeting links are released by the backend based on your enrollment." />
+      <PageHeader
+        title="Live Classes"
+        description="Meeting links are released by the backend based on your enrollment."
+      />
 
       {classes.isPending ? (
         <div className="space-y-3">
@@ -80,8 +92,11 @@ function ClassList({ items, emptyText }: { items: PlatformEvent[]; emptyText: st
             <Badge variant={e.status === "Live Now" ? "default" : "outline"}>{e.status}</Badge>
           </div>
           <p className="text-sm text-muted-foreground">
-            {new Date(`${e.date}T${e.startTime}`).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })} ·{" "}
-            {e.platform} · {e.type}
+            {new Date(`${e.date}T${e.startTime}`).toLocaleString("en-IN", {
+              dateStyle: "medium",
+              timeStyle: "short",
+            })}{" "}
+            · {e.platform} · {e.type}
           </p>
           <div className="flex gap-2">
             <Button size="sm" disabled={e.status !== "Live Now"}>

@@ -19,7 +19,10 @@ const careerTabs = [
 
 function CareerGate() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const eligibility = useQuery({ queryKey: ["career", "eligibility"], queryFn: () => careerService.eligibility() });
+  const eligibility = useQuery({
+    queryKey: ["career", "eligibility"],
+    queryFn: () => careerService.eligibility(),
+  });
 
   if (eligibility.isLoading) {
     return (

@@ -8,9 +8,22 @@ import { Panel, StatusBadge } from "@/components/portal/AdminBits";
 import { PageHeader, StatCard } from "@/components/portal/StatCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { crmService } from "@/services/crm.service";
 import { leadKanbanStages, leadStages, type Lead, type LeadStage } from "@/types/ops";
@@ -19,7 +32,11 @@ export const Route = createFileRoute("/admin/crm/")({
   head: () => ({
     meta: [
       { title: "CRM & Leads — Learntrix Admin" },
-      { name: "description", content: "Track enquiries from first touch to enrollment with counsellor ownership and follow-ups." },
+      {
+        name: "description",
+        content:
+          "Track enquiries from first touch to enrollment with counsellor ownership and follow-ups.",
+      },
       { property: "og:title", content: "CRM & Leads — Learntrix Admin" },
       { property: "og:description", content: "Lead pipeline, follow-ups and conversion tracking." },
       { name: "robots", content: "noindex" },
@@ -35,14 +52,19 @@ function AdminCrm() {
   const [owner, setOwner] = useState("all");
   const [search, setSearch] = useState("");
 
-  const overview = useQuery({ queryKey: ["crm", "overview"], queryFn: () => crmService.overview() });
+  const overview = useQuery({
+    queryKey: ["crm", "overview"],
+    queryFn: () => crmService.overview(),
+  });
   const staff = useQuery({ queryKey: ["crm", "staff"], queryFn: () => crmService.staff() });
   const leads = useQuery({
     queryKey: ["crm", "leads", stage, source, owner, search],
     queryFn: () => crmService.list({ stage, source, assignedToId: owner, search }),
   });
 
-  const counsellors = (staff.data ?? []).filter((s) => s.role === "counsellor" || s.role === "placement_officer" || s.role === "support_agent");
+  const counsellors = (staff.data ?? []).filter(
+    (s) => s.role === "counsellor" || s.role === "placement_officer" || s.role === "support_agent",
+  );
   const rows = leads.data ?? [];
 
   async function move(lead: Lead, next: LeadStage) {
@@ -74,7 +96,10 @@ function AdminCrm() {
         <StatCard label="Demo attendees" value={overview.data?.demoAttendees ?? "—"} />
         <StatCard label="Payment pending" value={overview.data?.paymentPending ?? "—"} />
         <StatCard label="Converted" value={overview.data?.convertedLeads ?? "—"} />
-        <StatCard label="Conversion rate" value={overview.data ? `${overview.data.conversionRate}%` : "—"} />
+        <StatCard
+          label="Conversion rate"
+          value={overview.data ? `${overview.data.conversionRate}%` : "—"}
+        />
       </section>
 
       <Tabs defaultValue="table">
@@ -90,7 +115,12 @@ function AdminCrm() {
             description="Filter by stage, source and owner."
             action={
               <div className="flex flex-wrap gap-2">
-                <Input className="w-48" placeholder="Search name, phone, email" value={search} onChange={(e) => setSearch(e.target.value)} />
+                <Input
+                  className="w-48"
+                  placeholder="Search name, phone, email"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
                 <Select value={stage} onValueChange={(v) => setStage(v as LeadStage | "all")}>
                   <SelectTrigger className="w-40" aria-label="Filter by stage">
                     <SelectValue />
@@ -110,7 +140,18 @@ function AdminCrm() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All sources</SelectItem>
-                    {["Website", "Course Enquiry", "Demo Class", "Webinar", "WhatsApp", "Phone", "Referral", "Social Media", "Advertisement", "Other"].map((s) => (
+                    {[
+                      "Website",
+                      "Course Enquiry",
+                      "Demo Class",
+                      "Webinar",
+                      "WhatsApp",
+                      "Phone",
+                      "Referral",
+                      "Social Media",
+                      "Advertisement",
+                      "Other",
+                    ].map((s) => (
                       <SelectItem key={s} value={s}>
                         {s}
                       </SelectItem>
@@ -155,7 +196,11 @@ function AdminCrm() {
                     {rows.map((lead) => (
                       <TableRow key={lead.id}>
                         <TableCell className="font-medium">
-                          <Link to="/admin/crm/$leadId" params={{ leadId: lead.id }} className="hover:underline">
+                          <Link
+                            to="/admin/crm/$leadId"
+                            params={{ leadId: lead.id }}
+                            className="hover:underline"
+                          >
                             {lead.name}
                           </Link>
                           <div className="text-xs text-muted-foreground">{lead.city}</div>
@@ -167,7 +212,10 @@ function AdminCrm() {
                         <TableCell className="text-sm">{lead.courseInterest}</TableCell>
                         <TableCell className="text-xs">{lead.source}</TableCell>
                         <TableCell>
-                          <Select value={lead.assignedToId} onValueChange={(v) => void assign(lead, v)}>
+                          <Select
+                            value={lead.assignedToId}
+                            onValueChange={(v) => void assign(lead, v)}
+                          >
                             <SelectTrigger className="w-40" aria-label={`Assign ${lead.name}`}>
                               <SelectValue />
                             </SelectTrigger>
@@ -183,17 +231,40 @@ function AdminCrm() {
                         <TableCell>
                           <StatusBadge value={lead.stage} />
                         </TableCell>
-                        <TableCell className="text-xs">{new Date(lead.lastContactAt).toLocaleDateString()}</TableCell>
-                        <TableCell className="text-xs">{lead.nextFollowUpAt ? new Date(lead.nextFollowUpAt).toLocaleDateString() : "—"}</TableCell>
+                        <TableCell className="text-xs">
+                          {new Date(lead.lastContactAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          {lead.nextFollowUpAt
+                            ? new Date(lead.nextFollowUpAt).toLocaleDateString()
+                            : "—"}
+                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
-                            <Button size="icon" variant="ghost" aria-label="Call lead" onClick={() => toast.success(`Call logged for ${lead.name}.`)}>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              aria-label="Call lead"
+                              onClick={() => toast.success(`Call logged for ${lead.name}.`)}
+                            >
                               <Phone className="size-4" />
                             </Button>
-                            <Button size="icon" variant="ghost" aria-label="WhatsApp lead" onClick={() => toast.success(`WhatsApp message queued for ${lead.name}.`)}>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              aria-label="WhatsApp lead"
+                              onClick={() =>
+                                toast.success(`WhatsApp message queued for ${lead.name}.`)
+                              }
+                            >
                               <MessageSquare className="size-4" />
                             </Button>
-                            <Button size="icon" variant="ghost" aria-label="Email lead" onClick={() => toast.success(`Email queued for ${lead.name}.`)}>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              aria-label="Email lead"
+                              onClick={() => toast.success(`Email queued for ${lead.name}.`)}
+                            >
                               <Mail className="size-4" />
                             </Button>
                             <Button size="sm" variant="outline" asChild>
@@ -217,23 +288,41 @@ function AdminCrm() {
             {leadKanbanStages.map((col) => {
               const items = rows.filter((l) => l.stage === col);
               return (
-                <div key={col} className="w-72 shrink-0 rounded-lg border border-border bg-card p-3">
+                <div
+                  key={col}
+                  className="w-72 shrink-0 rounded-lg border border-border bg-card p-3"
+                >
                   <div className="mb-3 flex items-center justify-between">
                     <h3 className="text-sm font-semibold">{col}</h3>
                     <span className="text-xs text-muted-foreground">{items.length}</span>
                   </div>
                   <div className="space-y-2">
                     {items.map((lead) => (
-                      <div key={lead.id} className="rounded-md border border-border/70 bg-background p-3">
-                        <Link to="/admin/crm/$leadId" params={{ leadId: lead.id }} className="text-sm font-medium hover:underline">
+                      <div
+                        key={lead.id}
+                        className="rounded-md border border-border/70 bg-background p-3"
+                      >
+                        <Link
+                          to="/admin/crm/$leadId"
+                          params={{ leadId: lead.id }}
+                          className="text-sm font-medium hover:underline"
+                        >
                           {lead.name}
                         </Link>
-                        <p className="mt-0.5 text-xs text-muted-foreground">{lead.courseInterest}</p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {lead.courseInterest}
+                        </p>
                         <p className="mt-1 text-[11px] text-muted-foreground">
                           {lead.source} · {lead.assignedTo}
                         </p>
-                        <Select value={lead.stage} onValueChange={(v) => void move(lead, v as LeadStage)}>
-                          <SelectTrigger className="mt-2 h-8 text-xs" aria-label={`Move ${lead.name}`}>
+                        <Select
+                          value={lead.stage}
+                          onValueChange={(v) => void move(lead, v as LeadStage)}
+                        >
+                          <SelectTrigger
+                            className="mt-2 h-8 text-xs"
+                            aria-label={`Move ${lead.name}`}
+                          >
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -246,7 +335,9 @@ function AdminCrm() {
                         </Select>
                       </div>
                     ))}
-                    {items.length === 0 ? <p className="py-6 text-center text-xs text-muted-foreground">No leads</p> : null}
+                    {items.length === 0 ? (
+                      <p className="py-6 text-center text-xs text-muted-foreground">No leads</p>
+                    ) : null}
                   </div>
                 </div>
               );
@@ -255,7 +346,10 @@ function AdminCrm() {
         </TabsContent>
 
         <TabsContent value="followups">
-          <Panel title="Follow-ups due today" description="Counsellors see only the leads assigned to them; admins see everything.">
+          <Panel
+            title="Follow-ups due today"
+            description="Counsellors see only the leads assigned to them; admins see everything."
+          >
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -269,7 +363,10 @@ function AdminCrm() {
                 </TableHeader>
                 <TableBody>
                   {rows
-                    .filter((l) => l.nextFollowUpAt?.slice(0, 10) === new Date().toISOString().slice(0, 10))
+                    .filter(
+                      (l) =>
+                        l.nextFollowUpAt?.slice(0, 10) === new Date().toISOString().slice(0, 10),
+                    )
                     .map((lead) => (
                       <TableRow key={lead.id}>
                         <TableCell className="font-medium">{lead.name}</TableCell>

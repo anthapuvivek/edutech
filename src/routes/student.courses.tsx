@@ -15,7 +15,10 @@ export const Route = createFileRoute("/student/courses")({
   head: () => ({
     meta: [
       { title: "My Courses — Learntrix" },
-      { name: "description", content: "All the Learntrix courses you are enrolled in, with progress and access status." },
+      {
+        name: "description",
+        content: "All the Learntrix courses you are enrolled in, with progress and access status.",
+      },
       { property: "og:title", content: "My Courses — Learntrix" },
       { property: "og:description", content: "Your enrolled Learntrix courses and progress." },
       { name: "robots", content: "noindex" },
@@ -34,7 +37,10 @@ const statusLabel: Record<EnrollmentStatus, string> = {
 };
 
 function MyCourses() {
-  const enrollments = useQuery({ queryKey: ["student", "enrollments"], queryFn: () => studentService.enrollments() });
+  const enrollments = useQuery({
+    queryKey: ["student", "enrollments"],
+    queryFn: () => studentService.enrollments(),
+  });
 
   return (
     <>
@@ -70,14 +76,26 @@ function MyCourses() {
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {enrollments.data.map((e) => {
-            const locked = e.status === "payment_pending" || e.status === "expired" || e.status === "not_enrolled";
+            const locked =
+              e.status === "payment_pending" ||
+              e.status === "expired" ||
+              e.status === "not_enrolled";
             return (
               <article key={e.id} className="surface-panel flex flex-col overflow-hidden">
-                <img src={e.thumbnailUrl} alt="" loading="lazy" className="aspect-16/9 w-full object-cover" />
+                <img
+                  src={e.thumbnailUrl}
+                  alt=""
+                  loading="lazy"
+                  className="aspect-16/9 w-full object-cover"
+                />
                 <div className="flex flex-1 flex-col p-5">
                   <div className="flex items-start justify-between gap-3">
                     <h2 className="text-base leading-snug">{e.courseTitle}</h2>
-                    <Badge variant={e.status === "completed" ? "secondary" : locked ? "outline" : "default"}>
+                    <Badge
+                      variant={
+                        e.status === "completed" ? "secondary" : locked ? "outline" : "default"
+                      }
+                    >
                       {statusLabel[e.status]}
                     </Badge>
                   </div>

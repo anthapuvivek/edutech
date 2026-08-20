@@ -7,18 +7,38 @@ import { Panel, StatusBadge } from "@/components/portal/AdminBits";
 import { PageHeader, StatCard } from "@/components/portal/StatCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { adminService } from "@/services/admin.service";
 
 export const Route = createFileRoute("/admin/attendance")({
   head: () => ({
     meta: [
       { title: "Attendance — Learntrix Admin" },
-      { name: "description", content: "Track, filter and correct student attendance across courses, batches and trainers." },
+      {
+        name: "description",
+        content:
+          "Track, filter and correct student attendance across courses, batches and trainers.",
+      },
       { property: "og:title", content: "Attendance — Learntrix Admin" },
-      { property: "og:description", content: "Attendance percentages, low-attendance alerts and audited corrections." },
+      {
+        property: "og:description",
+        content: "Attendance percentages, low-attendance alerts and audited corrections.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -28,7 +48,10 @@ export const Route = createFileRoute("/admin/attendance")({
 const ALL = "all";
 
 function AdminAttendance() {
-  const rowsQuery = useQuery({ queryKey: ["admin", "attendance"], queryFn: () => adminService.attendance() });
+  const rowsQuery = useQuery({
+    queryKey: ["admin", "attendance"],
+    queryFn: () => adminService.attendance(),
+  });
   const [course, setCourse] = useState(ALL);
   const [batch, setBatch] = useState(ALL);
   const [trainer, setTrainer] = useState(ALL);
@@ -36,7 +59,9 @@ function AdminAttendance() {
   const [date, setDate] = useState("");
 
   const data = rowsQuery.data ?? [];
-  const unique = (key: "courseTitle" | "batchName" | "trainerName") => [...new Set(data.map((r) => r[key]))];
+  const unique = (key: "courseTitle" | "batchName" | "trainerName") => [
+    ...new Set(data.map((r) => r[key])),
+  ];
 
   const rows = useMemo(
     () =>
@@ -51,7 +76,9 @@ function AdminAttendance() {
   );
 
   const below = data.filter((r) => r.attendancePercent < 80);
-  const average = data.length ? Math.round(data.reduce((sum, r) => sum + r.attendancePercent, 0) / data.length) : 0;
+  const average = data.length
+    ? Math.round(data.reduce((sum, r) => sum + r.attendancePercent, 0) / data.length)
+    : 0;
 
   return (
     <>
@@ -74,15 +101,29 @@ function AdminAttendance() {
 
       {below.length > 0 ? (
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
-          <p className="text-sm font-medium">⚠ {below.length} students have attendance below 80%.</p>
+          <p className="text-sm font-medium">
+            ⚠ {below.length} students have attendance below 80%.
+          </p>
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant="outline" onClick={() => toast.success("In-app notification queued for flagged students.")}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => toast.success("In-app notification queued for flagged students.")}
+            >
               Send notification
             </Button>
-            <Button size="sm" variant="outline" onClick={() => toast.success("WhatsApp campaign queued via the backend.")}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => toast.success("WhatsApp campaign queued via the backend.")}
+            >
               Send WhatsApp message
             </Button>
-            <Button size="sm" variant="outline" onClick={() => toast.success("Email campaign queued via the backend.")}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => toast.success("Email campaign queued via the backend.")}
+            >
               Send email
             </Button>
           </div>
@@ -110,8 +151,19 @@ function AdminAttendance() {
               </SelectContent>
             </Select>
           ))}
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} aria-label="Date" />
-          <Input value={student} onChange={(e) => setStudent(e.target.value)} placeholder="Student name" aria-label="Student" maxLength={80} />
+          <Input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            aria-label="Date"
+          />
+          <Input
+            value={student}
+            onChange={(e) => setStudent(e.target.value)}
+            placeholder="Student name"
+            aria-label="Student"
+            maxLength={80}
+          />
         </div>
 
         {rowsQuery.isPending ? (
@@ -148,8 +200,15 @@ function AdminAttendance() {
                     <TableCell className="text-right">{r.late}</TableCell>
                     <TableCell className="text-right">{r.excused}</TableCell>
                     <TableCell className="text-right">
-                      <StatusBadge value={r.attendancePercent >= 80 ? "active" : "pending"} className="mr-2" />
-                      <span className={r.attendancePercent < 80 ? "font-medium text-destructive" : "font-medium"}>
+                      <StatusBadge
+                        value={r.attendancePercent >= 80 ? "active" : "pending"}
+                        className="mr-2"
+                      />
+                      <span
+                        className={
+                          r.attendancePercent < 80 ? "font-medium text-destructive" : "font-medium"
+                        }
+                      >
                         {r.attendancePercent}%
                       </span>
                     </TableCell>

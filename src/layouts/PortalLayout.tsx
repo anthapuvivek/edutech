@@ -22,7 +22,6 @@ export interface PortalNavItem {
   indent?: boolean | undefined;
 }
 
-
 const roleLabel: Record<Role, string> = {
   student: "Student Portal",
   teacher: "Trainer Portal",
@@ -66,7 +65,10 @@ export function PortalLayout({
   }
 
   const sidebar = (
-    <nav aria-label={roleLabel[role]} className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4">
+    <nav
+      aria-label={roleLabel[role]}
+      className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4"
+    >
       {nav.map((item) => (
         <div key={item.label} className="contents">
           {item.section ? (
@@ -107,7 +109,6 @@ export function PortalLayout({
     </nav>
   );
 
-
   const initials = (user?.name ?? "U")
     .split(" ")
     .map((p) => p[0])
@@ -121,11 +122,17 @@ export function PortalLayout({
           <Link to="/" aria-label="Learntrix home">
             <Logo tone="inverse" />
           </Link>
-          <p className="mt-2 text-xs uppercase tracking-[0.18em] text-ink-foreground/45">{roleLabel[role]}</p>
+          <p className="mt-2 text-xs uppercase tracking-[0.18em] text-ink-foreground/45">
+            {roleLabel[role]}
+          </p>
         </div>
         {sidebar}
         <div className="px-3">
-          <Button variant="ghost" className="w-full justify-start text-ink-foreground/70 hover:text-ink-foreground" onClick={handleSignOut}>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-ink-foreground/70 hover:text-ink-foreground"
+            onClick={handleSignOut}
+          >
             <LogOut className="size-4" aria-hidden /> Sign out
           </Button>
         </div>

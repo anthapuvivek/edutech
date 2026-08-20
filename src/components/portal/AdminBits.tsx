@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-type BadgeVariant = "default" | "secondary" | "outline" | "destructive" | "success" | "warning" | "info";
+type BadgeVariant =
+  "default" | "secondary" | "outline" | "destructive" | "success" | "warning" | "info";
 
 const tone: Record<string, BadgeVariant> = {
   active: "success",
@@ -87,7 +88,15 @@ export function Panel({
   );
 }
 
-export function MetricBar({ label, value, suffix = "%" }: { label: string; value: number; suffix?: string }) {
+export function MetricBar({
+  label,
+  value,
+  suffix = "%",
+}: {
+  label: string;
+  value: number;
+  suffix?: string;
+}) {
   return (
     <div>
       <div className="flex items-center justify-between text-xs">
@@ -99,7 +108,10 @@ export function MetricBar({ label, value, suffix = "%" }: { label: string; value
       </div>
       <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
         <div
-          className={cn("h-full rounded-full", value >= 80 ? "bg-accent" : value >= 60 ? "bg-primary" : "bg-destructive")}
+          className={cn(
+            "h-full rounded-full",
+            value >= 80 ? "bg-accent" : value >= 60 ? "bg-primary" : "bg-destructive",
+          )}
           style={{ width: `${Math.min(Math.max(value, 0), 100)}%` }}
         />
       </div>

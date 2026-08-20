@@ -39,7 +39,8 @@ export const studentService = {
     return mockDelay(mockEvents);
   },
   async leaderboard(scope = "global"): Promise<LeaderboardEntry[]> {
-    if (!env.useMocks) return apiRequest<LeaderboardEntry[]>("/student/leaderboard", { query: { scope } });
+    if (!env.useMocks)
+      return apiRequest<LeaderboardEntry[]>("/student/leaderboard", { query: { scope } });
     return mockDelay(mockLeaderboard);
   },
 };

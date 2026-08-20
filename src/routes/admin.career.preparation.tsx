@@ -12,7 +12,11 @@ export const Route = createFileRoute("/admin/career/preparation")({
   head: () => ({
     meta: [
       { title: "Interview Preparation — Learntrix Admin" },
-      { name: "description", content: "Manage company-wise interview questions, preparation roadmaps, mock interview slots and assessment patterns." },
+      {
+        name: "description",
+        content:
+          "Manage company-wise interview questions, preparation roadmaps, mock interview slots and assessment patterns.",
+      },
       { property: "og:title", content: "Interview Preparation — Learntrix Admin" },
       { property: "og:description", content: "Company preparation content management." },
       { name: "robots", content: "noindex" },
@@ -22,9 +26,30 @@ export const Route = createFileRoute("/admin/career/preparation")({
 });
 
 const questions = [
-  { id: "q1", company: "Microsoft", round: "DSA Round", topic: "Graphs", difficulty: "Hard", asked: 24 },
-  { id: "q2", company: "Wipro", round: "Aptitude", topic: "Time & Work", difficulty: "Easy", asked: 61 },
-  { id: "q3", company: "Amazon", round: "System Design", topic: "Rate limiter", difficulty: "Hard", asked: 12 },
+  {
+    id: "q1",
+    company: "Microsoft",
+    round: "DSA Round",
+    topic: "Graphs",
+    difficulty: "Hard",
+    asked: 24,
+  },
+  {
+    id: "q2",
+    company: "Wipro",
+    round: "Aptitude",
+    topic: "Time & Work",
+    difficulty: "Easy",
+    asked: 61,
+  },
+  {
+    id: "q3",
+    company: "Amazon",
+    round: "System Design",
+    topic: "Rate limiter",
+    difficulty: "Hard",
+    asked: 12,
+  },
   { id: "q4", company: "TCS", round: "HR", topic: "Behavioural", difficulty: "Easy", asked: 88 },
 ];
 
@@ -74,8 +99,14 @@ function AdminPreparation() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant={q.difficulty === "Hard" ? "warning" : "outline"}>{q.difficulty}</Badge>
-                    <Button size="sm" variant="outline" onClick={() => toast.info("Opening question editor.")}>
+                    <Badge variant={q.difficulty === "Hard" ? "warning" : "outline"}>
+                      {q.difficulty}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => toast.info("Opening question editor.")}
+                    >
                       Edit
                     </Button>
                   </div>
@@ -88,10 +119,20 @@ function AdminPreparation() {
         <TabsContent value="roadmaps">
           <div className="grid gap-4 md:grid-cols-3">
             {roadmaps.map((r) => (
-              <Panel key={r.id} title={`${r.company} roadmap`} description={`${r.weeks} weeks · ${r.modules} modules`}>
+              <Panel
+                key={r.id}
+                title={`${r.company} roadmap`}
+                description={`${r.weeks} weeks · ${r.modules} modules`}
+              >
                 <div className="flex items-center justify-between">
-                  <Badge variant={r.published ? "success" : "outline"}>{r.published ? "Published" : "Draft"}</Badge>
-                  <Button size="sm" variant="outline" onClick={() => toast.success("Roadmap status updated.")}>
+                  <Badge variant={r.published ? "success" : "outline"}>
+                    {r.published ? "Published" : "Draft"}
+                  </Badge>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => toast.success("Roadmap status updated.")}
+                  >
                     {r.published ? "Unpublish" : "Publish"}
                   </Button>
                 </div>

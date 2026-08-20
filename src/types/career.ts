@@ -91,13 +91,7 @@ export interface JobApplication {
 }
 
 export type ReferralStatus =
-  | "Requested"
-  | "Under Review"
-  | "Accepted"
-  | "Referred"
-  | "Rejected"
-  | "Expired"
-  | "Completed";
+  "Requested" | "Under Review" | "Accepted" | "Referred" | "Rejected" | "Expired" | "Completed";
 
 export interface ReferralOpportunity {
   id: string;
@@ -164,7 +158,11 @@ export interface CareerOnboardingPayload {
 export interface SkillGap {
   targetRole: string;
   strong: string[];
-  needsImprovement: Array<{ skill: string; level: number; recommendedCourseSlug?: string | undefined }>;
+  needsImprovement: Array<{
+    skill: string;
+    level: number;
+    recommendedCourseSlug?: string | undefined;
+  }>;
   missing: string[];
 }
 

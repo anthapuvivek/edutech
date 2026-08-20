@@ -23,7 +23,8 @@ export const couponService = {
   },
 
   async create(payload: Partial<Coupon>): Promise<Coupon> {
-    if (!env.useMocks) return apiRequest<Coupon>("/admin/coupons", { method: "POST", body: payload });
+    if (!env.useMocks)
+      return apiRequest<Coupon>("/admin/coupons", { method: "POST", body: payload });
     const coupon: Coupon = {
       id: `cpn-${Date.now()}`,
       code: (payload.code ?? "NEWCODE").toUpperCase(),
@@ -37,7 +38,8 @@ export const couponService = {
       applicableBatches: payload.applicableBatches ?? [],
       applicableUsers: payload.applicableUsers ?? [],
       startDate: payload.startDate ?? new Date().toISOString().slice(0, 10),
-      expiryDate: payload.expiryDate ?? new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10),
+      expiryDate:
+        payload.expiryDate ?? new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10),
       usageLimit: payload.usageLimit ?? 100,
       usagePerStudent: payload.usagePerStudent ?? 1,
       status: payload.status ?? "draft",
@@ -49,15 +51,26 @@ export const couponService = {
   },
 
   async update(id: string, patch: Partial<Coupon>): Promise<Coupon> {
-    if (!env.useMocks) return apiRequest<Coupon>(`/admin/coupons/${id}`, { method: "PATCH", body: patch });
+    if (!env.useMocks)
+      return apiRequest<Coupon>(`/admin/coupons/${id}`, { method: "PATCH", body: patch });
     coupons = coupons.map((c) => (c.id === id ? { ...c, ...patch } : c));
-    return mockDelay(coupons.find((c) => c.id === id)!, 150);
+    return mockDelay(
+      coupons.find((c) => c.id === id)!,
+      150,
+    );
   },
 
   async duplicate(id: string): Promise<Coupon> {
-    if (!env.useMocks) return apiRequest<Coupon>(`/admin/coupons/${id}/duplicate`, { method: "POST" });
+    if (!env.useMocks)
+      return apiRequest<Coupon>(`/admin/coupons/${id}/duplicate`, { method: "POST" });
     const source = coupons.find((c) => c.id === id)!;
-    const copy: Coupon = { ...source, id: `cpn-${Date.now()}`, code: `${source.code}-COPY`, status: "draft", createdAt: new Date().toISOString() };
+    const copy: Coupon = {
+      ...source,
+      id: `cpn-${Date.now()}`,
+      code: `${source.code}-COPY`,
+      status: "draft",
+      createdAt: new Date().toISOString(),
+    };
     coupons = [copy, ...coupons];
     return mockDelay(copy, 150);
   },
@@ -69,39 +82,81 @@ export const couponService = {
   },
 
   /** Server-authoritative in production; the mock mirrors the response shape. */
-  async validate(input: { code: string; coursePrice: number; currency?: string }): Promise<CouponValidationResult> {
+  async validate(input: {
+    code: string;
+    coursePrice: number;
+    currency?: string;
+  }): Promise<CouponValidationResult> {
     const code = input.code.trim().toUpperCase();
     if (!env.useMocks) {
-      return apiRequest<CouponValidationResult>("/checkout/coupons/validate", { method: "POST", body: { ...input, code } });
+      return apiRequest<CouponValidationResult>("/checkout/coupons/validate", {
+        method: "POST",
+        body: { ...input, code },
+      });
     }
     const currency = input.currency ?? "INR";
     const coupon = coupons.find((c) => c.code.toUpperCase() === code);
     if (!coupon) {
-      return mockDelay({ valid: false, code, reason: "invalid", message: "This coupon code is not valid." }, 400);
+      return mockDelay(
+        { valid: false, code, reason: "invalid", message: "This coupon code is not valid." },
+        400,
+      );
     }
     if (coupon.status === "expired" || Date.parse(coupon.expiryDate) < Date.now()) {
-      return mockDelay({ valid: false, code, reason: "expired", message: "This coupon has expired." }, 400);
+      return mockDelay(
+        { valid: false, code, reason: "expired", message: "This coupon has expired." },
+        400,
+      );
     }
     if (coupon.status !== "active") {
-      return mockDelay({ valid: false, code, reason: "not_applicable", message: "This coupon is not applicable to this course yet." }, 400);
+      return mockDelay(
+        {
+          valid: false,
+          code,
+          reason: "not_applicable",
+          message: "This coupon is not applicable to this course yet.",
+        },
+        400,
+      );
     }
     if (coupon.minimumPurchase && input.coursePrice < coupon.minimumPurchase) {
       return mockDelay(
-        { valid: false, code, reason: "minimum_purchase", message: `A minimum purchase of ₹${coupon.minimumPurchase.toLocaleString("en-IN")} is required.` },
+        {
+          valid: false,
+          code,
+          reason: "minimum_purchase",
+          message: `A minimum purchase of ₹${coupon.minimumPurchase.toLocaleString("en-IN")} is required.`,
+        },
         400,
       );
     }
     if (code === "SUMMER15") {
-      return mockDelay({ valid: false, code, reason: "usage_limit", message: "This coupon has reached its usage limit." }, 400);
+      return mockDelay(
+        {
+          valid: false,
+          code,
+          reason: "usage_limit",
+          message: "This coupon has reached its usage limit.",
+        },
+        400,
+      );
     }
-    const raw = coupon.discountType === "percentage" ? Math.round((input.coursePrice * coupon.discountValue) / 100) : coupon.discountValue;
+    const raw =
+      coupon.discountType === "percentage"
+        ? Math.round((input.coursePrice * coupon.discountValue) / 100)
+        : coupon.discountValue;
     const discount = Math.min(raw, coupon.maximumDiscount ?? raw, input.coursePrice);
     return mockDelay(
       {
         valid: true,
         code,
         message: `${coupon.name} applied.`,
-        quote: { coursePrice: input.coursePrice, discount, finalPrice: input.coursePrice - discount, currency },
+        quote: {
+          coursePrice: input.coursePrice,
+          discount,
+          finalPrice: input.coursePrice - discount,
+          currency,
+        },
       },
       400,
     );

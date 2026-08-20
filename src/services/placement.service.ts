@@ -42,13 +42,28 @@ export const placementService = {
     return mockDelay(mockPlacementAnalytics);
   },
 
-  async students(params?: { eligibility?: string; search?: string }): Promise<PlacementEligibleStudent[]> {
-    if (!env.useMocks) return apiRequest<PlacementEligibleStudent[]>("/placement/students", { query: params as Record<string, string> });
+  async students(params?: {
+    eligibility?: string;
+    search?: string;
+  }): Promise<PlacementEligibleStudent[]> {
+    if (!env.useMocks)
+      return apiRequest<PlacementEligibleStudent[]>("/placement/students", {
+        query: params as Record<string, string>,
+      });
     const term = params?.search?.toLowerCase().trim();
     return mockDelay(
       mockEligibleStudents.filter((s) => {
-        if (params?.eligibility && params.eligibility !== "all" && s.eligibility !== params.eligibility) return false;
-        if (term && !`${s.name} ${s.courseTitle} ${s.skills.join(" ")}`.toLowerCase().includes(term)) return false;
+        if (
+          params?.eligibility &&
+          params.eligibility !== "all" &&
+          s.eligibility !== params.eligibility
+        )
+          return false;
+        if (
+          term &&
+          !`${s.name} ${s.courseTitle} ${s.skills.join(" ")}`.toLowerCase().includes(term)
+        )
+          return false;
         return true;
       }),
     );
@@ -60,7 +75,8 @@ export const placementService = {
   },
 
   async createDrive(payload: Partial<PlacementDrive>): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>("/placement/drives", { method: "POST", body: payload });
+    if (!env.useMocks)
+      return apiRequest<void>("/placement/drives", { method: "POST", body: payload });
     drives = [
       {
         id: `drv-${Date.now()}`,
@@ -84,25 +100,40 @@ export const placementService = {
   },
 
   async updateDriveStage(id: string, stage: PlacementDrive["stage"]): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>(`/placement/drives/${id}/stage`, { method: "PATCH", body: { stage } });
+    if (!env.useMocks)
+      return apiRequest<void>(`/placement/drives/${id}/stage`, {
+        method: "PATCH",
+        body: { stage },
+      });
     drives = drives.map((d) => (d.id === id ? { ...d, stage } : d));
     return mockDelay(undefined, 150);
   },
 
-  async applications(params?: { status?: string; search?: string }): Promise<PlacementApplication[]> {
-    if (!env.useMocks) return apiRequest<PlacementApplication[]>("/placement/applications", { query: params as Record<string, string> });
+  async applications(params?: {
+    status?: string;
+    search?: string;
+  }): Promise<PlacementApplication[]> {
+    if (!env.useMocks)
+      return apiRequest<PlacementApplication[]>("/placement/applications", {
+        query: params as Record<string, string>,
+      });
     const term = params?.search?.toLowerCase().trim();
     return mockDelay(
       applications.filter((a) => {
         if (params?.status && params.status !== "all" && a.status !== params.status) return false;
-        if (term && !`${a.studentName} ${a.companyName} ${a.role}`.toLowerCase().includes(term)) return false;
+        if (term && !`${a.studentName} ${a.companyName} ${a.role}`.toLowerCase().includes(term))
+          return false;
         return true;
       }),
     );
   },
 
   async updateApplicationStatus(ids: string[], status: PlacementApplicationStatus): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>("/placement/applications/status", { method: "PATCH", body: { ids, status } });
+    if (!env.useMocks)
+      return apiRequest<void>("/placement/applications/status", {
+        method: "PATCH",
+        body: { ids, status },
+      });
     applications = applications.map((a) => (ids.includes(a.id) ? { ...a, status } : a));
     return mockDelay(undefined, 200);
   },
@@ -113,7 +144,8 @@ export const placementService = {
   },
 
   async scheduleInterview(payload: Partial<PlacementInterview>): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>("/placement/interviews", { method: "POST", body: payload });
+    if (!env.useMocks)
+      return apiRequest<void>("/placement/interviews", { method: "POST", body: payload });
     interviews = [
       {
         id: `int-${Date.now()}`,
@@ -140,7 +172,8 @@ export const placementService = {
   },
 
   async recordOffer(payload: Partial<PlacementOffer>): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>("/placement/offers", { method: "POST", body: payload });
+    if (!env.useMocks)
+      return apiRequest<void>("/placement/offers", { method: "POST", body: payload });
     offers = [
       {
         id: `off-${Date.now()}`,
@@ -161,8 +194,20 @@ export const placementService = {
 
   /** Placement status is only advanced by an authorised confirmation. */
   async updateOfferStatus(id: string, status: PlacementOffer["status"]): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>(`/placement/offers/${id}/status`, { method: "PATCH", body: { status } });
-    offers = offers.map((o) => (o.id === id ? { ...o, status, verifiedBy: status === "Placement Verified" ? "Placement Office" : o.verifiedBy } : o));
+    if (!env.useMocks)
+      return apiRequest<void>(`/placement/offers/${id}/status`, {
+        method: "PATCH",
+        body: { status },
+      });
+    offers = offers.map((o) =>
+      o.id === id
+        ? {
+            ...o,
+            status,
+            verifiedBy: status === "Placement Verified" ? "Placement Office" : o.verifiedBy,
+          }
+        : o,
+    );
     return mockDelay(undefined, 150);
   },
 
@@ -172,12 +217,19 @@ export const placementService = {
     return mockDelay(
       drives
         .filter((d) => d.stage !== "Draft" && d.stage !== "Cancelled")
-        .map((d, i) => ({ ...d, applicationStatus: i % 3 === 0 ? (["Applied", "Assessment", "Shortlisted", "Interview"] as const)[i % 4] : undefined })),
+        .map((d, i) => ({
+          ...d,
+          applicationStatus:
+            i % 3 === 0
+              ? (["Applied", "Assessment", "Shortlisted", "Interview"] as const)[i % 4]
+              : undefined,
+        })),
     );
   },
 
   async applyToDrive(driveId: string): Promise<void> {
-    if (!env.useMocks) return apiRequest<void>(`/student/placement-drives/${driveId}/apply`, { method: "POST" });
+    if (!env.useMocks)
+      return apiRequest<void>(`/student/placement-drives/${driveId}/apply`, { method: "POST" });
     return mockDelay(undefined, 250);
   },
 };

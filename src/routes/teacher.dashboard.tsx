@@ -1,6 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Activity, BookOpen, Code2, ListChecks, TrendingUp, UserCheck, Users, Video } from "lucide-react";
+import {
+  Activity,
+  BookOpen,
+  Code2,
+  ListChecks,
+  TrendingUp,
+  UserCheck,
+  Users,
+  Video,
+} from "lucide-react";
 
 import { PageHeader, StatCard, StatCardSkeleton } from "@/components/portal/StatCard";
 import { Button } from "@/components/ui/button";
@@ -11,7 +20,11 @@ export const Route = createFileRoute("/teacher/dashboard")({
   head: () => ({
     meta: [
       { title: "Trainer Dashboard — Learntrix" },
-      { name: "description", content: "Trainer view of student engagement, course completion, quiz performance and upcoming classes." },
+      {
+        name: "description",
+        content:
+          "Trainer view of student engagement, course completion, quiz performance and upcoming classes.",
+      },
       { property: "og:title", content: "Trainer Dashboard — Learntrix" },
       { property: "og:description", content: "Monitor your batches, students and class schedule." },
       { name: "robots", content: "noindex" },
@@ -46,15 +59,29 @@ function TeacherDashboard() {
         {stats.isPending ? (
           Array.from({ length: 8 }).map((_, i) => <StatCardSkeleton key={i} />)
         ) : stats.isError || !stats.data ? (
-          <p className="text-sm text-destructive">Unable to load your analytics. Please try again.</p>
+          <p className="text-sm text-destructive">
+            Unable to load your analytics. Please try again.
+          </p>
         ) : (
           <>
             <StatCard label="Total Students" value={stats.data.totalStudents} icon={Users} />
             <StatCard label="Active Students" value={stats.data.activeStudents} icon={UserCheck} />
             <StatCard label="Courses" value={stats.data.courses} icon={BookOpen} />
-            <StatCard label="Avg Completion" value={`${stats.data.averageCompletion}%`} icon={TrendingUp} />
-            <StatCard label="Avg Quiz Score" value={`${stats.data.averageQuizScore}%`} icon={ListChecks} />
-            <StatCard label="Problems Solved" value={stats.data.problemsSolved.toLocaleString()} icon={Code2} />
+            <StatCard
+              label="Avg Completion"
+              value={`${stats.data.averageCompletion}%`}
+              icon={TrendingUp}
+            />
+            <StatCard
+              label="Avg Quiz Score"
+              value={`${stats.data.averageQuizScore}%`}
+              icon={ListChecks}
+            />
+            <StatCard
+              label="Problems Solved"
+              value={stats.data.problemsSolved.toLocaleString()}
+              icon={Code2}
+            />
             <StatCard label="Engagement" value={`${stats.data.engagement}%`} icon={Activity} />
             <StatCard label="Upcoming Classes" value={stats.data.upcomingClasses} icon={Video} />
           </>
@@ -85,7 +112,9 @@ function TeacherDashboard() {
             {[62, 78, 55, 91, 84, 40, 28].map((v, i) => (
               <div key={i} className="flex flex-1 flex-col items-center gap-2">
                 <div className="w-full rounded-t-sm bg-primary/80" style={{ height: `${v}%` }} />
-                <span className="text-xs text-muted-foreground">{["M", "T", "W", "T", "F", "S", "S"][i]}</span>
+                <span className="text-xs text-muted-foreground">
+                  {["M", "T", "W", "T", "F", "S", "S"][i]}
+                </span>
               </div>
             ))}
           </div>

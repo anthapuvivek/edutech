@@ -77,8 +77,16 @@ export const adminService = {
     if (!env.useMocks) return apiRequest("/admin/students", { method: "POST", body: payload });
     return mockDelay({ ok: true } as const);
   },
-  async setStudentStatus(id: string, status: StudentAccountStatus, reason?: string): Promise<{ ok: true }> {
-    if (!env.useMocks) return apiRequest(`/admin/students/${id}/status`, { method: "PATCH", body: { status, reason } });
+  async setStudentStatus(
+    id: string,
+    status: StudentAccountStatus,
+    reason?: string,
+  ): Promise<{ ok: true }> {
+    if (!env.useMocks)
+      return apiRequest(`/admin/students/${id}/status`, {
+        method: "PATCH",
+        body: { status, reason },
+      });
     return mockDelay({ ok: true } as const);
   },
   async createEnrollment(payload: Record<string, unknown>): Promise<{ ok: true }> {
@@ -86,7 +94,8 @@ export const adminService = {
     return mockDelay({ ok: true } as const);
   },
   async overrideEligibility(id: string, payload: Record<string, unknown>): Promise<{ ok: true }> {
-    if (!env.useMocks) return apiRequest(`/admin/students/${id}/eligibility`, { method: "PATCH", body: payload });
+    if (!env.useMocks)
+      return apiRequest(`/admin/students/${id}/eligibility`, { method: "PATCH", body: payload });
     return mockDelay({ ok: true } as const);
   },
 
@@ -104,7 +113,8 @@ export const adminService = {
     return mockDelay(mockTrainers);
   },
   async approveTrainer(id: string, approve: boolean): Promise<{ ok: true }> {
-    if (!env.useMocks) return apiRequest(`/admin/trainers/${id}/approval`, { method: "PATCH", body: { approve } });
+    if (!env.useMocks)
+      return apiRequest(`/admin/trainers/${id}/approval`, { method: "PATCH", body: { approve } });
     return mockDelay({ ok: true } as const);
   },
 
@@ -124,7 +134,11 @@ export const adminService = {
     return mockDelay(mockEligibilityRules);
   },
   async saveEligibilityRule(rule: EligibilityRuleSet): Promise<{ ok: true }> {
-    if (!env.useMocks) return apiRequest(`/admin/career/eligibility-rules/${rule.id}`, { method: "PUT", body: rule });
+    if (!env.useMocks)
+      return apiRequest(`/admin/career/eligibility-rules/${rule.id}`, {
+        method: "PUT",
+        body: rule,
+      });
     return mockDelay({ ok: true } as const);
   },
   async jobs(): Promise<AdminJob[]> {
@@ -148,7 +162,8 @@ export const adminService = {
     return mockDelay(mockAdminReferrals);
   },
   async updateReferral(id: string, status: string): Promise<{ ok: true }> {
-    if (!env.useMocks) return apiRequest(`/admin/career/referrals/${id}`, { method: "PATCH", body: { status } });
+    if (!env.useMocks)
+      return apiRequest(`/admin/career/referrals/${id}`, { method: "PATCH", body: { status } });
     return mockDelay({ ok: true } as const);
   },
 
@@ -166,11 +181,13 @@ export const adminService = {
     return mockDelay(mockWhatsAppSettings);
   },
   async saveWhatsappSettings(payload: WhatsAppSettings): Promise<{ ok: true }> {
-    if (!env.useMocks) return apiRequest("/admin/communication/whatsapp", { method: "PUT", body: payload });
+    if (!env.useMocks)
+      return apiRequest("/admin/communication/whatsapp", { method: "PUT", body: payload });
     return mockDelay({ ok: true } as const);
   },
   async sendNotification(payload: Record<string, unknown>): Promise<{ ok: true }> {
-    if (!env.useMocks) return apiRequest("/admin/communication/notifications", { method: "POST", body: payload });
+    if (!env.useMocks)
+      return apiRequest("/admin/communication/notifications", { method: "POST", body: payload });
     return mockDelay({ ok: true } as const);
   },
 

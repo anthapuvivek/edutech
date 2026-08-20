@@ -19,13 +19,40 @@ import type {
 
 const courseTitles = mockCourses.slice(0, 6).map((c) => c.title);
 const trainers = ["Durga Prasad", "Meera Krishnan", "Vikram Sethi", "Ananya Bose"];
-const colleges = ["VIT Vellore", "Osmania University", "NIT Warangal", "Anna University", "IIIT Hyderabad"];
+const colleges = [
+  "VIT Vellore",
+  "Osmania University",
+  "NIT Warangal",
+  "Anna University",
+  "IIIT Hyderabad",
+];
 const cities = ["Hyderabad", "Bengaluru", "Chennai", "Pune", "Delhi NCR", "Remote"];
 
 const firstNames = [
-  "Aarav", "Ishita", "Rohan", "Sneha", "Karthik", "Priya", "Aditya", "Fatima",
-  "Neha", "Vivek", "Ananya", "Rahul", "Divya", "Sanjay", "Meghna", "Arjun",
-  "Tanvi", "Nikhil", "Pooja", "Harsh", "Riya", "Manoj", "Swathi", "Imran",
+  "Aarav",
+  "Ishita",
+  "Rohan",
+  "Sneha",
+  "Karthik",
+  "Priya",
+  "Aditya",
+  "Fatima",
+  "Neha",
+  "Vivek",
+  "Ananya",
+  "Rahul",
+  "Divya",
+  "Sanjay",
+  "Meghna",
+  "Arjun",
+  "Tanvi",
+  "Nikhil",
+  "Pooja",
+  "Harsh",
+  "Riya",
+  "Manoj",
+  "Swathi",
+  "Imran",
 ];
 const lastNames = ["Sharma", "Nair", "Gupta", "Reddy", "Iyer", "Menon", "Rao", "Khan"];
 
@@ -53,7 +80,9 @@ export const mockAdminStudents: AdminStudentRow[] = Array.from({ length: 24 }).m
         : i % 7 === 0
           ? "under_review"
           : "not_eligible";
-  const status = (["active", "active", "active", "pending", "active", "suspended", "inactive", "active"] as const)[i % 8]!;
+  const status = (
+    ["active", "active", "active", "pending", "active", "suspended", "inactive", "active"] as const
+  )[i % 8]!;
   return {
     id: `stu-${i + 1}`,
     studentId: `LTX-2026-${(400 + i).toString().padStart(4, "0")}`,
@@ -75,7 +104,9 @@ export const mockAdminStudents: AdminStudentRow[] = Array.from({ length: 24 }).m
     rank: i + 1,
     careerStatus,
     paymentStatus: (["paid", "paid", "partial", "pending", "paid", "refunded"] as const)[i % 6]!,
-    placementStatus: (["job_seeking", "interviewing", "not_started", "placed", "offered", "job_seeking"] as const)[i % 6]!,
+    placementStatus: (
+      ["job_seeking", "interviewing", "not_started", "placed", "offered", "job_seeking"] as const
+    )[i % 6]!,
     location: pick(cities, i),
     college: pick(colleges, i),
     graduationYear: 2023 + (i % 4),
@@ -98,19 +129,85 @@ export function mockAdminStudentDetail(id: string): AdminStudentDetail {
       hackerrank: "https://hackerrank.com/example",
     },
     documents: [
-      { id: "d1", kind: "profile_photo", name: "profile.jpg", uploadedAt: "2026-06-02", reviewStatus: "approved" },
-      { id: "d2", kind: "resume", name: "resume-v3.pdf", uploadedAt: "2026-08-04", reviewStatus: "pending" },
-      { id: "d3", kind: "certificate", name: "aws-cloud-practitioner.pdf", uploadedAt: "2026-07-19", reviewStatus: "approved" },
-      { id: "d4", kind: "id_proof", name: "college-id.png", uploadedAt: "2026-05-28", reviewStatus: "approved" },
+      {
+        id: "d1",
+        kind: "profile_photo",
+        name: "profile.jpg",
+        uploadedAt: "2026-06-02",
+        reviewStatus: "approved",
+      },
+      {
+        id: "d2",
+        kind: "resume",
+        name: "resume-v3.pdf",
+        uploadedAt: "2026-08-04",
+        reviewStatus: "pending",
+      },
+      {
+        id: "d3",
+        kind: "certificate",
+        name: "aws-cloud-practitioner.pdf",
+        uploadedAt: "2026-07-19",
+        reviewStatus: "approved",
+      },
+      {
+        id: "d4",
+        kind: "id_proof",
+        name: "college-id.png",
+        uploadedAt: "2026-05-28",
+        reviewStatus: "approved",
+      },
     ],
     timeline: [
-      { id: "t1", stage: "Registration", detail: "Self-registered via website", occurredAt: "2026-01-12", state: "done" },
-      { id: "t2", stage: "Approval", detail: "Approved by Nisha Verma", occurredAt: "2026-01-13", state: "done" },
-      { id: "t3", stage: "Payment", detail: `${row.paymentStatus} · installment plan`, occurredAt: "2026-01-14", state: "done" },
-      { id: "t4", stage: "Batch assignment", detail: `${row.batchName} · ${row.trainerName}`, occurredAt: "2026-01-15", state: "done" },
-      { id: "t5", stage: "Learning", detail: `${row.progressPercent}% course progress`, occurredAt: "2026-08-18", state: "current" },
-      { id: "t6", stage: "Career eligibility", detail: row.careerStatus.replace("_", " "), occurredAt: "2026-08-18", state: row.careerStatus === "eligible" ? "done" : "current" },
-      { id: "t7", stage: "Placement", detail: "Awaiting verified offer", occurredAt: "—", state: "upcoming" },
+      {
+        id: "t1",
+        stage: "Registration",
+        detail: "Self-registered via website",
+        occurredAt: "2026-01-12",
+        state: "done",
+      },
+      {
+        id: "t2",
+        stage: "Approval",
+        detail: "Approved by Nisha Verma",
+        occurredAt: "2026-01-13",
+        state: "done",
+      },
+      {
+        id: "t3",
+        stage: "Payment",
+        detail: `${row.paymentStatus} · installment plan`,
+        occurredAt: "2026-01-14",
+        state: "done",
+      },
+      {
+        id: "t4",
+        stage: "Batch assignment",
+        detail: `${row.batchName} · ${row.trainerName}`,
+        occurredAt: "2026-01-15",
+        state: "done",
+      },
+      {
+        id: "t5",
+        stage: "Learning",
+        detail: `${row.progressPercent}% course progress`,
+        occurredAt: "2026-08-18",
+        state: "current",
+      },
+      {
+        id: "t6",
+        stage: "Career eligibility",
+        detail: row.careerStatus.replace("_", " "),
+        occurredAt: "2026-08-18",
+        state: row.careerStatus === "eligible" ? "done" : "current",
+      },
+      {
+        id: "t7",
+        stage: "Placement",
+        detail: "Awaiting verified offer",
+        occurredAt: "—",
+        state: "upcoming",
+      },
     ],
     enrollments: [
       {
@@ -129,20 +226,73 @@ export function mockAdminStudentDetail(id: string): AdminStudentDetail {
       date: `2026-08-${(10 + i).toString().padStart(2, "0")}`,
       classTitle: `Module ${i + 3} · Session ${i + 1}`,
       batchName: row.batchName,
-      status: (["present", "present", "late", "present", "absent", "present", "excused", "present"] as const)[i]!,
+      status: (
+        [
+          "present",
+          "present",
+          "late",
+          "present",
+          "absent",
+          "present",
+          "excused",
+          "present",
+        ] as const
+      )[i]!,
     })),
     assessments: [
-      { id: "as1", kind: "quiz", title: "Module 4 Quiz", score: row.quizScore, submittedAt: "2026-08-12" },
-      { id: "as2", kind: "assignment", title: "REST API assignment", score: row.assignmentCompletion, submittedAt: "2026-08-09" },
-      { id: "as3", kind: "coding", title: "DSA Sprint 3", score: row.codingScore, submittedAt: "2026-08-15" },
+      {
+        id: "as1",
+        kind: "quiz",
+        title: "Module 4 Quiz",
+        score: row.quizScore,
+        submittedAt: "2026-08-12",
+      },
+      {
+        id: "as2",
+        kind: "assignment",
+        title: "REST API assignment",
+        score: row.assignmentCompletion,
+        submittedAt: "2026-08-09",
+      },
+      {
+        id: "as3",
+        kind: "coding",
+        title: "DSA Sprint 3",
+        score: row.codingScore,
+        submittedAt: "2026-08-15",
+      },
     ],
     applications: [
-      { id: "ap1", company: "Microsoft", role: "SDE Intern", appliedAt: "2026-08-01", status: "Interview" },
-      { id: "ap2", company: "Wipro", role: "Java Developer", appliedAt: "2026-07-22", status: "Shortlisted" },
+      {
+        id: "ap1",
+        company: "Microsoft",
+        role: "SDE Intern",
+        appliedAt: "2026-08-01",
+        status: "Interview",
+      },
+      {
+        id: "ap2",
+        company: "Wipro",
+        role: "Java Developer",
+        appliedAt: "2026-07-22",
+        status: "Shortlisted",
+      },
     ],
     payments: [
-      { id: "p1", description: "Installment 1", amount: 45000, status: "paid", paidAt: "2026-01-14" },
-      { id: "p2", description: "Installment 2", amount: 45000, status: row.paymentStatus, paidAt: "2026-06-14" },
+      {
+        id: "p1",
+        description: "Installment 1",
+        amount: 45000,
+        status: "paid",
+        paidAt: "2026-01-14",
+      },
+      {
+        id: "p2",
+        description: "Installment 2",
+        amount: 45000,
+        status: row.paymentStatus,
+        paidAt: "2026-06-14",
+      },
     ],
     certificates: [{ id: "c1", title: "Foundations of Programming", issuedAt: "2026-04-02" }],
     activity: [
@@ -183,9 +333,22 @@ export const mockTrainers: AdminTrainer[] = [
   name,
   email: `${name.split(" ")[0]!.toLowerCase()}@learntrix.com`,
   phone: `+91 98${seeded(i + 5, 10000000, 89999999)}`,
-  headline: pick(["Full Stack Architect", "Data Science Lead", "Cloud & DevOps Coach", "DSA Mentor"], i),
-  approvalStatus: (["approved", "approved", "pending", "approved", "approved", "pending"] as const)[i]!,
-  skills: pick([["Java", "Spring"], ["Python", "ML"], ["AWS", "Kubernetes"], ["DSA", "System Design"]], i),
+  headline: pick(
+    ["Full Stack Architect", "Data Science Lead", "Cloud & DevOps Coach", "DSA Mentor"],
+    i,
+  ),
+  approvalStatus: (["approved", "approved", "pending", "approved", "approved", "pending"] as const)[
+    i
+  ]!,
+  skills: pick(
+    [
+      ["Java", "Spring"],
+      ["Python", "ML"],
+      ["AWS", "Kubernetes"],
+      ["DSA", "System Design"],
+    ],
+    i,
+  ),
   courses: [pick(courseTitles, i), pick(courseTitles, i + 2)],
   batches: seeded(i + 9, 1, 5),
   students: seeded(i + 13, 40, 220),
@@ -195,25 +358,27 @@ export const mockTrainers: AdminTrainer[] = [
   status: i === 5 ? "inactive" : "active",
 }));
 
-export const mockAttendanceSummary: AttendanceSummaryRow[] = mockAdminStudents.slice(0, 16).map((s, i) => {
-  const total = 48;
-  const present = Math.round((s.attendancePercent / 100) * total);
-  const late = seeded(i + 2, 0, 5);
-  const excused = seeded(i + 4, 0, 3);
-  return {
-    studentId: s.id,
-    studentName: s.name,
-    courseTitle: s.courseTitle,
-    batchName: s.batchName,
-    trainerName: s.trainerName,
-    totalClasses: total,
-    present,
-    absent: Math.max(total - present - late - excused, 0),
-    late,
-    excused,
-    attendancePercent: s.attendancePercent,
-  };
-});
+export const mockAttendanceSummary: AttendanceSummaryRow[] = mockAdminStudents
+  .slice(0, 16)
+  .map((s, i) => {
+    const total = 48;
+    const present = Math.round((s.attendancePercent / 100) * total);
+    const late = seeded(i + 2, 0, 5);
+    const excused = seeded(i + 4, 0, 3);
+    return {
+      studentId: s.id,
+      studentName: s.name,
+      courseTitle: s.courseTitle,
+      batchName: s.batchName,
+      trainerName: s.trainerName,
+      totalClasses: total,
+      present,
+      absent: Math.max(total - present - late - excused, 0),
+      late,
+      excused,
+      attendancePercent: s.attendancePercent,
+    };
+  });
 
 export const mockEligibilityRules: EligibilityRuleSet[] = [
   {
@@ -319,21 +484,37 @@ export const mockAdminCompanies: AdminCompany[] = [
 
 export const mockAdminJobs: AdminJob[] = Array.from({ length: 9 }).map((_, i) => ({
   id: `job-${i + 1}`,
-  title: pick(["Java Developer", "SDE Intern", "Data Analyst", "Cloud Engineer", "Frontend Engineer"], i),
-  companyName: pick(mockAdminCompanies.map((c) => c.name), i),
+  title: pick(
+    ["Java Developer", "SDE Intern", "Data Analyst", "Cloud Engineer", "Frontend Engineer"],
+    i,
+  ),
+  companyName: pick(
+    mockAdminCompanies.map((c) => c.name),
+    i,
+  ),
   location: pick(cities, i),
   workMode: (["Hybrid", "Remote", "Onsite"] as const)[i % 3]!,
   jobType: (["Full Time", "Internship", "Full Time", "Contract"] as const)[i % 4]!,
   salaryRange: pick(["₹6–9 LPA", "₹25k/mo stipend", "₹10–14 LPA", "₹4.5–7 LPA"], i),
   experience: pick(["0–1 yrs", "Fresher", "1–3 yrs"], i),
-  skills: pick([["Java", "Spring Boot"], ["React", "TypeScript"], ["Python", "SQL"], ["AWS", "Terraform"]], i),
+  skills: pick(
+    [
+      ["Java", "Spring Boot"],
+      ["React", "TypeScript"],
+      ["Python", "SQL"],
+      ["AWS", "Terraform"],
+    ],
+    i,
+  ),
   eligibleCourses: [pick(courseTitles, i), pick(courseTitles, i + 1)],
   minAttendance: [80, 85, 75, 90][i % 4]!,
   minCodingScore: [70, 75, 60, 80][i % 4]!,
   minCourseProgress: [70, 75, 60, 80][i % 4]!,
   deadline: `2026-09-${(5 + i).toString().padStart(2, "0")}`,
   applicationMethod: (["Internal", "External URL", "Referral"] as const)[i % 3]!,
-  status: (["Published", "Published", "Draft", "Published", "Expired", "Unpublished"] as const)[i % 6]!,
+  status: (["Published", "Published", "Draft", "Published", "Expired", "Unpublished"] as const)[
+    i % 6
+  ]!,
   applicants: seeded(i + 6, 4, 180),
   eligibleStudents: seeded(i + 8, 20, 420),
 }));
@@ -349,18 +530,43 @@ export const mockAdminApplications: AdminApplication[] = Array.from({ length: 14
     companyName: job.companyName,
     appliedAt: `2026-08-${(2 + i).toString().padStart(2, "0")}`,
     eligible: student.careerStatus === "eligible",
-    status: (["Applied", "Shortlisted", "Assessment", "Interview", "Final Round", "Offer", "Rejected", "Withdrawn"] as const)[i % 8]!,
+    status: (
+      [
+        "Applied",
+        "Shortlisted",
+        "Assessment",
+        "Interview",
+        "Final Round",
+        "Offer",
+        "Rejected",
+        "Withdrawn",
+      ] as const
+    )[i % 8]!,
   };
 });
 
 export const mockAdminReferrals: AdminReferral[] = Array.from({ length: 8 }).map((_, i) => ({
   id: `ref-${i + 1}`,
-  companyName: pick(mockAdminCompanies.map((c) => c.name), i),
+  companyName: pick(
+    mockAdminCompanies.map((c) => c.name),
+    i,
+  ),
   role: pick(["Java Developer", "SDE Intern", "Cloud Engineer"], i),
   studentName: mockAdminStudents[i + 2]!.name,
   referrerName: pick(["Alumni · Rohit K", "Alumni · Shreya M", "Trainer · Durga Prasad"], i),
   requestedAt: `2026-08-${(6 + i).toString().padStart(2, "0")}`,
-  status: (["Requested", "Under Review", "Approved", "Referred", "Rejected", "Expired", "Completed", "Requested"] as const)[i]!,
+  status: (
+    [
+      "Requested",
+      "Under Review",
+      "Approved",
+      "Referred",
+      "Rejected",
+      "Expired",
+      "Completed",
+      "Requested",
+    ] as const
+  )[i]!,
 }));
 
 export const mockAdminArticles: AdminArticle[] = [
@@ -372,7 +578,8 @@ export const mockAdminArticles: AdminArticle[] = [
     authorRole: "admin",
     category: "Interview",
     tags: ["interview", "dsa", "career"],
-    excerpt: "A structured 12-week preparation roadmap covering DSA, system design and behavioural rounds.",
+    excerpt:
+      "A structured 12-week preparation roadmap covering DSA, system design and behavioural rounds.",
     seoTitle: "Product company interview preparation roadmap (2026)",
     seoDescription: "A 12-week roadmap to prepare for product-based company interviews.",
     publishDate: "2026-08-10",
@@ -556,25 +763,99 @@ export const mockAdminOverview: AdminOverview = {
     { id: "op7", label: "Referral requests", detail: "Awaiting review", count: 8 },
   ],
   alerts: [
-    { id: "al1", severity: "warning", title: "Students with attendance below threshold", count: 32, actionLabel: "Review attendance", to: "/admin/attendance" },
-    { id: "al2", severity: "warning", title: "Trainer approvals pending", count: 2, actionLabel: "Review trainers", to: "/admin/teachers" },
-    { id: "al3", severity: "info", title: "New enquiries", count: 87, actionLabel: "Open communication", to: "/admin/communication" },
-    { id: "al4", severity: "info", title: "Referral requests pending", count: 8, actionLabel: "Review referrals", to: "/admin/career/referrals" },
-    { id: "al5", severity: "warning", title: "Jobs expiring in 7 days", count: 5, actionLabel: "Review jobs", to: "/admin/career/jobs" },
-    { id: "al6", severity: "info", title: "Unpublished articles", count: 3, actionLabel: "Open articles", to: "/admin/articles" },
-    { id: "al7", severity: "warning", title: "Student documents pending review", count: 17, actionLabel: "Review students", to: "/admin/students" },
+    {
+      id: "al1",
+      severity: "warning",
+      title: "Students with attendance below threshold",
+      count: 32,
+      actionLabel: "Review attendance",
+      to: "/admin/attendance",
+    },
+    {
+      id: "al2",
+      severity: "warning",
+      title: "Trainer approvals pending",
+      count: 2,
+      actionLabel: "Review trainers",
+      to: "/admin/teachers",
+    },
+    {
+      id: "al3",
+      severity: "info",
+      title: "New enquiries",
+      count: 87,
+      actionLabel: "Open communication",
+      to: "/admin/communication",
+    },
+    {
+      id: "al4",
+      severity: "info",
+      title: "Referral requests pending",
+      count: 8,
+      actionLabel: "Review referrals",
+      to: "/admin/career/referrals",
+    },
+    {
+      id: "al5",
+      severity: "warning",
+      title: "Jobs expiring in 7 days",
+      count: 5,
+      actionLabel: "Review jobs",
+      to: "/admin/career/jobs",
+    },
+    {
+      id: "al6",
+      severity: "info",
+      title: "Unpublished articles",
+      count: 3,
+      actionLabel: "Open articles",
+      to: "/admin/articles",
+    },
+    {
+      id: "al7",
+      severity: "warning",
+      title: "Student documents pending review",
+      count: 17,
+      actionLabel: "Review students",
+      to: "/admin/students",
+    },
   ],
 };
 
 export const mockSetupSteps: AdminSetupStep[] = [
-  { id: "s1", label: "Company profile", description: "Brand, contact details and legal information", complete: true },
+  {
+    id: "s1",
+    label: "Company profile",
+    description: "Brand, contact details and legal information",
+    complete: true,
+  },
   { id: "s2", label: "Courses", description: "Publish your course catalogue", complete: true },
   { id: "s3", label: "Teachers", description: "Invite and approve trainers", complete: true },
   { id: "s4", label: "Batches", description: "Create batches and schedules", complete: true },
   { id: "s5", label: "Students", description: "Onboard or import students", complete: true },
-  { id: "s6", label: "Schedules", description: "Live class calendar and meeting links", complete: false },
-  { id: "s7", label: "Career rules", description: "Configure eligibility thresholds", complete: true },
+  {
+    id: "s6",
+    label: "Schedules",
+    description: "Live class calendar and meeting links",
+    complete: false,
+  },
+  {
+    id: "s7",
+    label: "Career rules",
+    description: "Configure eligibility thresholds",
+    complete: true,
+  },
   { id: "s8", label: "Jobs", description: "Publish first job opportunities", complete: false },
-  { id: "s9", label: "Communication / WhatsApp", description: "Business number and message templates", complete: false },
-  { id: "s10", label: "Website content", description: "Banners, testimonials and FAQs", complete: false },
+  {
+    id: "s9",
+    label: "Communication / WhatsApp",
+    description: "Business number and message templates",
+    complete: false,
+  },
+  {
+    id: "s10",
+    label: "Website content",
+    description: "Banners, testimonials and FAQs",
+    complete: false,
+  },
 ];

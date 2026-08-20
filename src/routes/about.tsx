@@ -16,7 +16,8 @@ export const Route = createFileRoute("/about")({
       { property: "og:title", content: "About Learntrix" },
       {
         property: "og:description",
-        content: "Rigorous technology education led by practising engineers, built for career outcomes.",
+        content:
+          "Rigorous technology education led by practising engineers, built for career outcomes.",
       },
     ],
   }),
@@ -24,9 +25,18 @@ export const Route = createFileRoute("/about")({
 });
 
 const values = [
-  { title: "Academic rigour", body: "Curricula reviewed by senior practitioners and updated every quarter." },
-  { title: "Practice over theory", body: "Every concept is reinforced with graded projects and coding problems." },
-  { title: "Transparency", body: "Public outcome reporting and honest guidance on what a program can deliver." },
+  {
+    title: "Academic rigour",
+    body: "Curricula reviewed by senior practitioners and updated every quarter.",
+  },
+  {
+    title: "Practice over theory",
+    body: "Every concept is reinforced with graded projects and coding problems.",
+  },
+  {
+    title: "Transparency",
+    body: "Public outcome reporting and honest guidance on what a program can deliver.",
+  },
   { title: "Longevity", body: "We teach durable engineering judgement, not framework trivia." },
 ];
 
@@ -63,7 +73,9 @@ function AboutPage() {
         <div className="surface-panel flex flex-col items-start gap-5 p-10 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl">Considering a program for yourself or your team?</h2>
-            <p className="mt-2 text-muted-foreground">Our advisors will map a track to your goals.</p>
+            <p className="mt-2 text-muted-foreground">
+              Our advisors will map a track to your goals.
+            </p>
           </div>
           <Button asChild size="lg">
             <Link to="/contact">Contact us</Link>

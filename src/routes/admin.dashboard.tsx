@@ -43,22 +43,42 @@ export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({
     meta: [
       { title: "Admin Control Center — Learntrix" },
-      { name: "description", content: "Platform-wide command center for students, trainers, batches, attendance, career eligibility, jobs and revenue." },
+      {
+        name: "description",
+        content:
+          "Platform-wide command center for students, trainers, batches, attendance, career eligibility, jobs and revenue.",
+      },
       { property: "og:title", content: "Admin Control Center — Learntrix" },
-      { property: "og:description", content: "Run the entire Learntrix learning and placement operation from one console." },
+      {
+        property: "og:description",
+        content: "Run the entire Learntrix learning and placement operation from one console.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
   component: AdminDashboard,
 });
 
-const chartAxis = { stroke: "currentColor", fontSize: 11, tickLine: false, axisLine: false } as const;
+const chartAxis = {
+  stroke: "currentColor",
+  fontSize: 11,
+  tickLine: false,
+  axisLine: false,
+} as const;
 
 function AdminDashboard() {
-  const overview = useQuery({ queryKey: ["admin", "overview"], queryFn: () => adminService.overview() });
-  const setup = useQuery({ queryKey: ["admin", "setup"], queryFn: () => adminService.setupSteps() });
+  const overview = useQuery({
+    queryKey: ["admin", "overview"],
+    queryFn: () => adminService.overview(),
+  });
+  const setup = useQuery({
+    queryKey: ["admin", "setup"],
+    queryFn: () => adminService.setupSteps(),
+  });
 
-  const setupComplete = setup.data ? Math.round((setup.data.filter((s) => s.complete).length / setup.data.length) * 100) : 0;
+  const setupComplete = setup.data
+    ? Math.round((setup.data.filter((s) => s.complete).length / setup.data.length) * 100)
+    : 0;
 
   return (
     <>
@@ -81,24 +101,58 @@ function AdminDashboard() {
         {overview.isPending ? (
           Array.from({ length: 12 }).map((_, i) => <StatCardSkeleton key={i} />)
         ) : overview.isError || !overview.data ? (
-          <p className="text-sm text-destructive">Unable to load platform metrics. Please try again.</p>
+          <p className="text-sm text-destructive">
+            Unable to load platform metrics. Please try again.
+          </p>
         ) : (
           (() => {
             const m = overview.data.metrics;
             return (
               <>
-                <StatCard label="Total Students" value={formatCompact(m.students)} hint={`${formatCompact(m.activeStudents)} active · ${formatCompact(m.inactiveStudents)} inactive`} icon={Users} />
+                <StatCard
+                  label="Total Students"
+                  value={formatCompact(m.students)}
+                  hint={`${formatCompact(m.activeStudents)} active · ${formatCompact(m.inactiveStudents)} inactive`}
+                  icon={Users}
+                />
                 <StatCard label="Teachers" value={m.teachers} icon={GraduationCap} />
                 <StatCard label="Active Courses" value={m.activeCourses} icon={BookOpen} />
                 <StatCard label="Active Batches" value={m.activeBatches} icon={CalendarDays} />
-                <StatCard label="Enrollments" value={formatCompact(m.enrollments)} icon={ClipboardList} />
+                <StatCard
+                  label="Enrollments"
+                  value={formatCompact(m.enrollments)}
+                  icon={ClipboardList}
+                />
                 <StatCard label="Today's Classes" value={m.todaysClasses} icon={Video} />
-                <StatCard label="Today's Attendance" value={`${m.todaysAttendance}%`} icon={CalendarCheck} />
-                <StatCard label="Career Eligible" value={formatCompact(m.careerEligible)} hint={`${formatCompact(m.careerIneligible)} not eligible`} icon={ShieldCheck} />
+                <StatCard
+                  label="Today's Attendance"
+                  value={`${m.todaysAttendance}%`}
+                  icon={CalendarCheck}
+                />
+                <StatCard
+                  label="Career Eligible"
+                  value={formatCompact(m.careerEligible)}
+                  hint={`${formatCompact(m.careerIneligible)} not eligible`}
+                  icon={ShieldCheck}
+                />
                 <StatCard label="Active Jobs" value={m.activeJobs} icon={Briefcase} />
-                <StatCard label="Applications" value={formatCompact(m.applications)} hint={`${m.interviews} interviews`} icon={ClipboardList} />
-                <StatCard label="Offers / Placements" value={`${m.offers} / ${m.placements}`} icon={Award} />
-                <StatCard label="Revenue (MTD)" value={formatPrice(m.revenueThisMonth)} hint={`${m.newEnquiries} new enquiries`} icon={Wallet} />
+                <StatCard
+                  label="Applications"
+                  value={formatCompact(m.applications)}
+                  hint={`${m.interviews} interviews`}
+                  icon={ClipboardList}
+                />
+                <StatCard
+                  label="Offers / Placements"
+                  value={`${m.offers} / ${m.placements}`}
+                  icon={Award}
+                />
+                <StatCard
+                  label="Revenue (MTD)"
+                  value={formatPrice(m.revenueThisMonth)}
+                  hint={`${m.newEnquiries} new enquiries`}
+                  icon={Wallet}
+                />
               </>
             );
           })()
@@ -114,8 +168,22 @@ function AdminDashboard() {
                 <XAxis dataKey="month" {...chartAxis} />
                 <YAxis {...chartAxis} width={44} />
                 <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} />
-                <Area type="monotone" dataKey="students" stroke="var(--color-primary)" fill="var(--color-primary)" fillOpacity={0.12} strokeWidth={2} />
-                <Area type="monotone" dataKey="enrollments" stroke="var(--color-accent)" fill="var(--color-accent)" fillOpacity={0.1} strokeWidth={2} />
+                <Area
+                  type="monotone"
+                  dataKey="students"
+                  stroke="var(--color-primary)"
+                  fill="var(--color-primary)"
+                  fillOpacity={0.12}
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="enrollments"
+                  stroke="var(--color-accent)"
+                  fill="var(--color-accent)"
+                  fillOpacity={0.1}
+                  strokeWidth={2}
+                />
               </AreaChart>
             </ResponsiveContainer>
           ) : (
@@ -131,8 +199,20 @@ function AdminDashboard() {
                 <XAxis dataKey="week" {...chartAxis} />
                 <YAxis {...chartAxis} width={44} domain={[40, 100]} />
                 <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} />
-                <Line type="monotone" dataKey="attendance" stroke="var(--color-primary)" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="completion" stroke="var(--color-accent)" strokeWidth={2} dot={false} />
+                <Line
+                  type="monotone"
+                  dataKey="attendance"
+                  stroke="var(--color-primary)"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="completion"
+                  stroke="var(--color-accent)"
+                  strokeWidth={2}
+                  dot={false}
+                />
               </LineChart>
             </ResponsiveContainer>
           ) : (
@@ -200,7 +280,10 @@ function AdminDashboard() {
               <li key={alert.id} className="rounded-lg border border-border p-3">
                 <div className="flex items-start gap-2">
                   {alert.severity === "warning" ? (
-                    <AlertTriangle className="mt-0.5 size-4 shrink-0 text-destructive" aria-hidden />
+                    <AlertTriangle
+                      className="mt-0.5 size-4 shrink-0 text-destructive"
+                      aria-hidden
+                    />
                   ) : (
                     <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
                   )}
@@ -234,15 +317,24 @@ function AdminDashboard() {
         <Progress value={setupComplete} className="mb-4 h-2" />
         <ol className="grid gap-2 sm:grid-cols-2">
           {(setup.data ?? []).map((step, i) => (
-            <li key={step.id} className="flex items-start gap-3 rounded-lg border border-border p-3">
-              <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-muted text-xs font-medium">{i + 1}</span>
+            <li
+              key={step.id}
+              className="flex items-start gap-3 rounded-lg border border-border p-3"
+            >
+              <span className="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full bg-muted text-xs font-medium">
+                {i + 1}
+              </span>
               <div>
                 <p className="text-sm font-medium">
                   {step.label}{" "}
                   {step.complete ? (
-                    <Badge variant="success" className="ml-1 align-middle">Done</Badge>
+                    <Badge variant="success" className="ml-1 align-middle">
+                      Done
+                    </Badge>
                   ) : (
-                    <Badge variant="warning" className="ml-1 align-middle">Pending</Badge>
+                    <Badge variant="warning" className="ml-1 align-middle">
+                      Pending
+                    </Badge>
                   )}
                 </p>
                 <p className="text-xs text-muted-foreground">{step.description}</p>
@@ -254,7 +346,8 @@ function AdminDashboard() {
 
       <p className="mt-6 flex items-center gap-2 text-xs text-muted-foreground">
         <MessageSquare className="size-3.5" aria-hidden />
-        Notifications, WhatsApp campaigns and alert automation are configured in Communication and dispatched by the backend.
+        Notifications, WhatsApp campaigns and alert automation are configured in Communication and
+        dispatched by the backend.
       </p>
     </>
   );

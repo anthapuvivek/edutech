@@ -7,16 +7,30 @@ import { PageHeader, StatCard } from "@/components/portal/StatCard";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { adminService } from "@/services/admin.service";
 
 export const Route = createFileRoute("/admin/audit-logs")({
   head: () => ({
     meta: [
       { title: "Audit Logs — Learntrix Admin" },
-      { name: "description", content: "Immutable record of who changed what and when, with previous and new values for every admin action." },
+      {
+        name: "description",
+        content:
+          "Immutable record of who changed what and when, with previous and new values for every admin action.",
+      },
       { property: "og:title", content: "Audit Logs — Learntrix Admin" },
-      { property: "og:description", content: "Full accountability trail for platform administration." },
+      {
+        property: "og:description",
+        content: "Full accountability trail for platform administration.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -24,18 +38,28 @@ export const Route = createFileRoute("/admin/audit-logs")({
 });
 
 function AdminAuditLogs() {
-  const logs = useQuery({ queryKey: ["admin", "audit-logs"], queryFn: () => adminService.auditLogs() });
+  const logs = useQuery({
+    queryKey: ["admin", "audit-logs"],
+    queryFn: () => adminService.auditLogs(),
+  });
   const [q, setQ] = useState("");
   const data = logs.data ?? [];
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return data;
-    return data.filter((l) => [l.actorName, l.action, l.entity, l.recordLabel].some((v) => v.toLowerCase().includes(needle)));
+    return data.filter((l) =>
+      [l.actorName, l.action, l.entity, l.recordLabel].some((v) =>
+        v.toLowerCase().includes(needle),
+      ),
+    );
   }, [data, q]);
 
   return (
     <>
-      <PageHeader title="Audit Logs" description="Written by the backend. Entries cannot be edited or deleted from the admin console." />
+      <PageHeader
+        title="Audit Logs"
+        description="Written by the backend. Entries cannot be edited or deleted from the admin console."
+      />
 
       <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Entries (30 days)" value={data.length} />
@@ -75,7 +99,9 @@ function AdminAuditLogs() {
               <TableBody>
                 {rows.map((l) => (
                   <TableRow key={l.id}>
-                    <TableCell className="whitespace-nowrap text-sm">{new Date(l.occurredAt).toLocaleString()}</TableCell>
+                    <TableCell className="whitespace-nowrap text-sm">
+                      {new Date(l.occurredAt).toLocaleString()}
+                    </TableCell>
                     <TableCell>
                       <div className="font-medium">{l.actorName}</div>
                       <div className="text-xs text-muted-foreground">{l.actorRole}</div>
@@ -87,7 +113,9 @@ function AdminAuditLogs() {
                       <div className="text-sm">{l.recordLabel}</div>
                       <div className="text-xs text-muted-foreground">{l.entity}</div>
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{l.previousValue ?? "—"}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {l.previousValue ?? "—"}
+                    </TableCell>
                     <TableCell className="text-xs">{l.newValue ?? "—"}</TableCell>
                   </TableRow>
                 ))}

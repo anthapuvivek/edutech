@@ -6,14 +6,25 @@ import { MetricBar, Panel, StatusBadge } from "@/components/portal/AdminBits";
 import { PageHeader, StatCard } from "@/components/portal/StatCard";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { adminService } from "@/services/admin.service";
 
 export const Route = createFileRoute("/admin/performance")({
   head: () => ({
     meta: [
       { title: "Learning & Performance — Learntrix Admin" },
-      { name: "description", content: "Student scorecards covering course progress, quizzes, assignments, coding practice and points." },
+      {
+        name: "description",
+        content:
+          "Student scorecards covering course progress, quizzes, assignments, coding practice and points.",
+      },
       { property: "og:title", content: "Learning & Performance — Learntrix Admin" },
       { property: "og:description", content: "Platform-wide learning performance scorecards." },
       { name: "robots", content: "noindex" },
@@ -23,13 +34,18 @@ export const Route = createFileRoute("/admin/performance")({
 });
 
 function AdminPerformance() {
-  const students = useQuery({ queryKey: ["admin", "students"], queryFn: () => adminService.students() });
+  const students = useQuery({
+    queryKey: ["admin", "students"],
+    queryFn: () => adminService.students(),
+  });
   const [q, setQ] = useState("");
   const data = students.data ?? [];
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return data;
-    return data.filter((s) => [s.name, s.email, s.courseTitle].some((v) => String(v).toLowerCase().includes(needle)));
+    return data.filter((s) =>
+      [s.name, s.email, s.courseTitle].some((v) => String(v).toLowerCase().includes(needle)),
+    );
   }, [data, q]);
 
   const avg = (key: "quizScore" | "codingScore" | "progressPercent") =>
@@ -37,7 +53,10 @@ function AdminPerformance() {
 
   return (
     <>
-      <PageHeader title="Learning & Performance" description="Scorecards are computed by the backend from lessons, quizzes, assignments and coding submissions." />
+      <PageHeader
+        title="Learning & Performance"
+        description="Scorecards are computed by the backend from lessons, quizzes, assignments and coding submissions."
+      />
 
       <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Students tracked" value={data.length} />

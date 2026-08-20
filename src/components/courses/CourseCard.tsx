@@ -53,7 +53,9 @@ export function CourseCard({ course }: { course: Course }) {
           <span className="inline-flex items-center gap-1 font-medium text-foreground">
             <Star className="size-3.5 fill-accent text-accent" aria-hidden />
             {course.rating.toFixed(1)}
-            <span className="font-normal text-muted-foreground">({formatCompact(course.ratingCount)})</span>
+            <span className="font-normal text-muted-foreground">
+              ({formatCompact(course.ratingCount)})
+            </span>
           </span>
           <span className="inline-flex items-center gap-1">
             <Users className="size-3.5" aria-hidden /> {formatCompact(course.studentCount)}
@@ -66,7 +68,9 @@ export function CourseCard({ course }: { course: Course }) {
 
         <div className="mt-5 flex items-end justify-between border-t border-border pt-4">
           <div>
-            <span className="text-display text-xl">{formatPrice(course.price, course.currency)}</span>
+            <span className="text-display text-xl">
+              {formatPrice(course.price, course.currency)}
+            </span>
             {course.originalPrice ? (
               <span className="ml-2 text-sm text-muted-foreground line-through">
                 {formatPrice(course.originalPrice, course.currency)}

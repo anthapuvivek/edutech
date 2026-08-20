@@ -9,10 +9,14 @@ export const teacherService = {
     return mockDelay(mockTeacherStats);
   },
   async students(courseTitle?: string): Promise<TeacherStudentRow[]> {
-    if (!env.useMocks) return apiRequest<TeacherStudentRow[]>("/teacher/students", { query: { course: courseTitle } });
-    const rows = courseTitle && courseTitle !== "All"
-      ? mockTeacherStudents.filter((s) => s.courseTitle === courseTitle)
-      : mockTeacherStudents;
+    if (!env.useMocks)
+      return apiRequest<TeacherStudentRow[]>("/teacher/students", {
+        query: { course: courseTitle },
+      });
+    const rows =
+      courseTitle && courseTitle !== "All"
+        ? mockTeacherStudents.filter((s) => s.courseTitle === courseTitle)
+        : mockTeacherStudents;
     return mockDelay(rows);
   },
   async student(id: string): Promise<TeacherStudentRow | null> {

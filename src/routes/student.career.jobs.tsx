@@ -23,9 +23,16 @@ export const Route = createFileRoute("/student/career/jobs")({
   head: () => ({
     meta: [
       { title: "Job Portal — Learntrix Careers" },
-      { name: "description", content: "Search curated jobs and internships matched to your course, skills and coding performance." },
+      {
+        name: "description",
+        content:
+          "Search curated jobs and internships matched to your course, skills and coding performance.",
+      },
       { property: "og:title", content: "Job Portal — Learntrix Careers" },
-      { property: "og:description", content: "Curated opportunities for eligible enrolled Learntrix students." },
+      {
+        property: "og:description",
+        content: "Curated opportunities for eligible enrolled Learntrix students.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -63,11 +70,13 @@ function JobPortalPage() {
             <SelectValue placeholder="Job type" />
           </SelectTrigger>
           <SelectContent>
-            {["all", "Full Time", "Internship", "Part Time", "Contract", "Graduate/Fresher"].map((v) => (
-              <SelectItem key={v} value={v}>
-                {v === "all" ? "All job types" : v}
-              </SelectItem>
-            ))}
+            {["all", "Full Time", "Internship", "Part Time", "Contract", "Graduate/Fresher"].map(
+              (v) => (
+                <SelectItem key={v} value={v}>
+                  {v === "all" ? "All job types" : v}
+                </SelectItem>
+              ),
+            )}
           </SelectContent>
         </Select>
         <Select value={workMode} onValueChange={setWorkMode}>
@@ -101,7 +110,10 @@ function JobPortalPage() {
           ))}
         </div>
       ) : !jobs.data?.length ? (
-        <EmptyState title="No matching opportunities" description="Try a different keyword or clear your filters." />
+        <EmptyState
+          title="No matching opportunities"
+          description="Try a different keyword or clear your filters."
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {jobs.data.map((job) => (
@@ -138,7 +150,10 @@ function JobPortalPage() {
               </p>
 
               <div className="mt-auto flex flex-wrap gap-2">
-                <Button size="sm" onClick={() => toast.success(`Application started for ${job.title}`)}>
+                <Button
+                  size="sm"
+                  onClick={() => toast.success(`Application started for ${job.title}`)}
+                >
                   Apply now
                 </Button>
                 <Button
@@ -148,7 +163,11 @@ function JobPortalPage() {
                 >
                   <Bookmark className="size-3.5" aria-hidden /> {job.saved ? "Saved" : "Save"}
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => toast.info("Referral requests open in Phase 3F")}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => toast.info("Referral requests open in Phase 3F")}
+                >
                   Refer me
                 </Button>
               </div>

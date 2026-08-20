@@ -15,9 +15,16 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "Log in to Learntrix" },
-      { name: "description", content: "Sign in to your Learntrix account to continue learning, practising and tracking progress." },
+      {
+        name: "description",
+        content:
+          "Sign in to your Learntrix account to continue learning, practising and tracking progress.",
+      },
       { property: "og:title", content: "Log in to Learntrix" },
-      { property: "og:description", content: "Sign in to continue your Learntrix learning journey." },
+      {
+        property: "og:description",
+        content: "Sign in to continue your Learntrix learning journey.",
+      },
     ],
   }),
   component: LoginPage,
@@ -84,7 +91,11 @@ function LoginPage() {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Checkbox id="remember" checked={remember} onCheckedChange={(v) => setRemember(v === true)} />
+          <Checkbox
+            id="remember"
+            checked={remember}
+            onCheckedChange={(v) => setRemember(v === true)}
+          />
           <Label htmlFor="remember" className="text-sm font-normal text-muted-foreground">
             Remember me for 30 days
           </Label>
@@ -105,7 +116,10 @@ function LoginPage() {
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
         New to Learntrix?{" "}
-        <Link to="/register" className="font-medium text-foreground underline-offset-4 hover:underline">
+        <Link
+          to="/register"
+          className="font-medium text-foreground underline-offset-4 hover:underline"
+        >
           Create an account
         </Link>
       </p>

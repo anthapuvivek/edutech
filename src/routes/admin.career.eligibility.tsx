@@ -19,9 +19,16 @@ export const Route = createFileRoute("/admin/career/eligibility")({
   head: () => ({
     meta: [
       { title: "Career Eligibility Rules — Learntrix Admin" },
-      { name: "description", content: "Configure platform and company-specific eligibility thresholds for attendance, progress, coding and profile completion." },
+      {
+        name: "description",
+        content:
+          "Configure platform and company-specific eligibility thresholds for attendance, progress, coding and profile completion.",
+      },
       { property: "og:title", content: "Career Eligibility Rules — Learntrix Admin" },
-      { property: "og:description", content: "Fully configurable career eligibility engine — no hard-coded thresholds." },
+      {
+        property: "og:description",
+        content: "Fully configurable career eligibility engine — no hard-coded thresholds.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -40,7 +47,10 @@ const metrics: Array<{ key: EligibilityMetric; label: string; suffix: string }> 
 ];
 
 function AdminEligibility() {
-  const rules = useQuery({ queryKey: ["admin", "eligibility-rules"], queryFn: () => adminService.eligibilityRules() });
+  const rules = useQuery({
+    queryKey: ["admin", "eligibility-rules"],
+    queryFn: () => adminService.eligibilityRules(),
+  });
   const [draft, setDraft] = useState<EligibilityRuleSet[]>([]);
 
   useEffect(() => {
@@ -49,7 +59,14 @@ function AdminEligibility() {
 
   function update(id: string, key: EligibilityMetric, value: string) {
     setDraft((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, thresholds: { ...r.thresholds, [key]: value === "" ? undefined : Number(value) } } : r)),
+      prev.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              thresholds: { ...r.thresholds, [key]: value === "" ? undefined : Number(value) },
+            }
+          : r,
+      ),
     );
   }
 
@@ -66,7 +83,9 @@ function AdminEligibility() {
         title="Career Eligibility Rules"
         description="Thresholds are configuration, not code. The backend evaluates every student against the active rule sets and returns the official status."
         action={
-          <Button onClick={() => toast.info("New company rule sets are created from the company record.")}>
+          <Button
+            onClick={() => toast.info("New company rule sets are created from the company record.")}
+          >
             <Plus className="size-4" aria-hidden /> New rule set
           </Button>
         }
@@ -101,7 +120,9 @@ function AdminEligibility() {
                   id={`active-${rule.id}`}
                   checked={rule.active}
                   onCheckedChange={(checked) =>
-                    setDraft((prev) => prev.map((r) => (r.id === rule.id ? { ...r, active: checked } : r)))
+                    setDraft((prev) =>
+                      prev.map((r) => (r.id === rule.id ? { ...r, active: checked } : r)),
+                    )
                   }
                 />
               </div>
@@ -147,14 +168,15 @@ function AdminEligibility() {
             <p className="text-sm font-medium">Google opportunity</p>
             <StatusBadge value="not_eligible" className="mt-2" />
             <p className="mt-2 text-xs text-muted-foreground">
-              Reason: attendance below required threshold. Current attendance 72% · required 90%. Recommended action: attend upcoming
-              classes and improve attendance.
+              Reason: attendance below required threshold. Current attendance 72% · required 90%.
+              Recommended action: attend upcoming classes and improve attendance.
             </p>
           </div>
         </div>
         <p className="mt-4 text-xs text-muted-foreground">
-          Admins can override any student's status with a documented reason ({humanize("under_review")} included). Overrides are written to
-          the audit log by the backend.
+          Admins can override any student's status with a documented reason (
+          {humanize("under_review")} included). Overrides are written to the audit log by the
+          backend.
         </p>
       </Panel>
     </>

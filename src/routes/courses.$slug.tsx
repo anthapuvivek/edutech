@@ -1,6 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BadgeCheck, BookOpen, Clock, Globe, PlayCircle, RefreshCw, Star, Users } from "lucide-react";
+import {
+  BadgeCheck,
+  BookOpen,
+  Clock,
+  Globe,
+  PlayCircle,
+  RefreshCw,
+  Star,
+  Users,
+} from "lucide-react";
 
 import { EmptyState } from "@/components/common/EmptyState";
 import { EnquiryForm } from "@/components/courses/EnquiryForm";
@@ -120,10 +129,13 @@ function CourseDetailPage() {
               <span className="inline-flex items-center gap-1.5 text-accent">
                 <Star className="size-4 fill-accent" aria-hidden />
                 {course.rating.toFixed(1)}
-                <span className="text-ink-foreground/60">({formatCompact(course.ratingCount)} ratings)</span>
+                <span className="text-ink-foreground/60">
+                  ({formatCompact(course.ratingCount)} ratings)
+                </span>
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Users className="size-4" aria-hidden /> {formatCompact(course.studentCount)} students
+                <Users className="size-4" aria-hidden /> {formatCompact(course.studentCount)}{" "}
+                students
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Clock className="size-4" aria-hidden /> {course.durationHours} hours
@@ -133,12 +145,16 @@ function CourseDetailPage() {
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <RefreshCw className="size-4" aria-hidden /> Updated{" "}
-                {new Date(course.updatedAt).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}
+                {new Date(course.updatedAt).toLocaleDateString("en-GB", {
+                  month: "short",
+                  year: "numeric",
+                })}
               </span>
               <Badge variant="secondary">{course.level}</Badge>
             </div>
             <p className="mt-5 text-sm text-ink-foreground/70">
-              Taught by <span className="font-medium text-ink-foreground">{course.instructor.name}</span> ·{" "}
+              Taught by{" "}
+              <span className="font-medium text-ink-foreground">{course.instructor.name}</span> ·{" "}
               {course.instructor.title}
             </p>
           </div>
@@ -176,7 +192,8 @@ function CourseDetailPage() {
               Curriculum
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              {curriculum.length} modules · {course.lessonCount} lessons · {course.durationHours} hours
+              {curriculum.length} modules · {course.lessonCount} lessons · {course.durationHours}{" "}
+              hours
             </p>
             <Accordion type="multiple" className="surface-panel mt-5 px-6">
               {curriculum.map((module) => (
@@ -185,7 +202,10 @@ function CourseDetailPage() {
                   <AccordionContent>
                     <ul className="space-y-3">
                       {module.lessons.map((lesson) => (
-                        <li key={lesson.title} className="flex items-center justify-between gap-4 text-sm">
+                        <li
+                          key={lesson.title}
+                          className="flex items-center justify-between gap-4 text-sm"
+                        >
                           <span className="flex items-center gap-2 text-muted-foreground">
                             <PlayCircle className="size-4" aria-hidden />
                             {lesson.title}
@@ -195,7 +215,9 @@ function CourseDetailPage() {
                               </Badge>
                             ) : null}
                           </span>
-                          <span className="tabular-nums text-muted-foreground">{lesson.duration}</span>
+                          <span className="tabular-nums text-muted-foreground">
+                            {lesson.duration}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -219,9 +241,9 @@ function CourseDetailPage() {
                   <h3 className="text-xl">Course description</h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                     {course.title} is a {course.level.toLowerCase()}-level program covering{" "}
-                    {course.skills.join(", ")}. The course pairs {course.lessonCount} structured lessons with
-                    graded assignments, capstone projects and a curated coding problem set so that every
-                    concept is reinforced through practice.
+                    {course.skills.join(", ")}. The course pairs {course.lessonCount} structured
+                    lessons with graded assignments, capstone projects and a curated coding problem
+                    set so that every concept is reinforced through practice.
                   </p>
                 </div>
                 <div>
@@ -246,12 +268,15 @@ function CourseDetailPage() {
                 <h3 className="text-xl">{course.instructor.name}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">{course.instructor.title}</p>
                 <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                  {course.instructor.name} has led engineering teams across product companies and teaches
-                  with a focus on judgement, trade-offs and production realities rather than syntax recall.
+                  {course.instructor.name} has led engineering teams across product companies and
+                  teaches with a focus on judgement, trade-offs and production realities rather than
+                  syntax recall.
                 </p>
                 <div className="mt-6 flex gap-8 text-sm">
                   <span>
-                    <span className="block text-display text-2xl">{course.instructor.rating?.toFixed(1)}</span>
+                    <span className="block text-display text-2xl">
+                      {course.instructor.rating?.toFixed(1)}
+                    </span>
                     <span className="text-muted-foreground">Instructor rating</span>
                   </span>
                   <span>
@@ -263,11 +288,23 @@ function CourseDetailPage() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="reviews" className="surface-panel mt-5 divide-y divide-border p-8 pt-4">
+              <TabsContent
+                value="reviews"
+                className="surface-panel mt-5 divide-y divide-border p-8 pt-4"
+              >
                 {[
-                  { name: "Nikhil Verma", body: "Dense, well sequenced and genuinely challenging. The graded labs made the difference." },
-                  { name: "Aisha Rahman", body: "The instructor explains trade-offs rather than just steps. Best course I have taken online." },
-                  { name: "Karthik S", body: "Coding problems tied to each module kept the concepts fresh. Highly recommended." },
+                  {
+                    name: "Nikhil Verma",
+                    body: "Dense, well sequenced and genuinely challenging. The graded labs made the difference.",
+                  },
+                  {
+                    name: "Aisha Rahman",
+                    body: "The instructor explains trade-offs rather than just steps. Best course I have taken online.",
+                  },
+                  {
+                    name: "Karthik S",
+                    body: "Coding problems tied to each module kept the concepts fresh. Highly recommended.",
+                  },
                 ].map((review) => (
                   <div key={review.name} className="py-5">
                     <div className="flex items-center gap-2">
@@ -286,9 +323,18 @@ function CourseDetailPage() {
               <TabsContent value="faq" className="surface-panel mt-5 px-6">
                 <Accordion type="single" collapsible>
                   {[
-                    { q: "Is there a certificate?", a: "Yes. A verified certificate is issued after all graded assessments are completed." },
-                    { q: "Do I get lifetime access?", a: "Enrolment includes lifetime access to course material and future updates." },
-                    { q: "Is placement support included?", a: "Career-track programs include interview preparation and placement guidance." },
+                    {
+                      q: "Is there a certificate?",
+                      a: "Yes. A verified certificate is issued after all graded assessments are completed.",
+                    },
+                    {
+                      q: "Do I get lifetime access?",
+                      a: "Enrolment includes lifetime access to course material and future updates.",
+                    },
+                    {
+                      q: "Is placement support included?",
+                      a: "Career-track programs include interview preparation and placement guidance.",
+                    },
                   ].map((faq) => (
                     <AccordionItem key={faq.q} value={faq.q}>
                       <AccordionTrigger className="text-left">{faq.q}</AccordionTrigger>
@@ -325,13 +371,19 @@ function CourseDetailPage() {
           />
           <div className="p-6">
             <div className="flex items-end gap-3">
-              <span className="text-display text-3xl">{formatPrice(course.price, course.currency)}</span>
+              <span className="text-display text-3xl">
+                {formatPrice(course.price, course.currency)}
+              </span>
               {course.originalPrice ? (
                 <span className="pb-1 text-sm text-muted-foreground line-through">
                   {formatPrice(course.originalPrice, course.currency)}
                 </span>
               ) : null}
-              {discount ? <Badge variant="success" className="mb-1">{discount}% off</Badge> : null}
+              {discount ? (
+                <Badge variant="success" className="mb-1">
+                  {discount}% off
+                </Badge>
+              ) : null}
             </div>
             <div className="mt-5 grid gap-2">
               <Button size="lg">Enrol now</Button>
@@ -344,7 +396,8 @@ function CourseDetailPage() {
                 <span>Lessons</span> <span className="text-foreground">{course.lessonCount}</span>
               </li>
               <li className="flex justify-between">
-                <span>Duration</span> <span className="text-foreground">{course.durationHours} hours</span>
+                <span>Duration</span>{" "}
+                <span className="text-foreground">{course.durationHours} hours</span>
               </li>
               <li className="flex justify-between">
                 <span>Level</span> <span className="text-foreground">{course.level}</span>

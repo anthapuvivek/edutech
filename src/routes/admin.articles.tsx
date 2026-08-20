@@ -19,9 +19,22 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { adminService } from "@/services/admin.service";
 
@@ -29,9 +42,16 @@ export const Route = createFileRoute("/admin/articles")({
   head: () => ({
     meta: [
       { title: "Articles — Learntrix Admin" },
-      { name: "description", content: "Author, review and publish articles. Teacher submissions flow through admin review before going live." },
+      {
+        name: "description",
+        content:
+          "Author, review and publish articles. Teacher submissions flow through admin review before going live.",
+      },
       { property: "og:title", content: "Articles — Learntrix Admin" },
-      { property: "og:description", content: "Editorial workflow for the Learntrix knowledge library." },
+      {
+        property: "og:description",
+        content: "Editorial workflow for the Learntrix knowledge library.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -41,11 +61,17 @@ export const Route = createFileRoute("/admin/articles")({
 const ALL = "all";
 
 function AdminArticles() {
-  const articles = useQuery({ queryKey: ["admin", "articles"], queryFn: () => adminService.articles() });
+  const articles = useQuery({
+    queryKey: ["admin", "articles"],
+    queryFn: () => adminService.articles(),
+  });
   const [status, setStatus] = useState(ALL);
   const [open, setOpen] = useState(false);
   const data = articles.data ?? [];
-  const rows = useMemo(() => data.filter((a) => status === ALL || a.status === status), [data, status]);
+  const rows = useMemo(
+    () => data.filter((a) => status === ALL || a.status === status),
+    [data, status],
+  );
 
   return (
     <>
@@ -62,7 +88,9 @@ function AdminArticles() {
             <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle>New article</DialogTitle>
-                <DialogDescription>Content, categorisation and SEO metadata for the public knowledge library.</DialogDescription>
+                <DialogDescription>
+                  Content, categorisation and SEO metadata for the public knowledge library.
+                </DialogDescription>
               </DialogHeader>
               <form
                 id="new-article"
@@ -101,7 +129,13 @@ function AdminArticles() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="body">Content</Label>
-                  <Textarea id="body" name="body" rows={10} maxLength={20000} placeholder="Markdown supported — headings, lists, code blocks, links." />
+                  <Textarea
+                    id="body"
+                    name="body"
+                    rows={10}
+                    maxLength={20000}
+                    placeholder="Markdown supported — headings, lists, code blocks, links."
+                  />
                 </div>
               </form>
               <DialogFooter>
@@ -116,9 +150,15 @@ function AdminArticles() {
 
       <section className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Articles" value={data.length} />
-        <StatCard label="Awaiting review" value={data.filter((a) => a.status === "In Review").length} />
+        <StatCard
+          label="Awaiting review"
+          value={data.filter((a) => a.status === "In Review").length}
+        />
         <StatCard label="Published" value={data.filter((a) => a.status === "Published").length} />
-        <StatCard label="Total views" value={data.reduce((s, a) => s + a.views, 0).toLocaleString()} />
+        <StatCard
+          label="Total views"
+          value={data.reduce((s, a) => s + a.views, 0).toLocaleString()}
+        />
       </section>
 
       <Panel
@@ -182,10 +222,23 @@ function AdminArticles() {
                       <StatusBadge value={a.status} />
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
-                      <Button size="sm" variant="outline" onClick={() => toast.info("Opening the editor.")}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => toast.info("Opening the editor.")}
+                      >
                         Edit
                       </Button>
-                      <Button size="sm" onClick={() => toast.success(a.status === "Published" ? "Article unpublished." : "Article published.")}>
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          toast.success(
+                            a.status === "Published"
+                              ? "Article unpublished."
+                              : "Article published.",
+                          )
+                        }
+                      >
                         {a.status === "Published" ? "Unpublish" : "Publish"}
                       </Button>
                     </TableCell>
