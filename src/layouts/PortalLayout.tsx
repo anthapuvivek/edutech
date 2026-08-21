@@ -1,7 +1,8 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Bell, LogOut, Menu } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 
 import { Logo } from "@/components/site/Logo";
 import { Badge } from "@/components/ui/badge";
@@ -9,8 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
+import { canAccessPath, landingFor } from "@/lib/access-control";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/types/lms";
+import type { PlatformRole } from "@/types/ops";
+
 
 export interface PortalNavItem {
   label: string;
