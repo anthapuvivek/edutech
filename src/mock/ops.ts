@@ -950,6 +950,9 @@ export const mockRoleDefinitions: RoleDefinition[] = [
     label: "Admin",
     description: "Platform management: students, staff, content, marketing and governance.",
     permissions: [
+      "platform.manage",
+      "teaching.manage",
+      "learning.view",
       "users.manage",
       "coupons.manage",
       "crm.view",
@@ -975,7 +978,13 @@ export const mockRoleDefinitions: RoleDefinition[] = [
     role: "teacher",
     label: "Teacher",
     description: "Assigned courses, batches and students.",
-    permissions: ["support.view", "support.internal_notes"],
+    permissions: [
+      "teaching.manage",
+      "learning.view",
+      "mentor.students",
+      "support.view",
+      "support.internal_notes",
+    ],
   },
   {
     role: "mentor",
@@ -997,6 +1006,7 @@ export const mockRoleDefinitions: RoleDefinition[] = [
       "placement.applications.manage",
       "placement.interviews.manage",
       "placement.offers.record",
+      "learning.view",
       "support.view",
     ],
   },
