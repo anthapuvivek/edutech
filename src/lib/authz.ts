@@ -28,7 +28,7 @@ export function assertPermission(permission: Permission): void {
  * Wraps a service object so every method asserts a permission before running.
  * Method-specific overrides win over the module default.
  */
-export function guardService<T extends Record<string, (...args: never[]) => unknown>>(
+export function guardService<T extends object>(
   service: T,
   defaultPermission: Permission,
   overrides: Partial<Record<keyof T, Permission>> = {},
@@ -40,7 +40,7 @@ export function guardService<T extends Record<string, (...args: never[]) => unkn
       const permission = (overrides as Record<string, Permission | undefined>)[prop as string] ?? defaultPermission;
       return (...args: unknown[]) => {
         assertPermission(permission);
-        return (value as (...a: unknown[]) => unknown).apply(target, args);
+        return (value as unknown as (...a: unknown[]) => unknown).apply(target, args);
       };
     },
   }) as T;
