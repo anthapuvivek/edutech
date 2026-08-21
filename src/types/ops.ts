@@ -545,6 +545,8 @@ export type PlatformRole =
 
 export type Permission =
   | "platform.manage"
+  | "teaching.manage"
+  | "learning.view"
   | "users.manage"
   | "coupons.manage"
   | "crm.view"

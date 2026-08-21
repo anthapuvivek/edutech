@@ -981,7 +981,7 @@ export const mockRoleDefinitions: RoleDefinition[] = [
     role: "mentor",
     label: "Mentor",
     description: "Assigned students: guidance, sessions, notes and action plans.",
-    permissions: ["mentor.students", "mentor.sessions", "support.view", "support.internal_notes"],
+    permissions: ["mentor.students", "mentor.sessions", "learning.view", "support.view", "support.internal_notes"],
   },
   {
     role: "placement_officer",
