@@ -80,7 +80,7 @@ export function PortalLayout({
     );
   }
 
-  const visibleNav = useVisibleNav(nav, activeRole);
+  const visibleNav = filterNav(nav, activeRole);
 
   const sidebar = (
     <nav
@@ -88,7 +88,7 @@ export function PortalLayout({
       className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4"
     >
 
-      {nav.map((item) => (
+      {visibleNav.map((item) => (
         <div key={item.label} className="contents">
           {item.section ? (
             <p className="mt-4 px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-foreground/35">
@@ -142,7 +142,7 @@ export function PortalLayout({
             <Logo tone="inverse" />
           </Link>
           <p className="mt-2 text-xs uppercase tracking-[0.18em] text-ink-foreground/45">
-            {roleLabel[role]}
+            {roleLabel[activeRole]}
           </p>
         </div>
         {sidebar}
@@ -167,7 +167,7 @@ export function PortalLayout({
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-72 border-none bg-ink p-0 text-ink-foreground">
-                <SheetTitle className="sr-only">{roleLabel[role]} navigation</SheetTitle>
+                <SheetTitle className="sr-only">{roleLabel[activeRole]} navigation</SheetTitle>
                 <div className="flex h-full flex-col gap-6 py-6">
                   <div className="px-6 pt-6">
                     <Logo tone="inverse" />
@@ -177,7 +177,7 @@ export function PortalLayout({
               </SheetContent>
             </Sheet>
             <Badge variant="outline" className="hidden sm:inline-flex">
-              {roleLabel[role]}
+              {roleLabel[activeRole]}
             </Badge>
           </div>
 
@@ -208,4 +208,17 @@ export function PortalLayout({
     await logout();
     void navigate({ to: "/login", replace: true });
   }
+}
+
+/**
+ * Navigation reflects permissions: unauthorized destinations are removed, and a
+ * section heading is dropped when nothing under it survives the filter.
+ */
+function filterNav(nav: PortalNavItem[], role: PlatformRole): PortalNavItem[] {
+  const permitted = nav.filter((item) => !item.to || canAccessPath(role, item.to));
+  return permitted.filter((item, index) => {
+    if (!item.section) return true;
+    // Keep the heading only if this item or a following non-section item is visible.
+    return Boolean(item.to) || permitted.slice(index + 1).some((next) => !next.section);
+  });
 }
