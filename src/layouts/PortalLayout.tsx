@@ -42,6 +42,7 @@ export function PortalLayout({
   nav,
   children,
 }: {
+  /** Default portal identity; the signed-in user's own role always wins. */
   role: Role;
   nav: PortalNavItem[];
   children: ReactNode;
@@ -51,13 +52,24 @@ export function PortalLayout({
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  useEffect(() => {
-    if (isReady && !isAuthenticated) {
-      void navigate({ to: "/login", replace: true });
-    }
-  }, [isReady, isAuthenticated, navigate]);
+  const activeRole = (user?.role ?? role) as PlatformRole;
+  const allowed = isReady && isAuthenticated && canAccessPath(activeRole, pathname);
 
-  if (!isReady || !isAuthenticated) {
+  useEffect(() => {
+    if (!isReady) return;
+    if (!isAuthenticated) {
+      void navigate({ to: "/login", replace: true });
+      return;
+    }
+    // Direct URL access to a page this role has no permission for is bounced to
+    // the role's own landing page — the same check the API re-runs server side.
+    if (!canAccessPath(activeRole, pathname)) {
+      toast.error("You do not have access to that area.");
+      void navigate({ to: landingFor(activeRole), replace: true });
+    }
+  }, [isReady, isAuthenticated, activeRole, pathname, navigate]);
+
+  if (!allowed) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/30 px-6">
         <div className="w-full max-w-md space-y-3">
@@ -68,11 +80,14 @@ export function PortalLayout({
     );
   }
 
+  const visibleNav = useVisibleNav(nav, activeRole);
+
   const sidebar = (
     <nav
-      aria-label={roleLabel[role]}
+      aria-label={roleLabel[activeRole]}
       className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4"
     >
+
       {nav.map((item) => (
         <div key={item.label} className="contents">
           {item.section ? (
