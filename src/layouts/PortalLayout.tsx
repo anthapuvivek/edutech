@@ -2,6 +2,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Bell, LogOut, Menu } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
+import { toast } from "sonner";
 
 import { Logo } from "@/components/site/Logo";
 import { Badge } from "@/components/ui/badge";
@@ -9,8 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
+import { canAccessPath, landingFor } from "@/lib/access-control";
 import { cn } from "@/lib/utils";
+import { can } from "@/services/permissions.service";
 import type { Role } from "@/types/lms";
+import type { PlatformRole } from "@/types/ops";
+
 
 export interface PortalNavItem {
   label: string;
@@ -38,6 +43,7 @@ export function PortalLayout({
   nav,
   children,
 }: {
+  /** Default portal identity; the signed-in user's own role always wins. */
   role: Role;
   nav: PortalNavItem[];
   children: ReactNode;
@@ -47,13 +53,24 @@ export function PortalLayout({
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  useEffect(() => {
-    if (isReady && !isAuthenticated) {
-      void navigate({ to: "/login", replace: true });
-    }
-  }, [isReady, isAuthenticated, navigate]);
+  const activeRole = (user?.role ?? role) as PlatformRole;
+  const allowed = isReady && isAuthenticated && canAccessPath(activeRole, pathname);
 
-  if (!isReady || !isAuthenticated) {
+  useEffect(() => {
+    if (!isReady) return;
+    if (!isAuthenticated) {
+      void navigate({ to: "/login", replace: true });
+      return;
+    }
+    // Direct URL access to a page this role has no permission for is bounced to
+    // the role's own landing page — the same check the API re-runs server side.
+    if (!canAccessPath(activeRole, pathname)) {
+      toast.error("You do not have access to that area.");
+      void navigate({ to: landingFor(activeRole), replace: true });
+    }
+  }, [isReady, isAuthenticated, activeRole, pathname, navigate]);
+
+  if (!allowed) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/30 px-6">
         <div className="w-full max-w-md space-y-3">
@@ -64,12 +81,15 @@ export function PortalLayout({
     );
   }
 
+  const visibleNav = filterNav(nav, activeRole);
+
   const sidebar = (
     <nav
-      aria-label={roleLabel[role]}
+      aria-label={roleLabel[activeRole]}
       className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4"
     >
-      {nav.map((item) => (
+
+      {visibleNav.map((item) => (
         <div key={item.label} className="contents">
           {item.section ? (
             <p className="mt-4 px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-foreground/35">
@@ -123,7 +143,7 @@ export function PortalLayout({
             <Logo tone="inverse" />
           </Link>
           <p className="mt-2 text-xs uppercase tracking-[0.18em] text-ink-foreground/45">
-            {roleLabel[role]}
+            {roleLabel[activeRole]}
           </p>
         </div>
         {sidebar}
@@ -148,7 +168,7 @@ export function PortalLayout({
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-72 border-none bg-ink p-0 text-ink-foreground">
-                <SheetTitle className="sr-only">{roleLabel[role]} navigation</SheetTitle>
+                <SheetTitle className="sr-only">{roleLabel[activeRole]} navigation</SheetTitle>
                 <div className="flex h-full flex-col gap-6 py-6">
                   <div className="px-6 pt-6">
                     <Logo tone="inverse" />
@@ -158,7 +178,7 @@ export function PortalLayout({
               </SheetContent>
             </Sheet>
             <Badge variant="outline" className="hidden sm:inline-flex">
-              {roleLabel[role]}
+              {roleLabel[activeRole]}
             </Badge>
           </div>
 
@@ -189,4 +209,17 @@ export function PortalLayout({
     await logout();
     void navigate({ to: "/login", replace: true });
   }
+}
+
+/**
+ * Navigation reflects permissions: unauthorized destinations are removed, and a
+ * section heading is dropped when nothing under it survives the filter.
+ */
+function filterNav(nav: PortalNavItem[], role: PlatformRole): PortalNavItem[] {
+  // Placeholder ("soon") entries stay visible for the portal's primary roles so
+  // existing Admin / Teacher / Student navigation is unchanged, but scoped staff
+  // roles (mentor, placement officer, counsellor, support) never see them.
+  const showPlaceholders =
+    can(role, "platform.manage") || can(role, "teaching.manage") || can(role, "learning.own");
+  return nav.filter((item) => (item.to ? canAccessPath(role, item.to) : showPlaceholders));
 }

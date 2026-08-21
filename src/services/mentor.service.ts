@@ -1,3 +1,4 @@
+import { guardService } from "@/lib/authz";
 import { env } from "@/lib/env";
 import {
   mockMentorActionItems,
@@ -32,7 +33,7 @@ let actionItems = [...mockMentorActionItems];
  * students on career, projects and personal progress. Assignment authority
  * lives with admins and is enforced by the backend.
  */
-export const mentorService = {
+const mentorServiceRaw = {
   async mentors(): Promise<Mentor[]> {
     if (!env.useMocks) return apiRequest<Mentor[]>("/mentors");
     return mockDelay(mockMentors);
@@ -178,3 +179,33 @@ export const mentorService = {
     });
   },
 };
+
+const guardedMentorCalls = guardService(
+  {
+    mentors: mentorServiceRaw.mentors,
+    stats: mentorServiceRaw.stats,
+    students: mentorServiceRaw.students,
+    sessions: mentorServiceRaw.sessions,
+    createSession: mentorServiceRaw.createSession,
+    updateSession: mentorServiceRaw.updateSession,
+    notes: mentorServiceRaw.notes,
+    addNote: mentorServiceRaw.addNote,
+    actionItems: mentorServiceRaw.actionItems,
+    addActionItem: mentorServiceRaw.addActionItem,
+    alerts: mentorServiceRaw.alerts,
+    assignments: mentorServiceRaw.assignments,
+    createAssignment: mentorServiceRaw.createAssignment,
+    removeAssignment: mentorServiceRaw.removeAssignment,
+  },
+  "mentor.students",
+  {
+    createSession: "mentor.sessions",
+    updateSession: "mentor.sessions",
+    assignments: "mentor.assign",
+    createAssignment: "mentor.assign",
+    removeAssignment: "mentor.assign",
+  },
+);
+
+/** studentView stays student-scoped and is authorized by the backend. */
+export const mentorService = { ...mentorServiceRaw, ...guardedMentorCalls };

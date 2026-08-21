@@ -1,4 +1,5 @@
 import { env } from "@/lib/env";
+import { guardService } from "@/lib/authz";
 import {
   mockAdminApplications,
   mockAdminArticles,
@@ -46,7 +47,7 @@ import type { AdminStats, PlatformEvent } from "@/types/lms";
  * backend remains the authority for authorization, attendance maths,
  * eligibility evaluation, payments and placement verification.
  */
-export const adminService = {
+const adminServiceRaw = {
   async stats(): Promise<AdminStats> {
     if (!env.useMocks) return apiRequest<AdminStats>("/admin/stats");
     return mockDelay(mockAdminStats);
@@ -197,3 +198,19 @@ export const adminService = {
     return mockDelay(mockAuditLogs);
   },
 };
+
+/**
+ * Every admin call is permission-checked before it leaves the client, and the
+ * same permission is re-enforced by the API. Career/placement methods are
+ * shared with the Placement Officer role; everything else stays admin-only.
+ */
+export const adminService = guardService(adminServiceRaw, "platform.manage", {
+  jobs: "placement.jobs.view",
+  saveJob: "placement.jobs.manage",
+  companies: "placement.jobs.view",
+  applications: "placement.applications.manage",
+  referrals: "placement.applications.manage",
+  updateReferral: "placement.applications.manage",
+  eligibilityRules: "placement.students.view",
+  auditLogs: "audit.view",
+});

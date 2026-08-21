@@ -1,3 +1,4 @@
+import { guardService } from "@/lib/authz";
 import { env } from "@/lib/env";
 import {
   mockDrives,
@@ -31,7 +32,7 @@ let offers = [...mockOffers];
  * Eligibility, application status transitions and placement confirmation are
  * decided by the backend — nothing here grants authority on its own.
  */
-export const placementService = {
+const placementServiceRaw = {
   async stats(): Promise<PlacementStats> {
     if (!env.useMocks) return apiRequest<PlacementStats>("/placement/stats");
     return mockDelay(mockPlacementStats);
@@ -233,3 +234,36 @@ export const placementService = {
     return mockDelay(undefined, 250);
   },
 };
+
+const guardedPlacementCalls = guardService(
+  {
+    stats: placementServiceRaw.stats,
+    analytics: placementServiceRaw.analytics,
+    students: placementServiceRaw.students,
+    drives: placementServiceRaw.drives,
+    createDrive: placementServiceRaw.createDrive,
+    updateDriveStage: placementServiceRaw.updateDriveStage,
+    applications: placementServiceRaw.applications,
+    updateApplicationStatus: placementServiceRaw.updateApplicationStatus,
+    interviews: placementServiceRaw.interviews,
+    scheduleInterview: placementServiceRaw.scheduleInterview,
+    offers: placementServiceRaw.offers,
+    recordOffer: placementServiceRaw.recordOffer,
+    updateOfferStatus: placementServiceRaw.updateOfferStatus,
+  },
+  "placement.students.view",
+  {
+    createDrive: "placement.drives.manage",
+    updateDriveStage: "placement.drives.manage",
+    applications: "placement.applications.manage",
+    updateApplicationStatus: "placement.applications.manage",
+    interviews: "placement.interviews.manage",
+    scheduleInterview: "placement.interviews.manage",
+    offers: "placement.offers.record",
+    recordOffer: "placement.offers.record",
+    updateOfferStatus: "placement.offers.record",
+  },
+);
+
+/** Student-facing drive listing/apply stay student-scoped (backend authorized). */
+export const placementService = { ...placementServiceRaw, ...guardedPlacementCalls };

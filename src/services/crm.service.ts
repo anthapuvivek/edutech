@@ -1,3 +1,4 @@
+import { guardService } from "@/lib/authz";
 import { env } from "@/lib/env";
 import { buildLeadDetail, mockLeadOverview, mockLeads, mockStaff } from "@/mock/ops";
 import { apiRequest, mockDelay } from "@/services/api-client";
@@ -17,7 +18,7 @@ let leads = [...mockLeads];
  * Lead ownership and visibility are enforced by the backend; the `viewerId`
  * filter below only mirrors the API contract for the mock UI.
  */
-export const crmService = {
+const crmServiceRaw = {
   async overview(): Promise<LeadOverview> {
     if (!env.useMocks) return apiRequest<LeadOverview>("/admin/crm/overview");
     return mockDelay(mockLeadOverview);
@@ -118,3 +119,11 @@ export const crmService = {
     return mockDelay(mockStaff);
   },
 };
+
+export const crmService = guardService(crmServiceRaw, "crm.view", {
+  moveStage: "crm.manage",
+  addNote: "crm.manage",
+  logCommunication: "crm.manage",
+  scheduleFollowUp: "crm.manage",
+  assign: "crm.assign",
+});
