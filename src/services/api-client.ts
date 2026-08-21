@@ -33,13 +33,27 @@ function buildUrl(path: string, query?: RequestOptions["query"]) {
   return qs ? `${url}?${qs}` : url;
 }
 
+function authHeaders(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem("learntrix.session");
+    if (!raw) return {};
+    const token = (JSON.parse(raw) as { accessToken?: string }).accessToken;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { method = "GET", body, query, signal } = options;
   const response = await fetch(buildUrl(path, query), {
     method,
     signal: signal ?? null,
     credentials: "include",
-    headers: { "Content-Type": "application/json" },
+    // The token lets the API re-verify the caller's role on every request —
+    // the backend, not the UI, is the authority on permissions.
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: body === undefined ? null : JSON.stringify(body),
   });
 

@@ -97,8 +97,8 @@ export const roleHome: Record<Role, string> = {
   teacher: "/teacher/dashboard",
   admin: "/admin/dashboard",
   super_admin: "/admin/dashboard",
-  mentor: "/mentor/dashboard",
-  placement_officer: "/placement/dashboard",
+  mentor: "/teacher/students",
+  placement_officer: "/admin/career/jobs",
   support_agent: "/admin/support",
   counsellor: "/admin/crm",
 };
