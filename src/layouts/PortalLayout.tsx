@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { canAccessPath, landingFor } from "@/lib/access-control";
 import { cn } from "@/lib/utils";
+import { can } from "@/services/permissions.service";
 import type { Role } from "@/types/lms";
 import type { PlatformRole } from "@/types/ops";
 
@@ -215,5 +216,10 @@ export function PortalLayout({
  * section heading is dropped when nothing under it survives the filter.
  */
 function filterNav(nav: PortalNavItem[], role: PlatformRole): PortalNavItem[] {
-  return nav.filter((item) => (item.to ? canAccessPath(role, item.to) : false));
+  // Placeholder ("soon") entries stay visible for the portal's primary roles so
+  // existing Admin / Teacher / Student navigation is unchanged, but scoped staff
+  // roles (mentor, placement officer, counsellor, support) never see them.
+  const showPlaceholders =
+    can(role, "platform.manage") || can(role, "teaching.manage") || can(role, "learning.own");
+  return nav.filter((item) => (item.to ? canAccessPath(role, item.to) : showPlaceholders));
 }
