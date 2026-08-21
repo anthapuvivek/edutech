@@ -1,3 +1,4 @@
+import { guardService } from "@/lib/authz";
 import { env } from "@/lib/env";
 import { mockCouponOverview, mockCoupons } from "@/mock/ops";
 import { apiRequest, mockDelay } from "@/services/api-client";
@@ -11,7 +12,7 @@ let coupons = [...mockCoupons];
  * responsibilities. The mock branch only mirrors what the API will return so
  * the checkout UI can be reviewed — it is never the source of truth.
  */
-export const couponService = {
+const couponServiceRaw = {
   async list(): Promise<Coupon[]> {
     if (!env.useMocks) return apiRequest<Coupon[]>("/admin/coupons");
     return mockDelay(coupons);
@@ -162,3 +163,18 @@ export const couponService = {
     );
   },
 };
+
+const guardedCouponAdmin = guardService(
+  {
+    list: couponServiceRaw.list,
+    overview: couponServiceRaw.overview,
+    create: couponServiceRaw.create,
+    update: couponServiceRaw.update,
+    duplicate: couponServiceRaw.duplicate,
+    remove: couponServiceRaw.remove,
+  },
+  "coupons.manage",
+);
+
+/** `validate` is intentionally open — it is the public checkout path and the backend is the authority. */
+export const couponService = { ...couponServiceRaw, ...guardedCouponAdmin };

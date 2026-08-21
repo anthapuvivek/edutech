@@ -1,3 +1,4 @@
+import { guardService } from "@/lib/authz";
 import { env } from "@/lib/env";
 import { buildTicketDetail, mockStaff, mockSupportOverview, mockTickets } from "@/mock/ops";
 import { apiRequest, mockDelay } from "@/services/api-client";
@@ -18,7 +19,7 @@ let tickets = [...mockTickets];
  * Ticket visibility, internal-note access and escalation rights are enforced
  * by the backend. Internal notes are filtered here as a UI safeguard only.
  */
-export const supportService = {
+const supportServiceRaw = {
   async overview(): Promise<SupportOverview> {
     if (!env.useMocks) return apiRequest<SupportOverview>("/support/overview");
     return mockDelay(mockSupportOverview);
@@ -161,4 +162,26 @@ export const supportService = {
     if (!env.useMocks) return apiRequest<StaffMember[]>("/support/agents");
     return mockDelay(mockStaff);
   },
+};
+
+const guardedStaffCalls = guardService(
+  {
+    overview: supportServiceRaw.overview,
+    list: supportServiceRaw.list,
+    updateStatus: supportServiceRaw.updateStatus,
+    assign: supportServiceRaw.assign,
+    escalate: supportServiceRaw.escalate,
+    agents: supportServiceRaw.agents,
+  },
+  "support.view",
+  { updateStatus: "support.manage", assign: "support.manage", escalate: "support.manage", agents: "support.manage" },
+);
+
+/**
+ * Staff queues are permission-checked; student-scoped calls (own tickets,
+ * replies) are authorized by the backend against the session owner.
+ */
+export const supportService = {
+  ...supportServiceRaw,
+  ...guardedStaffCalls,
 };
