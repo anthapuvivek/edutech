@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Bell, LogOut, Menu } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { Logo } from "@/components/site/Logo";
@@ -215,10 +215,5 @@ export function PortalLayout({
  * section heading is dropped when nothing under it survives the filter.
  */
 function filterNav(nav: PortalNavItem[], role: PlatformRole): PortalNavItem[] {
-  const permitted = nav.filter((item) => !item.to || canAccessPath(role, item.to));
-  return permitted.filter((item, index) => {
-    if (!item.section) return true;
-    // Keep the heading only if this item or a following non-section item is visible.
-    return Boolean(item.to) || permitted.slice(index + 1).some((next) => !next.section);
-  });
+  return nav.filter((item) => (item.to ? canAccessPath(role, item.to) : false));
 }

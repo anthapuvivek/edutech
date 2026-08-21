@@ -57,6 +57,10 @@ const nav: PortalNavItem[] = [
   { label: "Eligibility Rules", to: "/admin/career/eligibility", icon: ShieldCheck, indent: true },
   { label: "Placement", icon: Award, indent: true },
 
+  { section: "Growth", label: "Leads / CRM", to: "/admin/crm", icon: Handshake },
+  { label: "Coupons", to: "/admin/marketing/coupons", icon: Wallet },
+  { label: "Support Desk", to: "/admin/support", icon: MessageSquare },
+
   { section: "Content", label: "Articles", to: "/admin/articles", icon: FileText, indent: true },
   { label: "CMS", to: "/admin/cms", icon: Sparkles, indent: true },
   { label: "Testimonials", icon: MessageSquare, indent: true },
