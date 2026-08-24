@@ -117,11 +117,18 @@ function MyCourses() {
                         </Button>
                       </>
                     ) : (
-                      <Button className="w-full" asChild>
-                        <Link to="/courses/$slug" params={{ slug: e.courseSlug }}>
-                          {e.status === "completed" ? "Review course" : "Go to course"}
-                        </Link>
-                      </Button>
+                      <div className="flex flex-col gap-2 w-full">
+                        <Button className="w-full" asChild>
+                          <Link to="/student/courses/$slug/recordings" params={{ slug: e.courseSlug }}>
+                            {e.status === "completed" ? "Review Recordings" : "Recorded Classes"}
+                          </Link>
+                        </Button>
+                        <Button variant="outline" className="w-full" asChild>
+                          <Link to="/courses/$slug" params={{ slug: e.courseSlug }}>
+                            Course Landing Page
+                          </Link>
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </div>

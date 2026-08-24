@@ -74,6 +74,12 @@ const nav: PortalNavItem[] = [
     icon: Video,
     indent: true,
   },
+  {
+    label: "Recorded Classes",
+    to: "/admin/recordings",
+    icon: Video,
+    indent: true,
+  },
 
   {
     section: "Communication",

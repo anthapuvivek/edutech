@@ -27,6 +27,7 @@ const nav: PortalNavItem[] = [
   { label: "Dashboard", to: "/student/dashboard", icon: LayoutDashboard },
   { label: "My Courses", to: "/student/courses", icon: BookOpen },
   { label: "Live Classes", to: "/student/live-classes", icon: Video },
+  { label: "Recorded Classes", to: "/student/recordings", icon: Video },
   { label: "Leaderboard", to: "/student/leaderboard", icon: Trophy },
   { label: "Coding Practice", icon: Code2 },
   { label: "Quizzes", icon: ListChecks },

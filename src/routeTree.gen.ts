@@ -35,6 +35,7 @@ import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
+import { Route as AdminRecordingsRouteImport } from './routes/admin.recordings'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AdminTeachersRouteImport } from './routes/admin.teachers'
@@ -45,6 +46,7 @@ import { Route as StudentCoursesRouteImport } from './routes/student.courses'
 import { Route as StudentDashboardRouteImport } from './routes/student.dashboard'
 import { Route as StudentLeaderboardRouteImport } from './routes/student.leaderboard'
 import { Route as StudentLiveClassesRouteImport } from './routes/student.live-classes'
+import { Route as StudentRecordingsRouteImport } from './routes/student.recordings'
 import { Route as TeacherDashboardRouteImport } from './routes/teacher.dashboard'
 import { Route as TeacherStudentsRouteImport } from './routes/teacher.students'
 import { Route as AdminCareerApplicationsRouteImport } from './routes/admin.career.applications'
@@ -65,6 +67,11 @@ import { Route as StudentCareerApplicationsRouteImport } from './routes/student.
 import { Route as StudentCareerJobsRouteImport } from './routes/student.career.jobs'
 import { Route as StudentCareerOnboardingRouteImport } from './routes/student.career.onboarding'
 import { Route as StudentCareerProfileRouteImport } from './routes/student.career.profile'
+import { Route as StudentRecordingsIdRouteImport } from './routes/student.recordings.$id'
+import { Route as TeacherRecordingsIndexRouteImport } from './routes/teacher.recordings.index'
+import { Route as TeacherRecordingsIdRouteImport } from './routes/teacher.recordings.$id'
+import { Route as TeacherRecordingsNewRouteImport } from './routes/teacher.recordings.new'
+import { Route as StudentCoursesSlugRecordingsRouteImport } from './routes/student.courses.$slug.recordings'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -196,6 +203,11 @@ const AdminPerformanceRoute = AdminPerformanceRouteImport.update({
   path: '/performance',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminRecordingsRoute = AdminRecordingsRouteImport.update({
+  id: '/recordings',
+  path: '/recordings',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -244,6 +256,11 @@ const StudentLeaderboardRoute = StudentLeaderboardRouteImport.update({
 const StudentLiveClassesRoute = StudentLiveClassesRouteImport.update({
   id: '/live-classes',
   path: '/live-classes',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentRecordingsRoute = StudentRecordingsRouteImport.update({
+  id: '/recordings',
+  path: '/recordings',
   getParentRoute: () => StudentRoute,
 } as any)
 const TeacherDashboardRoute = TeacherDashboardRouteImport.update({
@@ -348,6 +365,32 @@ const StudentCareerProfileRoute = StudentCareerProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => StudentCareerRoute,
 } as any)
+const StudentRecordingsIdRoute = StudentRecordingsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => StudentRecordingsRoute,
+} as any)
+const TeacherRecordingsIndexRoute = TeacherRecordingsIndexRouteImport.update({
+  id: '/recordings/',
+  path: '/recordings/',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherRecordingsIdRoute = TeacherRecordingsIdRouteImport.update({
+  id: '/recordings/$id',
+  path: '/recordings/$id',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherRecordingsNewRoute = TeacherRecordingsNewRouteImport.update({
+  id: '/recordings/new',
+  path: '/recordings/new',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const StudentCoursesSlugRecordingsRoute =
+  StudentCoursesSlugRecordingsRouteImport.update({
+    id: '/$slug/recordings',
+    path: '/$slug/recordings',
+    getParentRoute: () => StudentCoursesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -376,15 +419,17 @@ export interface FileRoutesByFullPath {
   '/admin/events': typeof AdminEventsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/performance': typeof AdminPerformanceRoute
+  '/admin/recordings': typeof AdminRecordingsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/student/career': typeof StudentCareerRouteWithChildren
-  '/student/courses': typeof StudentCoursesRoute
+  '/student/courses': typeof StudentCoursesRouteWithChildren
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
+  '/student/recordings': typeof StudentRecordingsRouteWithChildren
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
@@ -403,9 +448,14 @@ export interface FileRoutesByFullPath {
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/student/recordings/$id': typeof StudentRecordingsIdRoute
+  '/teacher/recordings/$id': typeof TeacherRecordingsIdRoute
+  '/teacher/recordings/new': typeof TeacherRecordingsNewRoute
   '/admin/crm/': typeof AdminCrmIndexRoute
   '/admin/students/': typeof AdminStudentsIndexRoute
   '/student/career/': typeof StudentCareerIndexRoute
+  '/teacher/recordings/': typeof TeacherRecordingsIndexRoute
+  '/student/courses/$slug/recordings': typeof StudentCoursesSlugRecordingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -434,14 +484,16 @@ export interface FileRoutesByTo {
   '/admin/events': typeof AdminEventsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/performance': typeof AdminPerformanceRoute
+  '/admin/recordings': typeof AdminRecordingsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
-  '/student/courses': typeof StudentCoursesRoute
+  '/student/courses': typeof StudentCoursesRouteWithChildren
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
+  '/student/recordings': typeof StudentRecordingsRouteWithChildren
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses': typeof CoursesIndexRoute
@@ -460,9 +512,14 @@ export interface FileRoutesByTo {
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/student/recordings/$id': typeof StudentRecordingsIdRoute
+  '/teacher/recordings/$id': typeof TeacherRecordingsIdRoute
+  '/teacher/recordings/new': typeof TeacherRecordingsNewRoute
   '/admin/crm': typeof AdminCrmIndexRoute
   '/admin/students': typeof AdminStudentsIndexRoute
   '/student/career': typeof StudentCareerIndexRoute
+  '/teacher/recordings': typeof TeacherRecordingsIndexRoute
+  '/student/courses/$slug/recordings': typeof StudentCoursesSlugRecordingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -492,15 +549,17 @@ export interface FileRoutesById {
   '/admin/events': typeof AdminEventsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/performance': typeof AdminPerformanceRoute
+  '/admin/recordings': typeof AdminRecordingsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/student/career': typeof StudentCareerRouteWithChildren
-  '/student/courses': typeof StudentCoursesRoute
+  '/student/courses': typeof StudentCoursesRouteWithChildren
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
+  '/student/recordings': typeof StudentRecordingsRouteWithChildren
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
@@ -519,9 +578,14 @@ export interface FileRoutesById {
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/student/recordings/$id': typeof StudentRecordingsIdRoute
+  '/teacher/recordings/$id': typeof TeacherRecordingsIdRoute
+  '/teacher/recordings/new': typeof TeacherRecordingsNewRoute
   '/admin/crm/': typeof AdminCrmIndexRoute
   '/admin/students/': typeof AdminStudentsIndexRoute
   '/student/career/': typeof StudentCareerIndexRoute
+  '/teacher/recordings/': typeof TeacherRecordingsIndexRoute
+  '/student/courses/$slug/recordings': typeof StudentCoursesSlugRecordingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -552,6 +616,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/notifications'
     | '/admin/performance'
+    | '/admin/recordings'
     | '/admin/settings'
     | '/admin/support'
     | '/admin/teachers'
@@ -561,6 +626,7 @@ export interface FileRouteTypes {
     | '/student/dashboard'
     | '/student/leaderboard'
     | '/student/live-classes'
+    | '/student/recordings'
     | '/teacher/dashboard'
     | '/teacher/students'
     | '/courses/'
@@ -579,9 +645,14 @@ export interface FileRouteTypes {
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/student/recordings/$id'
+    | '/teacher/recordings/$id'
+    | '/teacher/recordings/new'
     | '/admin/crm/'
     | '/admin/students/'
     | '/student/career/'
+    | '/teacher/recordings/'
+    | '/student/courses/$slug/recordings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -610,6 +681,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/notifications'
     | '/admin/performance'
+    | '/admin/recordings'
     | '/admin/settings'
     | '/admin/support'
     | '/admin/teachers'
@@ -618,6 +690,7 @@ export interface FileRouteTypes {
     | '/student/dashboard'
     | '/student/leaderboard'
     | '/student/live-classes'
+    | '/student/recordings'
     | '/teacher/dashboard'
     | '/teacher/students'
     | '/courses'
@@ -636,9 +709,14 @@ export interface FileRouteTypes {
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/student/recordings/$id'
+    | '/teacher/recordings/$id'
+    | '/teacher/recordings/new'
     | '/admin/crm'
     | '/admin/students'
     | '/student/career'
+    | '/teacher/recordings'
+    | '/student/courses/$slug/recordings'
   id:
     | '__root__'
     | '/'
@@ -667,6 +745,7 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/notifications'
     | '/admin/performance'
+    | '/admin/recordings'
     | '/admin/settings'
     | '/admin/support'
     | '/admin/teachers'
@@ -676,6 +755,7 @@ export interface FileRouteTypes {
     | '/student/dashboard'
     | '/student/leaderboard'
     | '/student/live-classes'
+    | '/student/recordings'
     | '/teacher/dashboard'
     | '/teacher/students'
     | '/courses/'
@@ -694,9 +774,14 @@ export interface FileRouteTypes {
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/student/recordings/$id'
+    | '/teacher/recordings/$id'
+    | '/teacher/recordings/new'
     | '/admin/crm/'
     | '/admin/students/'
     | '/student/career/'
+    | '/teacher/recordings/'
+    | '/student/courses/$slug/recordings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -903,6 +988,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPerformanceRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/recordings': {
+      id: '/admin/recordings'
+      path: '/recordings'
+      fullPath: '/admin/recordings'
+      preLoaderRoute: typeof AdminRecordingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/settings'
@@ -971,6 +1063,13 @@ declare module '@tanstack/react-router' {
       path: '/live-classes'
       fullPath: '/student/live-classes'
       preLoaderRoute: typeof StudentLiveClassesRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/recordings': {
+      id: '/student/recordings'
+      path: '/recordings'
+      fullPath: '/student/recordings'
+      preLoaderRoute: typeof StudentRecordingsRouteImport
       parentRoute: typeof StudentRoute
     }
     '/teacher/dashboard': {
@@ -1113,6 +1212,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentCareerProfileRouteImport
       parentRoute: typeof StudentCareerRoute
     }
+    '/student/recordings/$id': {
+      id: '/student/recordings/$id'
+      path: '/$id'
+      fullPath: '/student/recordings/$id'
+      preLoaderRoute: typeof StudentRecordingsIdRouteImport
+      parentRoute: typeof StudentRecordingsRoute
+    }
+    '/teacher/recordings/': {
+      id: '/teacher/recordings/'
+      path: '/recordings'
+      fullPath: '/teacher/recordings/'
+      preLoaderRoute: typeof TeacherRecordingsIndexRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/recordings/$id': {
+      id: '/teacher/recordings/$id'
+      path: '/recordings/$id'
+      fullPath: '/teacher/recordings/$id'
+      preLoaderRoute: typeof TeacherRecordingsIdRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/recordings/new': {
+      id: '/teacher/recordings/new'
+      path: '/recordings/new'
+      fullPath: '/teacher/recordings/new'
+      preLoaderRoute: typeof TeacherRecordingsNewRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/student/courses/$slug/recordings': {
+      id: '/student/courses/$slug/recordings'
+      path: '/$slug/recordings'
+      fullPath: '/student/courses/$slug/recordings'
+      preLoaderRoute: typeof StudentCoursesSlugRecordingsRouteImport
+      parentRoute: typeof StudentCoursesRoute
+    }
   }
 }
 
@@ -1128,6 +1262,7 @@ interface AdminRouteChildren {
   AdminEventsRoute: typeof AdminEventsRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
+  AdminRecordingsRoute: typeof AdminRecordingsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminSupportRoute: typeof AdminSupportRoute
   AdminTeachersRoute: typeof AdminTeachersRoute
@@ -1158,6 +1293,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEventsRoute: AdminEventsRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
+  AdminRecordingsRoute: AdminRecordingsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminSupportRoute: AdminSupportRoute,
   AdminTeachersRoute: AdminTeachersRoute,
@@ -1198,20 +1334,45 @@ const StudentCareerRouteWithChildren = StudentCareerRoute._addFileChildren(
   StudentCareerRouteChildren,
 )
 
+interface StudentCoursesRouteChildren {
+  StudentCoursesSlugRecordingsRoute: typeof StudentCoursesSlugRecordingsRoute
+}
+
+const StudentCoursesRouteChildren: StudentCoursesRouteChildren = {
+  StudentCoursesSlugRecordingsRoute: StudentCoursesSlugRecordingsRoute,
+}
+
+const StudentCoursesRouteWithChildren = StudentCoursesRoute._addFileChildren(
+  StudentCoursesRouteChildren,
+)
+
+interface StudentRecordingsRouteChildren {
+  StudentRecordingsIdRoute: typeof StudentRecordingsIdRoute
+}
+
+const StudentRecordingsRouteChildren: StudentRecordingsRouteChildren = {
+  StudentRecordingsIdRoute: StudentRecordingsIdRoute,
+}
+
+const StudentRecordingsRouteWithChildren =
+  StudentRecordingsRoute._addFileChildren(StudentRecordingsRouteChildren)
+
 interface StudentRouteChildren {
   StudentCareerRoute: typeof StudentCareerRouteWithChildren
-  StudentCoursesRoute: typeof StudentCoursesRoute
+  StudentCoursesRoute: typeof StudentCoursesRouteWithChildren
   StudentDashboardRoute: typeof StudentDashboardRoute
   StudentLeaderboardRoute: typeof StudentLeaderboardRoute
   StudentLiveClassesRoute: typeof StudentLiveClassesRoute
+  StudentRecordingsRoute: typeof StudentRecordingsRouteWithChildren
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
   StudentCareerRoute: StudentCareerRouteWithChildren,
-  StudentCoursesRoute: StudentCoursesRoute,
+  StudentCoursesRoute: StudentCoursesRouteWithChildren,
   StudentDashboardRoute: StudentDashboardRoute,
   StudentLeaderboardRoute: StudentLeaderboardRoute,
   StudentLiveClassesRoute: StudentLiveClassesRoute,
+  StudentRecordingsRoute: StudentRecordingsRouteWithChildren,
 }
 
 const StudentRouteWithChildren =
@@ -1220,11 +1381,17 @@ const StudentRouteWithChildren =
 interface TeacherRouteChildren {
   TeacherDashboardRoute: typeof TeacherDashboardRoute
   TeacherStudentsRoute: typeof TeacherStudentsRoute
+  TeacherRecordingsIdRoute: typeof TeacherRecordingsIdRoute
+  TeacherRecordingsNewRoute: typeof TeacherRecordingsNewRoute
+  TeacherRecordingsIndexRoute: typeof TeacherRecordingsIndexRoute
 }
 
 const TeacherRouteChildren: TeacherRouteChildren = {
   TeacherDashboardRoute: TeacherDashboardRoute,
   TeacherStudentsRoute: TeacherStudentsRoute,
+  TeacherRecordingsIdRoute: TeacherRecordingsIdRoute,
+  TeacherRecordingsNewRoute: TeacherRecordingsNewRoute,
+  TeacherRecordingsIndexRoute: TeacherRecordingsIndexRoute,
 }
 
 const TeacherRouteWithChildren =

@@ -68,7 +68,11 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   }
 
   if (response.status === 204) return undefined as T;
-  return (await response.json()) as T;
+  const json = await response.json();
+  if (json && typeof json === "object" && "success" in json && "data" in json) {
+    return json.data as T;
+  }
+  return json as T;
 }
 
 /** Simulates network latency for mock services so loading states are exercised. */

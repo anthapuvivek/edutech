@@ -21,6 +21,7 @@ const nav: PortalNavItem[] = [
   { label: "My Courses", icon: BookOpen },
   { label: "Batches", icon: Users },
   { label: "Live Classes", icon: Video },
+  { label: "Recorded Classes", to: "/teacher/recordings", icon: Video },
   { label: "Assignments", icon: FileCheck2 },
   { label: "Quizzes", icon: ListChecks },
   { label: "Coding Problems", icon: Code2 },

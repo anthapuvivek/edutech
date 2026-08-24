@@ -2,16 +2,18 @@ server:
   port: 8081
 
 spring:
+  profiles:
+    active: dev
   application:
     name: edtech-backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/edtech_dev
-    username: edtech
-    password:
+    url: jdbc:postgresql://localhost:5432/learntrix
+    username: postgres
+    password: "@Reddy01"
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     open-in-view: false
     properties:
       hibernate:
