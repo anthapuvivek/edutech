@@ -8,12 +8,12 @@ spring:
     name: edtech-backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/learntrix
-    username: postgres
-    password: "@Reddy01"
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/learntrix}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:your_secure_password}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     open-in-view: false
     properties:
       hibernate:
@@ -47,7 +47,7 @@ management:
 
 app:
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ${JWT_SECRET:learntrix-secret-key-32chars-dev-only}
     access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}
     refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
   cors:

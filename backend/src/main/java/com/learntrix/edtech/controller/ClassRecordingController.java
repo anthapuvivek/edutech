@@ -112,7 +112,7 @@ public class ClassRecordingController {
 
     /** Endpoint to receive local file upload payloads during development */
     @PostMapping(value = "/upload-local", consumes = "multipart/form-data")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     public ApiResponse<String> uploadLocalMultipart(
             @RequestParam("key") String key,
             @RequestParam("file") MultipartFile file) throws IOException {
@@ -121,7 +121,7 @@ public class ClassRecordingController {
     }
 
     @PutMapping(value = "/upload-local")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
     public ApiResponse<String> uploadLocalPut(
             @RequestParam("key") String key,
             HttpServletRequest request) throws IOException {

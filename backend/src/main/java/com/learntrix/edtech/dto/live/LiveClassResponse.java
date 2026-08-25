@@ -1,10 +1,11 @@
 package com.learntrix.edtech.dto.live;
 
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.UUID;
 
 @Data
 @Builder
@@ -14,6 +15,8 @@ public class LiveClassResponse {
     private UUID id;
     private String title;
     private String courseTitle;
+    private UUID batchId;
+    private String batchName;
     private String trainerName;
     private String description;
     private String date;        // YYYY-MM-DD

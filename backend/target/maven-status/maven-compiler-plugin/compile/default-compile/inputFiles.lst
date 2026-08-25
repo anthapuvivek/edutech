@@ -88,11 +88,13 @@ C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\dto\recording\Up
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\dto\student\ActivityItemResponse.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\dto\student\StudentProfileResponse.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\dto\student\StudentStatsResponse.java
+C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\dto\teacher\TeacherBatchResponse.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\dto\teacher\TeacherStatsResponse.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\dto\teacher\TeacherStudentResponse.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\EdtechApplication.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\entity\Assignment.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\entity\AssignmentSubmission.java
+C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\entity\Batch.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\entity\ClassRecording.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\entity\Company.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\entity\Course.java
@@ -119,6 +121,7 @@ C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\processing\AwsMe
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\processing\MockVideoProcessingService.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\repository\AssignmentRepository.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\repository\AssignmentSubmissionRepository.java
+C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\repository\BatchRepository.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\repository\ClassRecordingRepository.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\repository\CompanyRepository.java
 C:\Desktop\learntrix\backend\src\main\java\com\learntrix\edtech\repository\CourseRepository.java

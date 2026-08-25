@@ -28,6 +28,7 @@ com\learntrix\edtech\common\response\ApiResponse$ApiResponseBuilder.class
 com\learntrix\edtech\dto\admin\AdminStudentRowResponse.class
 com\learntrix\edtech\controller\MentorController.class
 com\learntrix\edtech\dto\career\JobResponse$JobResponseBuilder.class
+com\learntrix\edtech\repository\BatchRepository.class
 com\learntrix\edtech\dto\admin\AdminStatsResponse$AdminStatsResponseBuilder.class
 com\learntrix\edtech\entity\MentoringSession$MentoringSessionBuilder.class
 com\learntrix\edtech\entity\Quiz.class
@@ -76,12 +77,14 @@ com\learntrix\edtech\dto\career\CareerDashboardResponse$Notification$Notificatio
 com\learntrix\edtech\dto\admin\AdminOverviewResponse.class
 com\learntrix\edtech\dto\mentor\MentorResponse$MentorResponseBuilder.class
 com\learntrix\edtech\controller\JobController.class
+com\learntrix\edtech\entity\Batch.class
 com\learntrix\edtech\dto\student\StudentStatsResponse.class
 com\learntrix\edtech\dto\admin\AdminOverviewResponse$Operation.class
 com\learntrix\edtech\entity\PlacementDrive$PlacementDriveBuilder.class
 com\learntrix\edtech\service\CourseService.class
 com\learntrix\edtech\dto\admin\AdminStudentDetailResponse$AttendanceDetail.class
 com\learntrix\edtech\dto\teacher\TeacherStatsResponse.class
+com\learntrix\edtech\dto\teacher\TeacherBatchResponse.class
 com\learntrix\edtech\dto\career\JobResponse.class
 com\learntrix\edtech\dto\placement\PlacementStatsResponse$PlacementStatsResponseBuilder.class
 com\learntrix\edtech\repository\LessonRepository.class
@@ -174,6 +177,7 @@ com\learntrix\edtech\dto\admin\AdminSetupStepResponse.class
 com\learntrix\edtech\common\exception\ErrorCode.class
 com\learntrix\edtech\entity\AssignmentSubmission.class
 com\learntrix\edtech\entity\Assignment$AssignmentBuilder.class
+com\learntrix\edtech\dto\teacher\TeacherBatchResponse$TeacherBatchResponseBuilder.class
 com\learntrix\edtech\dto\mentor\MentorResponse.class
 com\learntrix\edtech\dto\placement\PlacementInterviewResponse$PlacementInterviewResponseBuilder.class
 com\learntrix\edtech\dto\auth\RegisterRequest.class

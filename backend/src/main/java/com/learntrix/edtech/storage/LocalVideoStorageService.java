@@ -88,7 +88,12 @@ public class LocalVideoStorageService implements VideoStorageService {
     }
 
     public void storeFile(String storageKey, byte[] bytes) throws IOException {
-        Path targetPath = Paths.get(uploadDir, storageKey);
+        Path uploadDirAbsolute = Paths.get(uploadDir).toAbsolutePath().normalize();
+        Path targetPath = uploadDirAbsolute.resolve(storageKey).normalize();
+        // Guard against path traversal: resolved path must be inside uploadDir
+        if (!targetPath.startsWith(uploadDirAbsolute)) {
+            throw new IllegalArgumentException("Invalid storage key — path traversal detected: " + storageKey);
+        }
         Files.createDirectories(targetPath.getParent());
         Files.write(targetPath, bytes);
     }

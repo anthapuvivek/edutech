@@ -1,9 +1,12 @@
 package com.learntrix.edtech.service;
 
-import com.learntrix.edtech.dto.recording.*;
-import com.learntrix.edtech.entity.*;
-import com.learntrix.edtech.entity.Module;
-import com.learntrix.edtech.repository.*;
+import java.time.Instant;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +14,25 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.learntrix.edtech.dto.recording.CreateRecordingRequest;
+import com.learntrix.edtech.dto.recording.RecordingProgressRequest;
+import com.learntrix.edtech.dto.recording.RecordingProgressResponse;
+import com.learntrix.edtech.dto.recording.RecordingResponse;
+import com.learntrix.edtech.entity.ClassRecording;
+import com.learntrix.edtech.entity.Course;
+import com.learntrix.edtech.entity.Enrollment;
+import com.learntrix.edtech.entity.Lesson;
+import com.learntrix.edtech.entity.Module;
+import com.learntrix.edtech.entity.RecordingStatus;
+import com.learntrix.edtech.entity.Role;
+import com.learntrix.edtech.entity.User;
+import com.learntrix.edtech.repository.ClassRecordingRepository;
+import com.learntrix.edtech.repository.CourseRepository;
+import com.learntrix.edtech.repository.EnrollmentRepository;
+import com.learntrix.edtech.repository.LessonRepository;
+import com.learntrix.edtech.repository.ModuleRepository;
+import com.learntrix.edtech.repository.RoleRepository;
+import com.learntrix.edtech.repository.UserRepository;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -54,16 +71,22 @@ public class ClassRecordingServiceTest {
 
     @BeforeEach
     public void setUp() {
-        // Setup Role
-        Role teacherRole = new Role();
-        teacherRole.setName("TEACHER");
-        teacherRole.setDisplayName("Teacher");
-        roleRepository.save(teacherRole);
+        // Setup Role (idempotent for repeated test execution in the in-memory DB)
+        Role teacherRole = roleRepository.findByName("TEACHER")
+                .orElseGet(() -> {
+                    Role role = new Role();
+                    role.setName("TEACHER");
+                    role.setDisplayName("Teacher");
+                    return roleRepository.save(role);
+                });
 
-        Role studentRole = new Role();
-        studentRole.setName("STUDENT");
-        studentRole.setDisplayName("Student");
-        roleRepository.save(studentRole);
+        Role studentRole = roleRepository.findByName("STUDENT")
+                .orElseGet(() -> {
+                    Role role = new Role();
+                    role.setName("STUDENT");
+                    role.setDisplayName("Student");
+                    return roleRepository.save(role);
+                });
 
         // Setup Teacher
         teacher = new User();
