@@ -38,7 +38,7 @@ import com.learntrix.edtech.repository.UserRepository;
 
 @RestController
 @RequestMapping("/api/teacher")
-@PreAuthorize("hasRole('TEACHER')")
+@PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN', 'MENTOR')")
 public class TeacherController {
 
     private final CourseRepository courseRepository;

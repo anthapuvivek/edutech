@@ -45,7 +45,7 @@ import com.learntrix.edtech.service.LiveClassService;
 
 @RestController
 @RequestMapping("/api/admin")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
 public class AdminController {
 
     private final UserRepository userRepository;
@@ -189,6 +189,10 @@ public class AdminController {
         ));
     }
 
+    // Read-only transaction required: mapToStudentRow walks Enrollment.course, which is a
+    // LAZY association, and open-in-view is disabled. Without this the whole endpoint 500s
+    // with LazyInitializationException.
+    @Transactional(readOnly = true)
     @GetMapping("/students")
     public ApiResponse<List<AdminStudentRowResponse>> getStudents() {
         List<User> students = userRepository.findAll().stream()
@@ -199,6 +203,7 @@ public class AdminController {
         return ApiResponse.success(rows);
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/students/{id}")
     public ApiResponse<AdminStudentDetailResponse> getStudent(@PathVariable("id") UUID id) {
         User student = userRepository.findById(id).orElse(null);

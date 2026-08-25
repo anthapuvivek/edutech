@@ -1,5 +1,5 @@
 import { env } from "@/lib/env";
-import { apiRequest, mockDelay } from "@/services/api-client";
+import { apiRequest, authHeaders, mockDelay } from "@/services/api-client";
 import type {
   CreateRecordingRequest,
   Recording,
@@ -125,16 +125,14 @@ export const recordingService = {
 
   async getTeacherRecordings(): Promise<{ items: Recording[] }> {
     if (!env.useMocks) {
-      const pageResponse = await apiRequest<{ content: Recording[] }>("/recordings/teacher");
-      return { items: pageResponse.content };
+      return apiRequest<{ items: Recording[] }>("/recordings/teacher");
     }
     return mockDelay({ items: mockRecordings });
   },
 
   async getAdminRecordings(): Promise<{ items: Recording[] }> {
     if (!env.useMocks) {
-      const pageResponse = await apiRequest<{ content: Recording[] }>("/admin/recordings");
-      return { items: pageResponse.content };
+      return apiRequest<{ items: Recording[] }>("/admin/recordings");
     }
     return mockDelay({ items: mockRecordings });
   },
@@ -355,6 +353,14 @@ export const recordingService = {
       const isLocal = uploadUrl.includes("upload-local");
 
       xhr.open(isLocal ? "POST" : "PUT", uploadUrl, true);
+
+      // The local endpoint sits behind the same JWT guard as the rest of the API.
+      // A presigned S3 URL carries its own signature and must NOT get this header.
+      if (isLocal) {
+        for (const [header, value] of Object.entries(authHeaders())) {
+          xhr.setRequestHeader(header, value);
+        }
+      }
 
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable && onProgress) {

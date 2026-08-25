@@ -6,6 +6,7 @@ import com.learntrix.edtech.dto.career.*;
 import com.learntrix.edtech.entity.*;
 import com.learntrix.edtech.repository.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.*;
@@ -41,6 +42,10 @@ public class JobController {
         this.userRepository = userRepository;
     }
 
+    // Read-only transaction: the response mappers walk LAZY @ManyToOne relations
+    // (Enrollment.course, Job.company, ...) and open-in-view is disabled, so without
+    // an open session these endpoints fail with LazyInitializationException.
+    @Transactional(readOnly = true)
     @GetMapping("/eligibility")
     public ApiResponse<CareerEligibilityResponse> getEligibility() {
         UUID studentId = SecurityUtil.getCurrentUserId();
@@ -65,6 +70,7 @@ public class JobController {
                 .build());
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/dashboard")
     public ApiResponse<CareerDashboardResponse> getDashboard() {
         UUID studentId = SecurityUtil.getCurrentUserId();
@@ -113,6 +119,7 @@ public class JobController {
                 .build());
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/readiness")
     public ApiResponse<CareerReadinessResponse> getReadiness() {
         return ApiResponse.success(CareerReadinessResponse.builder()
@@ -125,6 +132,7 @@ public class JobController {
                 .build());
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/profile")
     public ApiResponse<CareerProfileResponse> getProfile() {
         UUID studentId = SecurityUtil.getCurrentUserId();
@@ -193,6 +201,7 @@ public class JobController {
         return getEligibility();
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/roadmap")
     public ApiResponse<CareerRoadmapResponse> getRoadmap() {
         List<CareerRoadmapResponse.RoadmapStep> steps = List.of(
@@ -209,6 +218,7 @@ public class JobController {
                 .build());
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/skill-gap")
     public ApiResponse<SkillGapResponse> getSkillGap() {
         List<SkillGapResponse.NeedsImprovementSkill> gaps = List.of(
@@ -223,15 +233,55 @@ public class JobController {
                 .build());
     }
 
+    /**
+     * Filters mirror JobQuery in src/services/job.service.ts. They are applied here rather
+     * than client side so the list stays correct once it is paged.
+     */
+    @Transactional(readOnly = true)
     @GetMapping("/jobs")
-    public ApiResponse<List<JobResponse>> getJobs() {
-        List<Job> jobs = jobRepository.findAll();
-        List<JobResponse> responses = jobs.stream()
+    public ApiResponse<List<JobResponse>> getJobs(
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "workMode", required = false) String workMode,
+            @RequestParam(value = "sort", required = false) String sort) {
+
+        String needle = search == null ? "" : search.trim().toLowerCase();
+
+        List<JobResponse> responses = jobRepository.findAll().stream()
                 .map(this::mapToJobResponse)
+                .filter(j -> needle.isEmpty()
+                        || contains(j.getTitle(), needle)
+                        || contains(j.getCompanyName(), needle)
+                        || j.getSkills().stream().anyMatch(s -> contains(s, needle)))
+                .filter(j -> isAny(type) || type.equalsIgnoreCase(j.getType()))
+                .filter(j -> isAny(workMode) || workMode.equalsIgnoreCase(j.getWorkMode()))
+                .sorted(jobComparator(sort))
                 .collect(Collectors.toList());
+
         return ApiResponse.success(responses);
     }
 
+    private static boolean contains(String value, String lowercaseNeedle) {
+        return value != null && value.toLowerCase().contains(lowercaseNeedle);
+    }
+
+    /** Treats a missing filter and the explicit "all" option the same way. */
+    private static boolean isAny(String filter) {
+        return filter == null || filter.isBlank() || "all".equalsIgnoreCase(filter);
+    }
+
+    private static Comparator<JobResponse> jobComparator(String sort) {
+        if ("deadline".equalsIgnoreCase(sort)) {
+            return Comparator.comparing(JobResponse::getDeadline, Comparator.nullsLast(Comparator.<String>naturalOrder()));
+        }
+        if ("newest".equalsIgnoreCase(sort)) {
+            return Comparator.comparing(JobResponse::getPostedAt, Comparator.nullsLast(Comparator.<String>naturalOrder())).reversed();
+        }
+        // "relevance" and any unrecognised value fall back to best match first.
+        return Comparator.comparingInt(JobResponse::getMatchPercent).reversed();
+    }
+
+    @Transactional(readOnly = true)
     @GetMapping("/companies")
     public ApiResponse<List<CompanyResponse>> getCompanies() {
         List<Company> companies = companyRepository.findAll();
@@ -241,6 +291,7 @@ public class JobController {
         return ApiResponse.success(responses);
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/applications")
     public ApiResponse<List<JobApplicationResponse>> getApplications() {
         UUID studentId = SecurityUtil.getCurrentUserId();
@@ -251,6 +302,7 @@ public class JobController {
         return ApiResponse.success(responses);
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/referrals")
     public ApiResponse<List<ReferralOpportunityResponse>> getReferrals() {
         return ApiResponse.success(List.of());
@@ -269,8 +321,8 @@ public class JobController {
                 .experience("0-1 Years")
                 .salaryRange(job.getCtcRange())
                 .skills(List.of("Java", "Spring Boot", "SQL"))
-                .postedAt(job.getPostedAt().toString())
-                .deadline(job.getApplicationDeadline().toString())
+                .postedAt(job.getPostedAt() == null ? null : job.getPostedAt().toString())
+                .deadline(job.getApplicationDeadline() == null ? null : job.getApplicationDeadline().toString())
                 .matchPercent(85)
                 .saved(false)
                 .build();

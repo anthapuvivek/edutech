@@ -1,13 +1,12 @@
 import { env } from "@/lib/env";
 import { mockAccounts } from "@/mock/lms";
-import { apiRequest, mockDelay } from "@/services/api-client";
+import { apiRequest, mockDelay, SESSION_STORAGE_KEY } from "@/services/api-client";
 import type { AuthSession, AuthUser, LoginPayload, RegisterPayload, Role } from "@/types/lms";
 
-const STORAGE_KEY = "learntrix.session";
+const STORAGE_KEY = SESSION_STORAGE_KEY;
 
 /**
- * Auth abstraction. Mock-backed for now; every method has a real HTTP branch so
- * the FastAPI backend can be connected without touching UI code.
+ * Auth abstraction over the Spring Boot backend, with a mock branch for offline UI work.
  * NOTE: this is a UX-level session only. Real authorization is enforced server side.
  */
 export const authService = {
@@ -78,9 +77,26 @@ export const authService = {
     return mockDelay({ verified: true }, 800);
   },
 
+  /**
+   * Re-reads the signed-in user from the API. The stored session is only a cache —
+   * this is what proves the token is still valid, so it runs on every app start.
+   */
+  async profile(): Promise<AuthUser> {
+    if (!env.useMocks) return apiRequest<AuthUser>("/auth/profile");
+    const session = this.readSession();
+    if (!session) throw new Error("No active session.");
+    return mockDelay(session.user, 150);
+  },
+
   async logout(): Promise<void> {
-    if (!env.useMocks) await apiRequest<void>("/auth/logout", { method: "POST" });
-    this.persist(null);
+    try {
+      if (!env.useMocks) await apiRequest<void>("/auth/logout", { method: "POST" });
+    } catch {
+      // Server-side logout is best effort. An already-expired token 401s here, and that
+      // must never strand the user inside a signed-in shell.
+    } finally {
+      this.persist(null);
+    }
   },
 };
 

@@ -29,9 +29,9 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -45,6 +45,9 @@ public class AuthController {
 
     @Value("${app.jwt.access-token-expiration}")
     private long accessTokenExpirationMs;
+
+    @Value("${app.jwt.remember-me-expiration:2592000000}")
+    private long rememberMeExpirationMs;
 
     public AuthController(
             UserRepository userRepository,
@@ -129,26 +132,42 @@ public class AuthController {
     }
 
     private LoginResponse buildLoginResponse(User user, boolean remember) {
-        List<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(r -> new SimpleGrantedAuthority("ROLE_" + r.getName()))
-                .collect(Collectors.toList());
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                user.getId().toString(), null, resolveAuthorities(user));
 
-        Authentication auth = new UsernamePasswordAuthenticationToken(user.getId().toString(), null, authorities);
-        String token = jwtProvider.generateToken(auth, user.getId().toString());
-
-        long expiration = remember ? (30L * 24 * 3600 * 1000) : accessTokenExpirationMs;
-        Instant expiresAt = Instant.now().plusMillis(expiration);
+        // One lifetime for both the signed token and the expiry we advertise. Deriving
+        // them separately let the client keep a session alive long after the JWT died.
+        long ttlMillis = remember ? rememberMeExpirationMs : accessTokenExpirationMs;
+        String token = jwtProvider.generateToken(auth, user.getId().toString(), ttlMillis);
 
         return LoginResponse.builder()
                 .user(mapToUserResponse(user))
                 .accessToken(token)
-                .expiresAt(expiresAt)
+                .expiresAt(Instant.now().plusMillis(ttlMillis))
                 .build();
+    }
+
+    /**
+     * SUPER_ADMIN additionally carries ROLE_ADMIN so a single hasRole('ADMIN') guard
+     * covers both roles. Without this a super admin is routed to the admin console by
+     * the UI and then rejected by every endpoint in it.
+     */
+    private List<GrantedAuthority> resolveAuthorities(User user) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        for (Role role : user.getRoles()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+            if ("SUPER_ADMIN".equalsIgnoreCase(role.getName())) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            }
+        }
+        return authorities;
     }
 
     private UserResponse mapToUserResponse(User user) {
         String roleStr = "student";
-        if (user.getRoles().stream().anyMatch(r -> "ADMIN".equalsIgnoreCase(r.getName()) || "SUPER_ADMIN".equalsIgnoreCase(r.getName()))) {
+        if (user.getRoles().stream().anyMatch(r -> "SUPER_ADMIN".equalsIgnoreCase(r.getName()))) {
+            roleStr = "super_admin";
+        } else if (user.getRoles().stream().anyMatch(r -> "ADMIN".equalsIgnoreCase(r.getName()))) {
             roleStr = "admin";
         } else if (user.getRoles().stream().anyMatch(r -> "TEACHER".equalsIgnoreCase(r.getName()))) {
             roleStr = "teacher";
@@ -177,6 +196,8 @@ public class AuthController {
                 .role(roleStr)
                 .avatarUrl(user.getAvatarUrl())
                 .studentId(studentId)
+                .status(user.getStatus() == null ? null : user.getStatus().toLowerCase())
+                .createdAt(user.getCreatedAt())
                 .build();
     }
 }

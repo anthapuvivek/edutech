@@ -50,8 +50,13 @@ app:
     secret: ${JWT_SECRET:learntrix-secret-key-32chars-dev-only}
     access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}
     refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+    # Lifetime issued when the client sends "remember me". The signed token and the
+    # expiresAt returned to the client are both derived from this single value.
+    remember-me-expiration: ${JWT_REMEMBER_ME_EXPIRATION:2592000000}
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8080,http://127.0.0.1:8080,http://localhost:5173,http://127.0.0.1:5173}
+    # Vite picks its dev port at startup; every port the dev server may land on has to be
+    # listed or the browser fails preflight and the app looks like a backend outage.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8080,http://127.0.0.1:8080,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,http://localhost:4173,http://127.0.0.1:4173}
 
 logging:
   level:

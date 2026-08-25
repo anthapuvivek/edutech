@@ -1,5 +1,6 @@
 package com.learntrix.edtech.controller;
 
+import com.learntrix.edtech.common.pagination.PageResponse;
 import com.learntrix.edtech.common.response.ApiResponse;
 import com.learntrix.edtech.common.util.SecurityUtil;
 import com.learntrix.edtech.dto.recording.RecordingResponse;
@@ -16,7 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/recordings")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
 public class AdminRecordingController {
 
     private final ClassRecordingService recordingService;
@@ -26,12 +27,12 @@ public class AdminRecordingController {
     }
 
     @GetMapping
-    public ApiResponse<Page<RecordingResponse>> getAllRecordings(
+    public ApiResponse<PageResponse<RecordingResponse>> getAllRecordings(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<RecordingResponse> response = recordingService.getAllRecordings(pageable);
-        return ApiResponse.success(response);
+        return ApiResponse.success(PageResponse.of(response));
     }
 
     @PostMapping("/{id}/publish")

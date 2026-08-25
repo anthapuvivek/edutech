@@ -152,11 +152,13 @@ function CourseDetailPage() {
               </span>
               <Badge variant="secondary">{course.level}</Badge>
             </div>
-            <p className="mt-5 text-sm text-ink-foreground/70">
-              Taught by{" "}
-              <span className="font-medium text-ink-foreground">{course.instructor.name}</span> ·{" "}
-              {course.instructor.title}
-            </p>
+            {course.instructor ? (
+              <p className="mt-5 text-sm text-ink-foreground/70">
+                Taught by{" "}
+                <span className="font-medium text-ink-foreground">{course.instructor.name}</span> ·{" "}
+                {course.instructor.title}
+              </p>
+            ) : null}
           </div>
         </div>
       </section>
@@ -265,27 +267,35 @@ function CourseDetailPage() {
               </TabsContent>
 
               <TabsContent value="instructor" className="surface-panel mt-5 p-8">
-                <h3 className="text-xl">{course.instructor.name}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{course.instructor.title}</p>
-                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                  {course.instructor.name} has led engineering teams across product companies and
-                  teaches with a focus on judgement, trade-offs and production realities rather than
-                  syntax recall.
-                </p>
-                <div className="mt-6 flex gap-8 text-sm">
-                  <span>
-                    <span className="block text-display text-2xl">
-                      {course.instructor.rating?.toFixed(1)}
-                    </span>
-                    <span className="text-muted-foreground">Instructor rating</span>
-                  </span>
-                  <span>
-                    <span className="block text-display text-2xl">
-                      {formatCompact(course.instructor.students ?? 0)}
-                    </span>
-                    <span className="text-muted-foreground">Students taught</span>
-                  </span>
-                </div>
+                {course.instructor ? (
+                  <>
+                    <h3 className="text-xl">{course.instructor.name}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{course.instructor.title}</p>
+                    <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                      {course.instructor.name} has led engineering teams across product companies
+                      and teaches with a focus on judgement, trade-offs and production realities
+                      rather than syntax recall.
+                    </p>
+                    <div className="mt-6 flex gap-8 text-sm">
+                      <span>
+                        <span className="block text-display text-2xl">
+                          {course.instructor.rating?.toFixed(1)}
+                        </span>
+                        <span className="text-muted-foreground">Instructor rating</span>
+                      </span>
+                      <span>
+                        <span className="block text-display text-2xl">
+                          {formatCompact(course.instructor.students ?? 0)}
+                        </span>
+                        <span className="text-muted-foreground">Students taught</span>
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Instructor details will be announced soon.
+                  </p>
+                )}
               </TabsContent>
 
               <TabsContent

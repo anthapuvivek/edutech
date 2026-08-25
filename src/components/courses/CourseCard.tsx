@@ -47,7 +47,9 @@ export function CourseCard({ course }: { course: Course }) {
           </Link>
         </h3>
         <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">{course.subtitle}</p>
-        <p className="mt-3 text-sm text-muted-foreground">{course.instructor.name}</p>
+        {course.instructor ? (
+          <p className="mt-3 text-sm text-muted-foreground">{course.instructor.name}</p>
+        ) : null}
 
         <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1 font-medium text-foreground">

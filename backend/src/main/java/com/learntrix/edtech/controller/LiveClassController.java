@@ -6,6 +6,7 @@ import com.learntrix.edtech.dto.live.LiveClassResponse;
 import com.learntrix.edtech.entity.LiveClass;
 import com.learntrix.edtech.service.LiveClassService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,10 @@ public class LiveClassController {
         this.liveClassService = liveClassService;
     }
 
+    // Read-only transaction: the response mappers walk LAZY @ManyToOne relations
+    // (Enrollment.course, Job.company, ...) and open-in-view is disabled, so without
+    // an open session these endpoints fail with LazyInitializationException.
+    @Transactional(readOnly = true)
     @GetMapping("/student/live-classes")
     @PreAuthorize("hasRole('STUDENT')")
     public ApiResponse<List<LiveClassResponse>> getStudentLiveClasses() {
@@ -31,15 +36,16 @@ public class LiveClassController {
     }
 
     @PostMapping("/teacher/live-classes")
-    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<LiveClassResponse> createLiveClass(@RequestBody Map<String, Object> body) {
         UUID teacherId = SecurityUtil.getCurrentUserId();
         LiveClassResponse liveClass = liveClassService.createLiveClass(body, teacherId);
         return ApiResponse.success(liveClass);
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/teacher/live-classes")
-    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<LiveClassResponse>> getTeacherLiveClasses() {
         UUID teacherId = SecurityUtil.getCurrentUserId();
         List<LiveClassResponse> liveClasses = liveClassService.getTeacherLiveClasses(teacherId);

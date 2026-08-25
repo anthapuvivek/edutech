@@ -31,6 +31,15 @@ public class JwtProvider {
     }
 
     public String generateToken(Authentication authentication, String userId) {
+        return generateToken(authentication, userId, accessTokenExpiration);
+    }
+
+    /**
+     * Issues a token with an explicit lifetime. Callers that advertise a session
+     * expiry to the client (see AuthController "remember me") must use this so the
+     * JWT and the advertised expiry cannot drift apart.
+     */
+    public String generateToken(Authentication authentication, String userId, long ttlMillis) {
         String username = authentication.getName();
         List<String> roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -41,7 +50,7 @@ public class JwtProvider {
         claims.put("roles", roles);
 
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
+        Date expiryDate = new Date(now.getTime() + ttlMillis);
 
         return Jwts.builder()
                 .subject(username)

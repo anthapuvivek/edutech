@@ -41,13 +41,28 @@ public class CourseService {
 
     @Transactional(readOnly = true)
     public List<CourseResponse> listCourses(String search, String category) {
+        return listCourses(search, category, null, null, null, null);
+    }
+
+    /**
+     * Catalogue query. Every parameter mirrors CourseQuery in src/types/index.ts; the
+     * storefront's filter sidebar sends all of them, so all of them are applied here
+     * rather than being silently dropped.
+     */
+    @Transactional(readOnly = true)
+    public List<CourseResponse> listCourses(String search,
+                                            String category,
+                                            String level,
+                                            Integer maxPrice,
+                                            Double minRating,
+                                            String sort) {
         List<Course> courses = courseRepository.findAll();
 
         return courses.stream()
                 .filter(c -> {
                     if (search != null && !search.trim().isEmpty()) {
                         String s = search.toLowerCase();
-                        return c.getTitle().toLowerCase().contains(s) || 
+                        return c.getTitle().toLowerCase().contains(s) ||
                                (c.getSubtitle() != null && c.getSubtitle().toLowerCase().contains(s)) ||
                                c.getCategory().toLowerCase().contains(s);
                     }
@@ -59,8 +74,30 @@ public class CourseService {
                     }
                     return true;
                 })
+                .filter(c -> isAnyOption(level) || level.equalsIgnoreCase(c.getLevel()))
+                .filter(c -> maxPrice == null || c.getPrice() <= maxPrice)
+                .filter(c -> minRating == null || c.getRating() >= minRating)
+                .sorted(courseComparator(sort))
                 .map(this::mapToCourseResponse)
                 .collect(Collectors.toList());
+    }
+
+    /** Treats a missing filter and the sidebar's explicit "All" option the same way. */
+    private static boolean isAnyOption(String filter) {
+        return filter == null || filter.isBlank() || "All".equalsIgnoreCase(filter);
+    }
+
+    private static Comparator<Course> courseComparator(String sort) {
+        if (sort == null) return Comparator.comparing(Course::getTitle);
+        return switch (sort.toLowerCase()) {
+            case "rating" -> Comparator.comparing(Course::getRating).reversed();
+            case "price_low" -> Comparator.comparing(Course::getPrice);
+            case "price_high" -> Comparator.comparing(Course::getPrice).reversed();
+            case "newest" -> Comparator.comparing(
+                    Course::getUpdatedAt, Comparator.nullsLast(Comparator.<Instant>naturalOrder())).reversed();
+            case "popular" -> Comparator.comparing(Course::getStudentCount).reversed();
+            default -> Comparator.comparing(Course::getTitle);
+        };
     }
 
     @Transactional(readOnly = true)
@@ -138,7 +175,7 @@ public class CourseService {
                     .build();
         }
 
-        // Setup mock/default values for rich UI mapping since database properties are minimalistic
+        // Skills are still derived: courses has no skills column yet.
         List<String> skills = List.of("Java", "Spring Boot", "REST APIs", "SQL");
         if (course.getSlug().contains("python")) {
             skills = List.of("Python", "FastAPI", "Pandas", "OOP");
@@ -153,16 +190,16 @@ public class CourseService {
                 .subtitle(course.getSubtitle())
                 .category(course.getCategory())
                 .skills(skills)
-                .level("Intermediate")
-                .language("English")
-                .durationHours(48)
-                .lessonCount(12)
-                .rating(4.8)
-                .ratingCount(1240)
-                .studentCount(3560)
-                .price(14999)
-                .originalPrice(24999)
-                .currency("INR")
+                .level(course.getLevel())
+                .language(course.getLanguage())
+                .durationHours(course.getDurationHours())
+                .lessonCount(course.getLessonCount())
+                .rating(course.getRating())
+                .ratingCount(course.getRatingCount())
+                .studentCount(course.getStudentCount())
+                .price(course.getPrice())
+                .originalPrice(course.getOriginalPrice())
+                .currency(course.getCurrency())
                 .thumbnailUrl(course.getThumbnailUrl())
                 .instructor(instructorResponse)
                 .badges(List.of("Career Track"))

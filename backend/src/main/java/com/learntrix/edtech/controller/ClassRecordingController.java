@@ -1,5 +1,6 @@
 package com.learntrix.edtech.controller;
 
+import com.learntrix.edtech.common.pagination.PageResponse;
 import com.learntrix.edtech.common.response.ApiResponse;
 import com.learntrix.edtech.common.util.SecurityUtil;
 import com.learntrix.edtech.dto.recording.*;
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/recordings")
-@PreAuthorize("hasRole('TEACHER')")
+@PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
 public class ClassRecordingController {
 
     private final ClassRecordingService recordingService;
@@ -41,13 +42,13 @@ public class ClassRecordingController {
     }
 
     @GetMapping("/teacher")
-    public ApiResponse<Page<RecordingResponse>> getTeacherRecordings(
+    public ApiResponse<PageResponse<RecordingResponse>> getTeacherRecordings(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         UUID teacherId = SecurityUtil.getCurrentUserId();
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<RecordingResponse> response = recordingService.getTeacherRecordings(teacherId, pageable);
-        return ApiResponse.success(response);
+        return ApiResponse.success(PageResponse.of(response));
     }
 
     @GetMapping("/{id}")
@@ -112,7 +113,7 @@ public class ClassRecordingController {
 
     /** Endpoint to receive local file upload payloads during development */
     @PostMapping(value = "/upload-local", consumes = "multipart/form-data")
-    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<String> uploadLocalMultipart(
             @RequestParam("key") String key,
             @RequestParam("file") MultipartFile file) throws IOException {
@@ -121,7 +122,7 @@ public class ClassRecordingController {
     }
 
     @PutMapping(value = "/upload-local")
-    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<String> uploadLocalPut(
             @RequestParam("key") String key,
             HttpServletRequest request) throws IOException {

@@ -7,6 +7,7 @@ import com.learntrix.edtech.dto.student.StudentProfileResponse;
 import com.learntrix.edtech.dto.student.StudentStatsResponse;
 import com.learntrix.edtech.service.StudentService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,10 @@ public class StudentController {
         this.studentService = studentService;
     }
 
+    // Read-only transaction: the response mappers walk LAZY @ManyToOne relations
+    // (Enrollment.course, Job.company, ...) and open-in-view is disabled, so without
+    // an open session these endpoints fail with LazyInitializationException.
+    @Transactional(readOnly = true)
     @GetMapping("/profile")
     public ApiResponse<StudentProfileResponse> getProfile() {
         UUID studentId = SecurityUtil.getCurrentUserId();
@@ -32,6 +37,7 @@ public class StudentController {
         return ApiResponse.success(profile);
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/stats")
     public ApiResponse<StudentStatsResponse> getStats() {
         UUID studentId = SecurityUtil.getCurrentUserId();
@@ -39,6 +45,7 @@ public class StudentController {
         return ApiResponse.success(stats);
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/activity")
     public ApiResponse<List<ActivityItemResponse>> getActivity() {
         UUID studentId = SecurityUtil.getCurrentUserId();

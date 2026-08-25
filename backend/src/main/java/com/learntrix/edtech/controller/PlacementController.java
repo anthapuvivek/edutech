@@ -5,6 +5,7 @@ import com.learntrix.edtech.dto.placement.*;
 import com.learntrix.edtech.entity.*;
 import com.learntrix.edtech.repository.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/placement")
-@PreAuthorize("hasRole('PLACEMENT_OFFICER')")
+@PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
 public class PlacementController {
 
     private final UserRepository userRepository;
@@ -44,6 +45,10 @@ public class PlacementController {
         this.studentProfileRepository = studentProfileRepository;
     }
 
+    // Read-only transaction: the response mappers walk LAZY @ManyToOne relations
+    // (Enrollment.course, Job.company, ...) and open-in-view is disabled, so without
+    // an open session these endpoints fail with LazyInitializationException.
+    @Transactional(readOnly = true)
     @GetMapping("/stats")
     public ApiResponse<PlacementStatsResponse> getStats() {
         int studentCount = (int) userRepository.findAll().stream()
@@ -68,6 +73,7 @@ public class PlacementController {
                 .build());
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/analytics")
     public ApiResponse<PlacementAnalyticsResponse> getAnalytics() {
         int studentCount = (int) userRepository.findAll().stream()
@@ -93,6 +99,7 @@ public class PlacementController {
                 .build());
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/students")
     public ApiResponse<List<PlacementEligibleStudentResponse>> getStudents(
             @RequestParam(value = "eligibility", required = false) String eligibility,
@@ -121,6 +128,7 @@ public class PlacementController {
         return ApiResponse.success(responses);
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/drives")
     public ApiResponse<List<PlacementDriveResponse>> getDrives() {
         List<PlacementDrive> drives = placementDriveRepository.findAll();
@@ -163,6 +171,7 @@ public class PlacementController {
         return ApiResponse.success(Map.of("ok", true));
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/applications")
     public ApiResponse<List<PlacementApplicationResponse>> getApplications(
             @RequestParam(value = "status", required = false) String status,
@@ -204,6 +213,7 @@ public class PlacementController {
         return ApiResponse.success(Map.of("ok", true));
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/interviews")
     public ApiResponse<List<PlacementInterviewResponse>> getInterviews() {
         List<PlacementInterview> interviews = placementInterviewRepository.findAll();
@@ -240,6 +250,7 @@ public class PlacementController {
         return ApiResponse.success(Map.of("ok", true));
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/offers")
     public ApiResponse<List<PlacementOfferResponse>> getOffers() {
         List<PlacementOffer> offers = placementOfferRepository.findAll();

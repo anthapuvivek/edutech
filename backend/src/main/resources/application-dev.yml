@@ -2,7 +2,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/learntrix}
     username: ${DB_USERNAME:postgres}
-    password: "${DB_PASSWORD:@Reddy01}"
+    password: "${DB_PASSWORD:postgres}"
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -19,6 +19,7 @@ app:
     secret: dev-secret-key-change-in-production-min-256-bits-long-string-here
     access-token-expiration: 900000
     refresh-token-expiration: 604800000
+    remember-me-expiration: 2592000000
 
 logging:
   level:

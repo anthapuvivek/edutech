@@ -9,6 +9,22 @@ import type { Permission, PlatformRole, RoleDefinition, StaffMember } from "@/ty
  * always re-enforced by the backend on every request. Hiding navigation is
  * never treated as a security control.
  */
+
+/**
+ * The active role → permission table.
+ *
+ * Seeded from the mock definitions so the synchronous `can()` call sites keep working
+ * before the network answers, then replaced with the server's own table once
+ * `GET /rbac/roles` resolves (see <AuthProvider>). Backend migration V20 seeds
+ * role_permissions from the same source, so the two agree.
+ */
+let roleDefinitions: RoleDefinition[] = mockRoleDefinitions;
+
+/** Installs the authoritative table fetched from the API. Ignores an empty response. */
+export function setRoleDefinitions(definitions: RoleDefinition[]): void {
+  if (definitions.length > 0) roleDefinitions = definitions;
+}
+
 export const permissionsService = {
   async roles(): Promise<RoleDefinition[]> {
     if (!env.useMocks) return apiRequest<RoleDefinition[]>("/rbac/roles");
@@ -29,8 +45,14 @@ export const permissionsService = {
   },
 
   async updateRolePermissions(role: PlatformRole, permissions: Permission[]): Promise<void> {
-    if (!env.useMocks)
-      return apiRequest<void>(`/rbac/roles/${role}`, { method: "PATCH", body: { permissions } });
+    if (!env.useMocks) {
+      await apiRequest<void>(`/rbac/roles/${role}`, { method: "PATCH", body: { permissions } });
+      // Keep the local table in step so the change takes effect without a reload.
+      setRoleDefinitions(
+        roleDefinitions.map((def) => (def.role === role ? { ...def, permissions } : def)),
+      );
+      return;
+    }
     const def = mockRoleDefinitions.find((r) => r.role === role);
     if (def) def.permissions = permissions;
     return mockDelay(undefined, 150);
@@ -38,7 +60,7 @@ export const permissionsService = {
 };
 
 export function permissionsFor(role: PlatformRole): Permission[] {
-  return mockRoleDefinitions.find((r) => r.role === role)?.permissions ?? [];
+  return roleDefinitions.find((r) => r.role === role)?.permissions ?? [];
 }
 
 export function can(role: PlatformRole | undefined, permission: Permission): boolean {

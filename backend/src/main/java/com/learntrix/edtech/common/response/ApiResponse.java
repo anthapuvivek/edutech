@@ -12,7 +12,13 @@ import java.time.Instant;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     private final boolean success;
+
+    // Always emitted, even when null. The client unwraps this envelope by looking for
+    // the "data" key; letting NON_NULL drop it would hand the caller the whole envelope
+    // instead of the null payload for every void endpoint.
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private final T data;
+
     private final String message;
     
     @Builder.Default

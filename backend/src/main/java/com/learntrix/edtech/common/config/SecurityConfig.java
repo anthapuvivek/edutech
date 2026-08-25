@@ -28,9 +28,12 @@ public class SecurityConfig {
     private static final List<String> ALLOWED_HEADERS = List.of("Authorization", "Content-Type", "X-Trace-Id", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers");
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RestAuthErrorHandler restAuthErrorHandler;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                          RestAuthErrorHandler restAuthErrorHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.restAuthErrorHandler = restAuthErrorHandler;
     }
 
     @Bean
@@ -46,10 +49,22 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .formLogin(formLogin -> formLogin.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(restAuthErrorHandler)
+                        .accessDeniedHandler(restAuthErrorHandler))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/", "/api", "/actuator/health", "/actuator/info", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // Only the endpoints that must work without a token. /api/auth/profile
+                        // and /api/auth/logout stay authenticated so a dead token gets a 401
+                        // (which the client acts on) instead of a confusing 404.
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/refresh",
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password",
+                                "/api/auth/verify-email").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/courses/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories", "/api/testimonials", "/api/stats").permitAll()

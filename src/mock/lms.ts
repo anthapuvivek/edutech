@@ -94,7 +94,7 @@ export const mockEnrollments: Enrollment[] = mockCourses.slice(0, 5).map((course
     courseId: course.id,
     courseSlug: course.slug,
     courseTitle: course.title,
-    instructorName: course.instructor.name,
+    instructorName: course.instructor?.name ?? "Instructor",
     thumbnailUrl: course.thumbnailUrl,
     status: statuses[index]!,
     progressPercent: progress,

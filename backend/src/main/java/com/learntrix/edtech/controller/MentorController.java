@@ -6,6 +6,7 @@ import com.learntrix.edtech.dto.mentor.*;
 import com.learntrix.edtech.entity.*;
 import com.learntrix.edtech.repository.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -38,8 +39,12 @@ public class MentorController {
         this.mentoringNoteRepository = mentoringNoteRepository;
     }
 
+    // Read-only transaction: the response mappers walk LAZY @ManyToOne relations
+    // (Enrollment.course, Job.company, ...) and open-in-view is disabled, so without
+    // an open session these endpoints fail with LazyInitializationException.
+    @Transactional(readOnly = true)
     @GetMapping("/mentors")
-    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN', 'MENTOR')")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN', 'SUPER_ADMIN', 'MENTOR')")
     public ApiResponse<List<MentorResponse>> getMentors() {
         List<User> mentors = userRepository.findAll().stream()
                 .filter(u -> u.getRoles().stream().anyMatch(r -> "MENTOR".equalsIgnoreCase(r.getName())))
@@ -58,8 +63,9 @@ public class MentorController {
         return ApiResponse.success(responses);
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/mentor/stats")
-    @PreAuthorize("hasRole('MENTOR')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<MentorStatsResponse> getStats() {
         UUID mentorId = SecurityUtil.getCurrentUserId();
         int studentCount = (int) userRepository.findAll().stream()
@@ -81,8 +87,9 @@ public class MentorController {
                 .build());
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/mentor/students")
-    @PreAuthorize("hasRole('MENTOR')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<MentorStudentResponse>> getStudents() {
         List<User> students = userRepository.findAll().stream()
                 .filter(u -> u.getRoles().stream().anyMatch(r -> "STUDENT".equalsIgnoreCase(r.getName())))
@@ -95,8 +102,9 @@ public class MentorController {
         return ApiResponse.success(responses);
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/mentor/sessions")
-    @PreAuthorize("hasAnyRole('MENTOR', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'STUDENT', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<MentorSessionResponse>> getSessions() {
         UUID userId = SecurityUtil.getCurrentUserId();
         // Return sessions where user is either mentor or student
@@ -112,7 +120,7 @@ public class MentorController {
     }
 
     @PostMapping("/mentor/sessions")
-    @PreAuthorize("hasAnyRole('MENTOR', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'STUDENT', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<MentorSessionResponse> createSession(@RequestBody Map<String, Object> body) {
         UUID studentId = UUID.fromString((String) body.get("studentId"));
         User student = userRepository.findById(studentId).orElse(null);
@@ -149,7 +157,7 @@ public class MentorController {
     }
 
     @PatchMapping("/mentor/sessions/{id}")
-    @PreAuthorize("hasAnyRole('MENTOR', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'STUDENT', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<Map<String, Object>> updateSession(
             @PathVariable("id") UUID id,
             @RequestBody Map<String, Object> body) {
@@ -169,8 +177,9 @@ public class MentorController {
         return ApiResponse.success(Map.of("ok", true));
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/mentor/notes")
-    @PreAuthorize("hasRole('MENTOR')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<MentorNoteResponse>> getNotes() {
         UUID mentorId = SecurityUtil.getCurrentUserId();
         List<MentoringNote> notes = mentoringNoteRepository.findByMentorId(mentorId);
@@ -181,7 +190,7 @@ public class MentorController {
     }
 
     @PostMapping("/mentor/notes")
-    @PreAuthorize("hasRole('MENTOR')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<Map<String, Object>> createNote(@RequestBody Map<String, Object> body) {
         UUID studentId = UUID.fromString((String) body.get("studentId"));
         User student = userRepository.findById(studentId).orElse(null);
@@ -203,14 +212,16 @@ public class MentorController {
         return ApiResponse.success(Map.of("ok", true));
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/mentor/alerts")
-    @PreAuthorize("hasRole('MENTOR')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<MentorAlertResponse>> getAlerts() {
         return ApiResponse.success(List.of());
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/mentor/action-items")
-    @PreAuthorize("hasRole('MENTOR')")
+    @PreAuthorize("hasAnyRole('MENTOR', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<MentorActionItemResponse>> getActionItems() {
         return ApiResponse.success(List.of());
     }

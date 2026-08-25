@@ -15,10 +15,14 @@ public class PageResponse<T> {
     private final long total;
     private final int totalPages;
 
+    /**
+     * Note the page number is 1-based here while Spring's Page is 0-based. This DTO is the
+     * client contract (src/types/index.ts Paginated), and the client counts from 1.
+     */
     public static <T> PageResponse<T> of(Page<T> page) {
         return PageResponse.<T>builder()
                 .items(page.getContent())
-                .page(page.getNumber())
+                .page(page.getNumber() + 1)
                 .pageSize(page.getSize())
                 .total(page.getTotalElements())
                 .totalPages(page.getTotalPages())
