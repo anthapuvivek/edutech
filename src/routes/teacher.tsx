@@ -20,7 +20,7 @@ const nav: PortalNavItem[] = [
   { label: "Students", to: "/teacher/students", icon: Users },
   { label: "My Courses", icon: BookOpen },
   { label: "Batches", icon: Users },
-  { label: "Live Classes", icon: Video },
+  { label: "Live Classes", to: "/teacher/live-classes", icon: Video },
   { label: "Recorded Classes", to: "/teacher/recordings", icon: Video },
   { label: "Assignments", icon: FileCheck2 },
   { label: "Quizzes", icon: ListChecks },

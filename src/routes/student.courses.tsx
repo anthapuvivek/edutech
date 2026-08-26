@@ -119,7 +119,10 @@ function MyCourses() {
                     ) : (
                       <div className="flex flex-col gap-2 w-full">
                         <Button className="w-full" asChild>
-                          <Link to="/student/courses/$slug/recordings" params={{ slug: e.courseSlug }}>
+                          <Link
+                            to="/student/courses/$slug/recordings"
+                            params={{ slug: e.courseSlug }}
+                          >
                             {e.status === "completed" ? "Review Recordings" : "Recorded Classes"}
                           </Link>
                         </Button>

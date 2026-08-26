@@ -48,6 +48,7 @@ import { Route as StudentLeaderboardRouteImport } from './routes/student.leaderb
 import { Route as StudentLiveClassesRouteImport } from './routes/student.live-classes'
 import { Route as StudentRecordingsRouteImport } from './routes/student.recordings'
 import { Route as TeacherDashboardRouteImport } from './routes/teacher.dashboard'
+import { Route as TeacherLiveClassesRouteImport } from './routes/teacher.live-classes'
 import { Route as TeacherStudentsRouteImport } from './routes/teacher.students'
 import { Route as AdminCareerApplicationsRouteImport } from './routes/admin.career.applications'
 import { Route as AdminCareerCompaniesRouteImport } from './routes/admin.career.companies'
@@ -268,6 +269,11 @@ const TeacherDashboardRoute = TeacherDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => TeacherRoute,
 } as any)
+const TeacherLiveClassesRoute = TeacherLiveClassesRouteImport.update({
+  id: '/live-classes',
+  path: '/live-classes',
+  getParentRoute: () => TeacherRoute,
+} as any)
 const TeacherStudentsRoute = TeacherStudentsRouteImport.update({
   id: '/students',
   path: '/students',
@@ -431,6 +437,7 @@ export interface FileRoutesByFullPath {
   '/student/live-classes': typeof StudentLiveClassesRoute
   '/student/recordings': typeof StudentRecordingsRouteWithChildren
   '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/teacher/live-classes': typeof TeacherLiveClassesRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
   '/admin/career/applications': typeof AdminCareerApplicationsRoute
@@ -495,6 +502,7 @@ export interface FileRoutesByTo {
   '/student/live-classes': typeof StudentLiveClassesRoute
   '/student/recordings': typeof StudentRecordingsRouteWithChildren
   '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/teacher/live-classes': typeof TeacherLiveClassesRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses': typeof CoursesIndexRoute
   '/admin/career/applications': typeof AdminCareerApplicationsRoute
@@ -561,6 +569,7 @@ export interface FileRoutesById {
   '/student/live-classes': typeof StudentLiveClassesRoute
   '/student/recordings': typeof StudentRecordingsRouteWithChildren
   '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/teacher/live-classes': typeof TeacherLiveClassesRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
   '/admin/career/applications': typeof AdminCareerApplicationsRoute
@@ -628,6 +637,7 @@ export interface FileRouteTypes {
     | '/student/live-classes'
     | '/student/recordings'
     | '/teacher/dashboard'
+    | '/teacher/live-classes'
     | '/teacher/students'
     | '/courses/'
     | '/admin/career/applications'
@@ -692,6 +702,7 @@ export interface FileRouteTypes {
     | '/student/live-classes'
     | '/student/recordings'
     | '/teacher/dashboard'
+    | '/teacher/live-classes'
     | '/teacher/students'
     | '/courses'
     | '/admin/career/applications'
@@ -757,6 +768,7 @@ export interface FileRouteTypes {
     | '/student/live-classes'
     | '/student/recordings'
     | '/teacher/dashboard'
+    | '/teacher/live-classes'
     | '/teacher/students'
     | '/courses/'
     | '/admin/career/applications'
@@ -1079,6 +1091,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeacherDashboardRouteImport
       parentRoute: typeof TeacherRoute
     }
+    '/teacher/live-classes': {
+      id: '/teacher/live-classes'
+      path: '/live-classes'
+      fullPath: '/teacher/live-classes'
+      preLoaderRoute: typeof TeacherLiveClassesRouteImport
+      parentRoute: typeof TeacherRoute
+    }
     '/teacher/students': {
       id: '/teacher/students'
       path: '/students'
@@ -1380,6 +1399,7 @@ const StudentRouteWithChildren =
 
 interface TeacherRouteChildren {
   TeacherDashboardRoute: typeof TeacherDashboardRoute
+  TeacherLiveClassesRoute: typeof TeacherLiveClassesRoute
   TeacherStudentsRoute: typeof TeacherStudentsRoute
   TeacherRecordingsIdRoute: typeof TeacherRecordingsIdRoute
   TeacherRecordingsNewRoute: typeof TeacherRecordingsNewRoute
@@ -1388,6 +1408,7 @@ interface TeacherRouteChildren {
 
 const TeacherRouteChildren: TeacherRouteChildren = {
   TeacherDashboardRoute: TeacherDashboardRoute,
+  TeacherLiveClassesRoute: TeacherLiveClassesRoute,
   TeacherStudentsRoute: TeacherStudentsRoute,
   TeacherRecordingsIdRoute: TeacherRecordingsIdRoute,
   TeacherRecordingsNewRoute: TeacherRecordingsNewRoute,

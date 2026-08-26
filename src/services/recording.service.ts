@@ -22,11 +22,14 @@ let mockRecordings: Recording[] = [
     teacherId: "u-teacher",
     teacherName: "Durga Prasad",
     title: "Java OOP - Inheritance & Polymorphism",
-    description: "Deep dive into object-oriented concepts like classes, inheritance, and runtime polymorphism in Java.",
+    description:
+      "Deep dive into object-oriented concepts like classes, inheritance, and runtime polymorphism in Java.",
     classDate: "2026-08-21T09:00:00.000Z",
     videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    hlsManifestUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    thumbnailUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=70",
+    hlsManifestUrl:
+      "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=70",
     durationSeconds: 5040, // 1h 24m
     fileSizeBytes: 412984500,
     videoFormat: "mp4",
@@ -46,7 +49,8 @@ let mockRecordings: Recording[] = [
     teacherId: "u-teacher",
     teacherName: "Durga Prasad",
     title: "Spring Boot REST Controller Design",
-    description: "Learn how to build production-ready REST controllers in Spring Boot with validation and global exception handling.",
+    description:
+      "Learn how to build production-ready REST controllers in Spring Boot with validation and global exception handling.",
     classDate: "2026-08-22T04:00:00.000Z",
     videoUrl: "",
     thumbnailUrl: "",
@@ -55,16 +59,16 @@ let mockRecordings: Recording[] = [
     status: "DRAFT",
     published: false,
     createdAt: "2026-08-22T06:00:00.000Z",
-  }
+  },
 ];
 
-let mockProgress: Record<string, RecordingProgress> = {
+const mockProgress: Record<string, RecordingProgress> = {
   "rec-1": {
     watchedSeconds: 3376, // 67%
     durationSeconds: 5040,
     completed: false,
     lastWatchedAt: "2026-08-22T10:00:00.000Z",
-  }
+  },
 };
 
 export const recordingService = {
@@ -76,7 +80,8 @@ export const recordingService = {
     const newRecording: Recording = {
       id: `rec-${Date.now()}`,
       courseId: req.courseId,
-      courseTitle: req.courseId === "1" ? "Full Stack Engineering Program" : "Course " + req.courseId,
+      courseTitle:
+        req.courseId === "1" ? "Full Stack Engineering Program" : "Course " + req.courseId,
       moduleId: req.moduleId,
       moduleTitle: "Module " + req.moduleId,
       lessonId: req.lessonId,
@@ -253,9 +258,12 @@ export const recordingService = {
         mockRecordings[idx] = {
           ...mockRecordings[idx]!,
           status: "READY",
-          videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          hlsManifestUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-          thumbnailUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=70",
+          videoUrl:
+            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          hlsManifestUrl:
+            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+          thumbnailUrl:
+            "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=70",
           durationSeconds: 3600,
           fileSizeBytes: 300485900,
           videoFormat: "mp4",
@@ -282,7 +290,7 @@ export const recordingService = {
   async updateProgress(
     id: string,
     watchedSeconds: number,
-    durationSeconds: number
+    durationSeconds: number,
   ): Promise<RecordingProgress> {
     if (!env.useMocks) {
       return apiRequest<RecordingProgress>(`/student/recordings/${id}/progress`, {
@@ -311,7 +319,12 @@ export const recordingService = {
       });
     }
 
-    const current = mockProgress[id] ?? { watchedSeconds: 3600, durationSeconds: 3600, completed: true, lastWatchedAt: "" };
+    const current = mockProgress[id] ?? {
+      watchedSeconds: 3600,
+      durationSeconds: 3600,
+      completed: true,
+      lastWatchedAt: "",
+    };
     const progress: RecordingProgress = {
       ...current,
       watchedSeconds: current.durationSeconds > 0 ? current.durationSeconds : 3600,
@@ -344,11 +357,11 @@ export const recordingService = {
   async uploadLocalFile(
     uploadUrl: string,
     file: File,
-    onProgress?: (pct: number) => void
+    onProgress?: (pct: number) => void,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      
+
       // Determine if it is a local upload or AWS S3 presigned URL
       const isLocal = uploadUrl.includes("upload-local");
 

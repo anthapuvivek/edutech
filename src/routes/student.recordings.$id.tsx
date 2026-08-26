@@ -25,10 +25,7 @@ import { recordingService } from "@/services/recording.service";
 
 export const Route = createFileRoute("/student/recordings/$id")({
   head: () => ({
-    meta: [
-      { title: "Watch Class — Learntrix Player" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Watch Class — Learntrix Player" }, { name: "robots", content: "noindex" }],
   }),
   component: StudentRecordingPlayerPage,
 });
@@ -146,7 +143,8 @@ function StudentRecordingPlayerPage() {
         <Lock className="size-12 text-destructive mx-auto" />
         <h2 className="text-xl font-medium text-foreground">Access Restricted</h2>
         <p className="text-muted-foreground">
-          You must be enrolled in the course, and the recording must be published, to watch this class.
+          You must be enrolled in the course, and the recording must be published, to watch this
+          class.
         </p>
         <Button asChild variant="outline">
           <Link to="/student/recordings">Back to Recorded Classes</Link>
@@ -189,9 +187,7 @@ function StudentRecordingPlayerPage() {
 
           {/* Quick Player controls overlay */}
           <div className="absolute top-4 right-4 flex items-center gap-2 bg-ink/75 px-3 py-1.5 rounded-full border border-border/20 text-xs text-ink-foreground">
-            <span className="flex items-center gap-1">
-              Playback Speed:
-            </span>
+            <span className="flex items-center gap-1">Playback Speed:</span>
             {[1, 1.25, 1.5, 2].map((s) => (
               <button
                 key={s}
@@ -216,9 +212,17 @@ function StudentRecordingPlayerPage() {
             </div>
             <h1 className="text-2xl font-bold text-foreground leading-snug">{recording.title}</h1>
             <p className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1">
-              <span>Instructor: <strong>{recording.teacherName}</strong></span>
-              <span className="flex items-center gap-1"><Calendar className="size-3.5" /> {new Date(recording.classDate).toLocaleDateString("en-IN", { dateStyle: "medium" })}</span>
-              <span className="flex items-center gap-1"><Clock className="size-3.5" /> Duration: {formatTime(recording.durationSeconds || 3600)}</span>
+              <span>
+                Instructor: <strong>{recording.teacherName}</strong>
+              </span>
+              <span className="flex items-center gap-1">
+                <Calendar className="size-3.5" />{" "}
+                {new Date(recording.classDate).toLocaleDateString("en-IN", { dateStyle: "medium" })}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock className="size-3.5" /> Duration:{" "}
+                {formatTime(recording.durationSeconds || 3600)}
+              </span>
             </p>
           </div>
 
@@ -246,20 +250,31 @@ function StudentRecordingPlayerPage() {
           <TabsContent value="resources" className="surface-panel p-6 mt-4 space-y-4">
             <h3 className="font-bold text-foreground text-lg">Class Summary & Reference Links</h3>
             <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
-              {recording.description || "No description or resource links provided for this recording."}
+              {recording.description ||
+                "No description or resource links provided for this recording."}
             </p>
             <div className="border-t pt-4 space-y-2">
               <h4 className="text-sm font-semibold text-foreground">Useful Resources</h4>
               <ul className="space-y-1.5 text-sm">
                 <li className="flex items-center gap-2 text-accent">
                   <ExternalLink className="size-4" />
-                  <a href="https://github.com/learntrix" target="_blank" rel="noreferrer" className="hover:underline">
+                  <a
+                    href="https://github.com/learntrix"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:underline"
+                  >
                     Learntrix Github Repository
                   </a>
                 </li>
                 <li className="flex items-center gap-2 text-accent">
                   <ExternalLink className="size-4" />
-                  <a href="https://spring.io/projects/spring-boot" target="_blank" rel="noreferrer" className="hover:underline">
+                  <a
+                    href="https://spring.io/projects/spring-boot"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:underline"
+                  >
                     Spring Boot Reference Documentation
                   </a>
                 </li>
@@ -271,9 +286,12 @@ function StudentRecordingPlayerPage() {
             <Clock className="size-10 text-muted-foreground/60 mx-auto" />
             <h3 className="font-bold text-foreground">Personal Study Notes</h3>
             <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-              Write down timestamps, key questions, and code syntax snippets. Notes are saved locally in your portal profile.
+              Write down timestamps, key questions, and code syntax snippets. Notes are saved
+              locally in your portal profile.
             </p>
-            <Button size="sm" variant="outline">Create Note</Button>
+            <Button size="sm" variant="outline">
+              Create Note
+            </Button>
           </TabsContent>
 
           <TabsContent value="discussion" className="surface-panel p-6 mt-4 text-center space-y-3">

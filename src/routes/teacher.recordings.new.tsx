@@ -27,10 +27,7 @@ import type { Recording } from "@/types/recording";
 
 export const Route = createFileRoute("/teacher/recordings/new")({
   head: () => ({
-    meta: [
-      { title: "Add Recording — Teacher Portal" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Add Recording — Teacher Portal" }, { name: "robots", content: "noindex" }],
   }),
   component: CreateRecordedClassPage,
 });
@@ -41,7 +38,7 @@ function CreateRecordedClassPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [step, setStep] = useState<Step>("details");
-  
+
   // Form fields
   const [courseId, setCourseId] = useState("");
   const [moduleId, setModuleId] = useState("");
@@ -70,9 +67,12 @@ function CreateRecordedClassPage() {
 
   // Dynamic modules/lessons based on selection
   const mockModules = selectedCourse
-    ? selectedCourse.skills.map((s, idx) => ({ id: `mod-${idx + 1}`, title: `Module ${idx + 1} · ${s}` }))
+    ? selectedCourse.skills.map((s, idx) => ({
+        id: `mod-${idx + 1}`,
+        title: `Module ${idx + 1} · ${s}`,
+      }))
     : [];
-  
+
   const mockLessons = moduleId
     ? [
         { id: `les-1`, title: "Introduction to concepts" },
@@ -108,7 +108,10 @@ function CreateRecordedClassPage() {
       setUploadProgress(0);
 
       // Generate upload signature
-      const uploadInfo = await recordingService.createUploadUrl(createdRecording.id, videoFile.name);
+      const uploadInfo = await recordingService.createUploadUrl(
+        createdRecording.id,
+        videoFile.name,
+      );
 
       // Perform file upload with progress tracking
       await recordingService.uploadLocalFile(uploadInfo.uploadUrl, videoFile, (pct) => {
@@ -132,7 +135,7 @@ function CreateRecordedClassPage() {
   useEffect(() => {
     if (step !== "processing" || !createdRecording) return;
 
-    let intervalId = setInterval(async () => {
+    const intervalId = setInterval(async () => {
       try {
         const updated = await recordingService.getRecording(createdRecording.id);
         if (updated.status === "READY") {
@@ -194,40 +197,56 @@ function CreateRecordedClassPage() {
       <div className="surface-panel mb-8 p-5">
         <div className="flex flex-col justify-around gap-y-4 md:flex-row md:items-center">
           <div className="flex items-center gap-2">
-            <span className={`grid size-7 place-items-center rounded-full text-xs font-semibold ${step === "details" ? "bg-accent text-accent-foreground" : "bg-success text-success-foreground"}`}>
+            <span
+              className={`grid size-7 place-items-center rounded-full text-xs font-semibold ${step === "details" ? "bg-accent text-accent-foreground" : "bg-success text-success-foreground"}`}
+            >
               {step === "details" ? "1" : "✓"}
             </span>
-            <span className={`text-sm font-medium ${step === "details" ? "text-foreground" : "text-muted-foreground"}`}>
+            <span
+              className={`text-sm font-medium ${step === "details" ? "text-foreground" : "text-muted-foreground"}`}
+            >
               Class Details
             </span>
           </div>
           <ChevronRight className="hidden md:block size-4 text-muted-foreground" />
 
           <div className="flex items-center gap-2">
-            <span className={`grid size-7 place-items-center rounded-full text-xs font-semibold ${step === "upload" ? "bg-accent text-accent-foreground" : step === "details" ? "bg-muted text-muted-foreground" : "bg-success text-success-foreground"}`}>
+            <span
+              className={`grid size-7 place-items-center rounded-full text-xs font-semibold ${step === "upload" ? "bg-accent text-accent-foreground" : step === "details" ? "bg-muted text-muted-foreground" : "bg-success text-success-foreground"}`}
+            >
               {step === "upload" ? "2" : step === "details" ? "2" : "✓"}
             </span>
-            <span className={`text-sm font-medium ${step === "upload" ? "text-foreground" : "text-muted-foreground"}`}>
+            <span
+              className={`text-sm font-medium ${step === "upload" ? "text-foreground" : "text-muted-foreground"}`}
+            >
               Upload Video
             </span>
           </div>
           <ChevronRight className="hidden md:block size-4 text-muted-foreground" />
 
           <div className="flex items-center gap-2">
-            <span className={`grid size-7 place-items-center rounded-full text-xs font-semibold ${step === "processing" ? "bg-accent text-accent-foreground" : step === "ready" ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"}`}>
+            <span
+              className={`grid size-7 place-items-center rounded-full text-xs font-semibold ${step === "processing" ? "bg-accent text-accent-foreground" : step === "ready" ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"}`}
+            >
               {step === "processing" ? "3" : step === "ready" ? "✓" : "3"}
             </span>
-            <span className={`text-sm font-medium ${step === "processing" ? "text-foreground" : "text-muted-foreground"}`}>
+            <span
+              className={`text-sm font-medium ${step === "processing" ? "text-foreground" : "text-muted-foreground"}`}
+            >
               Transcoding
             </span>
           </div>
           <ChevronRight className="hidden md:block size-4 text-muted-foreground" />
 
           <div className="flex items-center gap-2">
-            <span className={`grid size-7 place-items-center rounded-full text-xs font-semibold ${step === "ready" ? "bg-accent text-accent-foreground animate-pulse" : "bg-muted text-muted-foreground"}`}>
+            <span
+              className={`grid size-7 place-items-center rounded-full text-xs font-semibold ${step === "ready" ? "bg-accent text-accent-foreground animate-pulse" : "bg-muted text-muted-foreground"}`}
+            >
               4
             </span>
-            <span className={`text-sm font-medium ${step === "ready" ? "text-foreground" : "text-muted-foreground"}`}>
+            <span
+              className={`text-sm font-medium ${step === "ready" ? "text-foreground" : "text-muted-foreground"}`}
+            >
               Publish
             </span>
           </div>
@@ -301,8 +320,12 @@ function CreateRecordedClassPage() {
                     ) : (
                       // We will support simple fallback in rendering
                       <>
-                        <option value="00000000-0000-0000-0000-000000000301">Introduction & Setup</option>
-                        <option value="00000000-0000-0000-0000-000000000302">JPA & Databases</option>
+                        <option value="00000000-0000-0000-0000-000000000301">
+                          Introduction & Setup
+                        </option>
+                        <option value="00000000-0000-0000-0000-000000000302">
+                          JPA & Databases
+                        </option>
                       </>
                     )}
                   </select>
@@ -326,9 +349,15 @@ function CreateRecordedClassPage() {
                       ))
                     ) : (
                       <>
-                        <option value="00000000-0000-0000-0000-000000000401">Introduction to Java</option>
-                        <option value="00000000-0000-0000-0000-000000000402">Spring Boot Core Concepts</option>
-                        <option value="00000000-0000-0000-0000-000000000403">PostgreSQL Integration</option>
+                        <option value="00000000-0000-0000-0000-000000000401">
+                          Introduction to Java
+                        </option>
+                        <option value="00000000-0000-0000-0000-000000000402">
+                          Spring Boot Core Concepts
+                        </option>
+                        <option value="00000000-0000-0000-0000-000000000403">
+                          PostgreSQL Integration
+                        </option>
                       </>
                     )}
                   </select>
@@ -362,7 +391,13 @@ function CreateRecordedClassPage() {
                 </Button>
                 <Button
                   onClick={() => createRecordingMutation.mutate()}
-                  disabled={!courseId || !moduleId || !lessonId || !title.trim() || createRecordingMutation.isPending}
+                  disabled={
+                    !courseId ||
+                    !moduleId ||
+                    !lessonId ||
+                    !title.trim() ||
+                    createRecordingMutation.isPending
+                  }
                 >
                   {createRecordingMutation.isPending ? (
                     <Loader2 className="mr-2 size-4 animate-spin" />
@@ -403,7 +438,9 @@ function CreateRecordedClassPage() {
                     <div className="mt-6 flex items-center gap-3 bg-panel border rounded-md p-3 max-w-md w-full relative z-10">
                       <FileVideo className="size-8 text-accent shrink-0" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate text-foreground">{videoFile.name}</p>
+                        <p className="text-sm font-medium truncate text-foreground">
+                          {videoFile.name}
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           {(videoFile.size / 1048576).toFixed(1)} MB
                         </p>
@@ -415,9 +452,12 @@ function CreateRecordedClassPage() {
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm">
                     <span className="font-medium text-foreground flex items-center gap-2">
-                      <Loader2 className="size-4 animate-spin text-accent" /> Uploading video file...
+                      <Loader2 className="size-4 animate-spin text-accent" /> Uploading video
+                      file...
                     </span>
-                    <span className="tabular-nums text-muted-foreground font-semibold">{uploadProgress}%</span>
+                    <span className="tabular-nums text-muted-foreground font-semibold">
+                      {uploadProgress}%
+                    </span>
                   </div>
                   <Progress value={uploadProgress} className="h-2.5" />
                   <p className="text-xs text-muted-foreground text-center">
@@ -427,11 +467,7 @@ function CreateRecordedClassPage() {
               )}
 
               <div className="flex justify-end gap-2 border-t pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setStep("details")}
-                  disabled={isUploading}
-                >
+                <Button variant="outline" onClick={() => setStep("details")} disabled={isUploading}>
                   Back
                 </Button>
                 <Button
@@ -453,7 +489,8 @@ function CreateRecordedClassPage() {
               </div>
               <CardTitle className="mt-4">Processing Recording</CardTitle>
               <CardDescription className="max-w-md">
-                We are generating the adaptive HLS streams (.m3u8 manifests) and compressing thumbnails. This usually takes around 10–15 seconds in development.
+                We are generating the adaptive HLS streams (.m3u8 manifests) and compressing
+                thumbnails. This usually takes around 10–15 seconds in development.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -461,12 +498,13 @@ function CreateRecordedClassPage() {
                 <Loader2 className="size-4 animate-spin" /> Transcoding in progress...
               </div>
               <Progress value={45} className="h-2 max-w-xs mx-auto animate-pulse" />
-              
+
               <Alert className="max-w-md mx-auto text-left">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Did you know?</AlertTitle>
                 <AlertDescription>
-                  You don't have to wait here! You can return to the recordings list and check status later. We will process it in the background.
+                  You don't have to wait here! You can return to the recordings list and check
+                  status later. We will process it in the background.
                 </AlertDescription>
               </Alert>
 
@@ -485,21 +523,31 @@ function CreateRecordedClassPage() {
               <CheckCircle2 className="size-14 text-success" />
               <CardTitle className="mt-4 text-success">Processing Completed!</CardTitle>
               <CardDescription className="max-w-md">
-                Your video HLS manifest and thumbnails are fully prepared. The class is ready to be published to enrolled students.
+                Your video HLS manifest and thumbnails are fully prepared. The class is ready to be
+                published to enrolled students.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="surface-panel p-4 max-w-md mx-auto text-left space-y-2 text-sm border bg-muted/10">
-                <p><strong>Title:</strong> {title}</p>
-                <p><strong>Course:</strong> {selectedCourse?.title || "Spring Boot"}</p>
-                <p><strong>Length:</strong> 1 hour 12 minutes (transcoded)</p>
+                <p>
+                  <strong>Title:</strong> {title}
+                </p>
+                <p>
+                  <strong>Course:</strong> {selectedCourse?.title || "Spring Boot"}
+                </p>
+                <p>
+                  <strong>Length:</strong> 1 hour 12 minutes (transcoded)
+                </p>
               </div>
 
               <div className="flex justify-center gap-3 border-t pt-6">
                 <Button variant="outline" asChild>
                   <Link to="/teacher/recordings">Keep Draft</Link>
                 </Button>
-                <Button onClick={() => publishMutation.mutate()} disabled={publishMutation.isPending}>
+                <Button
+                  onClick={() => publishMutation.mutate()}
+                  disabled={publishMutation.isPending}
+                >
                   {publishMutation.isPending ? (
                     <Loader2 className="mr-2 size-4 animate-spin" />
                   ) : null}

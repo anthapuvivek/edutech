@@ -16,7 +16,6 @@ import { can } from "@/services/permissions.service";
 import type { Role } from "@/types/lms";
 import type { PlatformRole } from "@/types/ops";
 
-
 export interface PortalNavItem {
   label: string;
   to?: string | undefined;
@@ -88,7 +87,6 @@ export function PortalLayout({
       aria-label={roleLabel[activeRole]}
       className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pb-4"
     >
-
       {visibleNav.map((item) => (
         <div key={item.label} className="contents">
           {item.section ? (

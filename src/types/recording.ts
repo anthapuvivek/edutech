@@ -1,11 +1,5 @@
 export type RecordingStatus =
-  | "DRAFT"
-  | "UPLOADING"
-  | "PROCESSING"
-  | "READY"
-  | "PUBLISHED"
-  | "UNPUBLISHED"
-  | "FAILED";
+  "DRAFT" | "UPLOADING" | "PROCESSING" | "READY" | "PUBLISHED" | "UNPUBLISHED" | "FAILED";
 
 export interface Recording {
   id: string;

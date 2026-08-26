@@ -39,10 +39,7 @@ import type { Recording, RecordingStatus } from "@/types/recording";
 
 export const Route = createFileRoute("/teacher/recordings/")({
   head: () => ({
-    meta: [
-      { title: "Recorded Classes — Teacher Portal" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Recorded Classes — Teacher Portal" }, { name: "robots", content: "noindex" }],
   }),
   component: TeacherRecordingsPage,
 });
@@ -109,7 +106,14 @@ function TeacherRecordingsPage() {
   };
 
   const getStatusBadge = (status: RecordingStatus) => {
-    const config: Record<RecordingStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "info" }> = {
+    const config: Record<
+      RecordingStatus,
+      {
+        label: string;
+        variant:
+          "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "info";
+      }
+    > = {
       DRAFT: { label: "Draft", variant: "secondary" },
       UPLOADING: { label: "Uploading", variant: "outline" },
       PROCESSING: { label: "Processing", variant: "info" },
@@ -119,8 +123,8 @@ function TeacherRecordingsPage() {
       FAILED: { label: "Failed", variant: "destructive" },
     };
 
-    const c = config[status] || { label: status, variant: "outline" };
-    return <Badge variant={c.variant as any}>{c.label}</Badge>;
+    const c = config[status] || { label: status, variant: "outline" as const };
+    return <Badge variant={c.variant}>{c.label}</Badge>;
   };
 
   return (
@@ -278,11 +282,15 @@ function TeacherRecordingsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuItem asChild>
-                          <Link to="/teacher/recordings/$id" params={{ id: r.id }} className="flex w-full items-center">
+                          <Link
+                            to="/teacher/recordings/$id"
+                            params={{ id: r.id }}
+                            className="flex w-full items-center"
+                          >
                             <Eye className="mr-2 size-4" /> Details & Stats
                           </Link>
                         </DropdownMenuItem>
-                        
+
                         {(r.status === "READY" || r.status === "UNPUBLISHED") && (
                           <DropdownMenuItem
                             onClick={() => publishMutation.mutate(r.id)}
@@ -291,7 +299,7 @@ function TeacherRecordingsPage() {
                             <Globe className="mr-2 size-4" /> Publish Class
                           </DropdownMenuItem>
                         )}
-                        
+
                         {r.status === "PUBLISHED" && (
                           <DropdownMenuItem
                             onClick={() => unpublishMutation.mutate(r.id)}
@@ -301,11 +309,18 @@ function TeacherRecordingsPage() {
                           </DropdownMenuItem>
                         )}
 
-                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => {
-                          if (confirm("Are you sure you want to delete this class recording? This cannot be undone.")) {
-                            deleteMutation.mutate(r.id);
-                          }
-                        }}>
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => {
+                            if (
+                              confirm(
+                                "Are you sure you want to delete this class recording? This cannot be undone.",
+                              )
+                            ) {
+                              deleteMutation.mutate(r.id);
+                            }
+                          }}
+                        >
                           <Trash2 className="mr-2 size-4" /> Delete Recording
                         </DropdownMenuItem>
                       </DropdownMenuContent>

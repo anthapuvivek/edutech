@@ -173,6 +173,107 @@ public class LiveClassService {
         return mapToResponse(saved);
     }
 
+    @Transactional(readOnly = true)
+    public LiveClassResponse getLiveClassById(UUID id, UUID teacherId) {
+        LiveClass lc = liveClassRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("LiveClass", "id", id));
+        return mapToResponse(lc);
+    }
+
+    public LiveClassResponse updateLiveClass(UUID id, Map<String, Object> body, UUID teacherId) {
+        LiveClass liveClass = liveClassRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("LiveClass", "id", id));
+
+        if (body.containsKey("title") && body.get("title") != null) {
+            liveClass.setTitle((String) body.get("title"));
+        }
+
+        if (body.containsKey("courseId")) {
+            Object cid = body.get("courseId");
+            if (cid != null && !cid.toString().isBlank()) {
+                UUID courseId = UUID.fromString(cid.toString());
+                Course course = courseRepository.findById(courseId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
+                liveClass.setCourse(course);
+            } else {
+                liveClass.setCourse(null);
+            }
+        }
+
+        if (body.containsKey("batchId")) {
+            Object bid = body.get("batchId");
+            if (bid != null && !bid.toString().isBlank()) {
+                UUID batchId = UUID.fromString(bid.toString());
+                Batch batch = batchRepository.findById(batchId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", batchId));
+                liveClass.setBatch(batch);
+            } else {
+                liveClass.setBatch(null);
+            }
+        }
+
+        if (body.containsKey("trainerName") && body.get("trainerName") != null) {
+            liveClass.setTrainerName((String) body.get("trainerName"));
+        }
+        
+        if (body.containsKey("description")) {
+            liveClass.setDescription((String) body.get("description"));
+        }
+        
+        if (body.containsKey("classDate") && body.get("classDate") != null) {
+            liveClass.setClassDate(LocalDate.parse((String) body.get("classDate")));
+        }
+        
+        if (body.containsKey("startTime") && body.get("startTime") != null) {
+            liveClass.setStartTime(LocalTime.parse((String) body.get("startTime")));
+        }
+        
+        if (body.containsKey("endTime") && body.get("endTime") != null) {
+            liveClass.setEndTime(LocalTime.parse((String) body.get("endTime")));
+        }
+        
+        if (body.containsKey("platform") && body.get("platform") != null) {
+            liveClass.setPlatform((String) body.get("platform"));
+        }
+        
+        if (body.containsKey("meetingUrl")) {
+            liveClass.setMeetingUrl((String) body.get("meetingUrl"));
+        }
+        
+        if (body.containsKey("type") && body.get("type") != null) {
+            liveClass.setType((String) body.get("type"));
+        }
+        
+        if (body.containsKey("visibility") && body.get("visibility") != null) {
+            liveClass.setVisibility((String) body.get("visibility"));
+        }
+        
+        if (body.containsKey("published") && body.get("published") != null) {
+            liveClass.setPublished((Boolean) body.get("published"));
+        }
+        
+        if (body.containsKey("status") && body.get("status") != null) {
+            liveClass.setStatus((String) body.get("status"));
+        }
+        
+        LiveClass saved = liveClassRepository.save(liveClass);
+        return mapToResponse(saved);
+    }
+
+    public LiveClassResponse cancelLiveClass(UUID id, UUID teacherId) {
+        LiveClass liveClass = liveClassRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("LiveClass", "id", id));
+        liveClass.setStatus("Cancelled");
+        LiveClass saved = liveClassRepository.save(liveClass);
+        return mapToResponse(saved);
+    }
+
+    public void deleteLiveClass(UUID id, UUID teacherId) {
+        LiveClass liveClass = liveClassRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("LiveClass", "id", id));
+        liveClassRepository.delete(liveClass);
+    }
+
     private LiveClassResponse mapToResponse(LiveClass lc) {
         String startTimeStr = lc.getStartTime() != null ? lc.getStartTime().toString() : "";
         if (startTimeStr.length() > 5) {

@@ -7,15 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { courseService } from "@/services/course.service";
 import { recordingService } from "@/services/recording.service";
+import type { RecordingProgress } from "@/types/recording";
 
 export const Route = createFileRoute("/student/courses/$slug/recordings")({
   head: ({ params }) => {
     const readable = params.slug.replace(/-/g, " ");
     return {
-      meta: [
-        { title: `Recorded Classes — ${readable}` },
-        { name: "robots", content: "noindex" },
-      ],
+      meta: [{ title: `Recorded Classes — ${readable}` }, { name: "robots", content: "noindex" }],
     };
   },
   component: CourseRecordingsPage,
@@ -44,7 +42,7 @@ function CourseRecordingsPage() {
     queryKey: ["student", "recordings", "progress", course?.id],
     queryFn: async () => {
       const items = recordingsQuery.data ?? [];
-      const progressMap: Record<string, any> = {};
+      const progressMap: Record<string, RecordingProgress> = {};
       for (const item of items) {
         try {
           const prog = await recordingService.getProgress(item.id);
@@ -150,11 +148,17 @@ function CourseRecordingsPage() {
                 <div className="flex flex-1 flex-col p-5">
                   <div className="space-y-1">
                     <h2 className="text-base font-bold text-foreground leading-snug line-clamp-2">
-                      <Link to="/student/recordings/$id" params={{ id: r.id }} className="hover:underline">
+                      <Link
+                        to="/student/recordings/$id"
+                        params={{ id: r.id }}
+                        className="hover:underline"
+                      >
                         {r.title}
                       </Link>
                     </h2>
-                    <p className="text-xs text-muted-foreground">{r.moduleTitle} · {r.lessonTitle}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {r.moduleTitle} · {r.lessonTitle}
+                    </p>
                   </div>
 
                   <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-muted-foreground border-y py-2.5">

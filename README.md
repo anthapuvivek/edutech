@@ -2,11 +2,11 @@
 
 An enterprise-grade learning platform: course catalogue and learning (LMS), live classes and recordings, coding practice, career/placement tools, and role-based portals for students, teachers, mentors, placement officers and admins.
 
-| Layer    | Tech                                                                              | Port |
-| -------- | --------------------------------------------------------------------------------- | ---- |
-| Frontend | React 19, TanStack Start + Router, TypeScript, Tailwind CSS 4, shadcn/ui           | 8080 |
-| Backend  | Spring Boot 3.4, Spring Security (JWT), JPA/Hibernate, Flyway                      | 8081 |
-| Database | PostgreSQL 16 (Docker)                                                            | 5432 |
+| Layer    | Tech                                                                     | Port |
+| -------- | ------------------------------------------------------------------------ | ---- |
+| Frontend | React 19, TanStack Start + Router, TypeScript, Tailwind CSS 4, shadcn/ui | 8080 |
+| Backend  | Spring Boot 3.4, Spring Security (JWT), JPA/Hibernate, Flyway            | 8081 |
+| Database | PostgreSQL 16 (Docker)                                                   | 5432 |
 
 > Redis and Kafka appear in `backend/docker-compose.yml` for future features — only PostgreSQL is required to run the app today.
 
@@ -76,14 +76,14 @@ The committed `.env` already points the frontend at the local backend (`VITE_API
 
 Seeded by the Flyway migrations. Password for all accounts: **`password`**
 
-| Role              | Email                    |
-| ----------------- | ------------------------ |
-| Student           | student@learntrix.com    |
-| Teacher           | teacher@learntrix.com    |
-| Admin             | admin@learntrix.com      |
-| Super admin       | super@learntrix.com      |
-| Mentor            | mentor@learntrix.com     |
-| Placement officer | placement@learntrix.com  |
+| Role              | Email                   |
+| ----------------- | ----------------------- |
+| Student           | student@learntrix.com   |
+| Teacher           | teacher@learntrix.com   |
+| Admin             | admin@learntrix.com     |
+| Super admin       | super@learntrix.com     |
+| Mentor            | mentor@learntrix.com    |
+| Placement officer | placement@learntrix.com |
 
 ## Project layout
 
@@ -102,11 +102,11 @@ Seeded by the Flyway migrations. Password for all accounts: **`password`**
 
 ## Useful commands
 
-| Command                          | What it does                       |
-| -------------------------------- | ---------------------------------- |
-| `npm run dev`                    | Frontend dev server (port 8080)    |
-| `npm run build`                  | Production frontend build          |
-| `npm run lint`                   | ESLint                             |
-| `npx tsc --noEmit`               | Typecheck the frontend             |
-| `mvn spring-boot:run` (backend/) | Run the API (port 8081)            |
-| `mvn test` (backend/)            | Backend tests                      |
+| Command                          | What it does                    |
+| -------------------------------- | ------------------------------- |
+| `npm run dev`                    | Frontend dev server (port 8080) |
+| `npm run build`                  | Production frontend build       |
+| `npm run lint`                   | ESLint                          |
+| `npx tsc --noEmit`               | Typecheck the frontend          |
+| `mvn spring-boot:run` (backend/) | Run the API (port 8081)         |
+| `mvn test` (backend/)            | Backend tests                   |

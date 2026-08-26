@@ -109,7 +109,10 @@ export type EventStatus = "Upcoming" | "Live Now" | "Completed" | "Cancelled";
 export interface PlatformEvent {
   id: string;
   title: string;
+  courseId?: string | undefined;
   courseTitle: string;
+  batchId?: string | undefined;
+  batchName?: string | undefined;
   trainerName: string;
   description?: string | undefined;
   date: string;
@@ -123,6 +126,26 @@ export interface PlatformEvent {
   status: EventStatus;
   registrations: number;
 }
+
+export interface CreateLiveClassPayload {
+  title: string;
+  courseId?: string | undefined;
+  courseTitle?: string | undefined;
+  batchId?: string | undefined;
+  trainerName?: string | undefined;
+  description?: string | undefined;
+  date: string;
+  startTime: string;
+  endTime: string;
+  platform: MeetingPlatform;
+  meetingUrl?: string | undefined;
+  type: EventType;
+  visibility?: "public" | "restricted" | undefined;
+  published?: boolean | undefined;
+  status?: EventStatus | undefined;
+}
+
+export interface UpdateLiveClassPayload extends Partial<CreateLiveClassPayload> {}
 
 export interface TeacherStats {
   totalStudents: number;

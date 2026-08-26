@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { recordingService } from "@/services/recording.service";
+import type { RecordingProgress } from "@/types/recording";
 
 export const Route = createFileRoute("/student/recordings")({
   head: () => ({
@@ -32,7 +33,7 @@ function StudentRecordingsPage() {
     queryKey: ["student", "recordings", "progress"],
     queryFn: async () => {
       const items = recordingsQuery.data ?? [];
-      const progressMap: Record<string, any> = {};
+      const progressMap: Record<string, RecordingProgress> = {};
       for (const item of items) {
         try {
           const prog = await recordingService.getProgress(item.id);
@@ -137,7 +138,11 @@ function StudentRecordingsPage() {
                       {r.courseTitle}
                     </span>
                     <h2 className="text-base font-bold text-foreground leading-snug line-clamp-2">
-                      <Link to="/student/recordings/$id" params={{ id: r.id }} className="hover:underline">
+                      <Link
+                        to="/student/recordings/$id"
+                        params={{ id: r.id }}
+                        className="hover:underline"
+                      >
                         {r.title}
                       </Link>
                     </h2>

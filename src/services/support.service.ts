@@ -174,7 +174,12 @@ const guardedStaffCalls = guardService(
     agents: supportServiceRaw.agents,
   },
   "support.view",
-  { updateStatus: "support.manage", assign: "support.manage", escalate: "support.manage", agents: "support.manage" },
+  {
+    updateStatus: "support.manage",
+    assign: "support.manage",
+    escalate: "support.manage",
+    agents: "support.manage",
+  },
 );
 
 /**

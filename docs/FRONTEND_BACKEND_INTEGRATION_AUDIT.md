@@ -15,10 +15,10 @@ the problem.
 
 The problems are:
 
-1. **`.env` already has `VITE_USE_MOCKS=false`.** The app is *already* in live mode, so every gap below is
+1. **`.env` already has `VITE_USE_MOCKS=false`.** The app is _already_ in live mode, so every gap below is
    currently a runtime failure, not a future task.
 2. **52 of 122 frontend API paths have no backend route at all** (~43%).
-3. **Six cross-cutting defects** break authentication and authorization even on the routes that *do* match.
+3. **Six cross-cutting defects** break authentication and authorization even on the routes that _do_ match.
 
 Fix the six defects in §2 first — they are small, and until they land, even the 70 matched endpoints
 misbehave for anyone who is not a plain `STUDENT` or `TEACHER`.
@@ -29,19 +29,19 @@ misbehave for anyone who is not a plain `STUDENT` or `TEACHER`.
 
 ### 1.1 Matched and working (~70 paths)
 
-| Area | Frontend service | Backend controller |
-| :--- | :--- | :--- |
-| Login / register / logout | `auth.service.ts` | `AuthController` |
-| Public catalogue | `course.service.ts` | `CourseController`, `PublicContentController` |
-| Student profile / stats / activity | `student.service.ts` | `StudentController` |
-| Student enrollments | `student.service.ts` | `CourseController` |
-| Student live classes | `student.service.ts` | `LiveClassController` |
-| Recordings (teacher + student + admin) | `recording.service.ts` | `ClassRecordingController`, `StudentRecordingController`, `AdminRecordingController` |
-| Career (student-facing) | `career.service.ts`, `job.service.ts` | `JobController` |
-| Mentor console (read) | `mentor.service.ts` | `MentorController` |
-| Placement console | `placement.service.ts` | `PlacementController` |
-| Teacher console | `teacher.service.ts` | `TeacherController` |
-| Admin students / batches / trainers / stats | `admin.service.ts` | `AdminController` |
+| Area                                        | Frontend service                      | Backend controller                                                                   |
+| :------------------------------------------ | :------------------------------------ | :----------------------------------------------------------------------------------- |
+| Login / register / logout                   | `auth.service.ts`                     | `AuthController`                                                                     |
+| Public catalogue                            | `course.service.ts`                   | `CourseController`, `PublicContentController`                                        |
+| Student profile / stats / activity          | `student.service.ts`                  | `StudentController`                                                                  |
+| Student enrollments                         | `student.service.ts`                  | `CourseController`                                                                   |
+| Student live classes                        | `student.service.ts`                  | `LiveClassController`                                                                |
+| Recordings (teacher + student + admin)      | `recording.service.ts`                | `ClassRecordingController`, `StudentRecordingController`, `AdminRecordingController` |
+| Career (student-facing)                     | `career.service.ts`, `job.service.ts` | `JobController`                                                                      |
+| Mentor console (read)                       | `mentor.service.ts`                   | `MentorController`                                                                   |
+| Placement console                           | `placement.service.ts`                | `PlacementController`                                                                |
+| Teacher console                             | `teacher.service.ts`                  | `TeacherController`                                                                  |
+| Admin students / batches / trainers / stats | `admin.service.ts`                    | `AdminController`                                                                    |
 
 ### 1.2 Frontend calls with NO backend route (52)
 
@@ -49,19 +49,19 @@ Grouped by what it would take to build them.
 
 **A. Auth completion — 3 routes, blocks 3 existing pages**
 
-| Path | Method | Frontend caller | Page |
-| :--- | :--- | :--- | :--- |
-| `/auth/forgot-password` | POST | `auth.service.ts:65` | `routes/forgot-password.tsx` |
-| `/auth/reset-password` | POST | `auth.service.ts:71` | `routes/reset-password.tsx` |
-| `/auth/verify-email` | POST | `auth.service.ts:77` | `routes/verify-email.tsx` |
+| Path                    | Method | Frontend caller      | Page                         |
+| :---------------------- | :----- | :------------------- | :--------------------------- |
+| `/auth/forgot-password` | POST   | `auth.service.ts:65` | `routes/forgot-password.tsx` |
+| `/auth/reset-password`  | POST   | `auth.service.ts:71` | `routes/reset-password.tsx`  |
+| `/auth/verify-email`    | POST   | `auth.service.ts:77` | `routes/verify-email.tsx`    |
 
 No `password_reset_tokens` table exists either. Three shipped pages 404 today.
 
 **B. Public funnel — 1 route, blocks lead capture**
 
-| Path | Method | Frontend caller | Page |
-| :--- | :--- | :--- | :--- |
-| `/enquiries` | POST | `enquiry.service.ts:13` | `components/courses/EnquiryForm.tsx` |
+| Path         | Method | Frontend caller         | Page                                 |
+| :----------- | :----- | :---------------------- | :----------------------------------- |
+| `/enquiries` | POST   | `enquiry.service.ts:13` | `components/courses/EnquiryForm.tsx` |
 
 This is the marketing entry point. No `enquiries` table.
 
@@ -89,7 +89,7 @@ The `counsellor` role lands on `/admin/crm` — that role currently has nothing 
 
 No `coupons` table. `/checkout/coupons/validate` is the **price authority** — the code comment in
 `types/ops.ts` says "the frontend never decides the final price", but with no endpoint the frontend
-currently *is* the only thing computing it (from `mock/ops.ts`).
+currently _is_ the only thing computing it (from `mock/ops.ts`).
 
 **F. Admin career operations — 8 routes**
 
@@ -109,26 +109,26 @@ them. See §2.5 — this is why frontend RBAC is running off a mock table.
 
 **H. Remaining admin gaps — 8 routes**
 
-| Path | Table exists? |
-| :--- | :--- |
-| `/admin/articles` (GET, POST) | no |
-| `/admin/attendance` (GET, PATCH) | no |
-| `/admin/audit-logs` | partial — only `login_audit_logs` |
-| `/admin/events` | partial — `live_classes` could back it |
-| `/admin/staff` | yes (`users` + `roles`) |
-| `/admin/trainers/:id/approval` (PATCH) | yes (GET `/admin/trainers` already exists) |
-| `/admin/communication/whatsapp` (GET, PUT) | no |
-| `/admin/communication/notifications` (POST) | `notifications` exists |
-| `/admin/mentor-assignments` (GET, POST, DELETE) | no |
+| Path                                            | Table exists?                              |
+| :---------------------------------------------- | :----------------------------------------- |
+| `/admin/articles` (GET, POST)                   | no                                         |
+| `/admin/attendance` (GET, PATCH)                | no                                         |
+| `/admin/audit-logs`                             | partial — only `login_audit_logs`          |
+| `/admin/events`                                 | partial — `live_classes` could back it     |
+| `/admin/staff`                                  | yes (`users` + `roles`)                    |
+| `/admin/trainers/:id/approval` (PATCH)          | yes (GET `/admin/trainers` already exists) |
+| `/admin/communication/whatsapp` (GET, PUT)      | no                                         |
+| `/admin/communication/notifications` (POST)     | `notifications` exists                     |
+| `/admin/mentor-assignments` (GET, POST, DELETE) | no                                         |
 
 **I. Student gaps — 4 routes**
 
-| Path | Note |
-| :--- | :--- |
-| `/student/leaderboard` | derivable from `student_profiles.points` — cheap win |
-| `/student/mentor` | `mentoring_sessions` exists; needs an assignment link |
-| `/student/placement-drives` | `placement_drives` exists; needs a student-scoped read |
-| `/student/placement-drives/:id/apply` | needs write |
+| Path                                  | Note                                                   |
+| :------------------------------------ | :----------------------------------------------------- |
+| `/student/leaderboard`                | derivable from `student_profiles.points` — cheap win   |
+| `/student/mentor`                     | `mentoring_sessions` exists; needs an assignment link  |
+| `/student/placement-drives`           | `placement_drives` exists; needs a student-scoped read |
+| `/student/placement-drives/:id/apply` | needs write                                            |
 
 **J. Partial — 1 route**
 
@@ -136,22 +136,22 @@ them. See §2.5 — this is why frontend RBAC is running off a mock table.
 
 ### 1.3 Backend routes the frontend never calls (9)
 
-| Endpoint | Why it matters |
-| :--- | :--- |
-| `GET /api/auth/profile` | **Should be wired now.** See §2.3. |
-| `POST /api/courses/{id}/enroll` | Enrollment works server-side but no UI calls it — students cannot enroll. |
-| `POST /api/admin/batches/{batchId}/students` | Batch assignment UI missing. |
-| `GET /api/teacher/batches` | `TeacherBatchResponse` built and unused. |
-| `GET`/`POST /api/teacher/live-classes` | Teachers cannot schedule classes from the UI. |
-| `GET /api/student/notifications`, `POST /{id}/read` | `NotificationController` fully unused. |
-| `GET /api/admin/recordings/statistics` | Global stats unused. |
-| `POST`/`PUT /api/recordings/upload-local` | Reached only via a hardcoded mock URL. See §5. |
+| Endpoint                                            | Why it matters                                                            |
+| :-------------------------------------------------- | :------------------------------------------------------------------------ |
+| `GET /api/auth/profile`                             | **Should be wired now.** See §2.3.                                        |
+| `POST /api/courses/{id}/enroll`                     | Enrollment works server-side but no UI calls it — students cannot enroll. |
+| `POST /api/admin/batches/{batchId}/students`        | Batch assignment UI missing.                                              |
+| `GET /api/teacher/batches`                          | `TeacherBatchResponse` built and unused.                                  |
+| `GET`/`POST /api/teacher/live-classes`              | Teachers cannot schedule classes from the UI.                             |
+| `GET /api/student/notifications`, `POST /{id}/read` | `NotificationController` fully unused.                                    |
+| `GET /api/admin/recordings/statistics`              | Global stats unused.                                                      |
+| `POST`/`PUT /api/recordings/upload-local`           | Reached only via a hardcoded mock URL. See §5.                            |
 
 ---
 
 ## 2. Cross-cutting defects
 
-These affect endpoints that *do* match. Fix these before building any missing route.
+These affect endpoints that _do_ match. Fix these before building any missing route.
 
 ### 2.1 `SUPER_ADMIN` is locked out of the entire admin console — critical
 
@@ -251,12 +251,12 @@ This is also the source of the mismatches in 2.6.
 `mock/ops.ts` grants `admin` the full placement, mentor-assign and teaching permission set. The backend's
 class-level guards are narrower:
 
-| Controller | Backend guard | Frontend believes it can be called by |
-| :--- | :--- | :--- |
-| `PlacementController` | `hasRole('PLACEMENT_OFFICER')` | admin, super_admin, placement_officer |
-| `MentorController` (`/mentor/**`) | `hasRole('MENTOR')` | admin has `mentor.assign` |
-| `TeacherController` | `hasRole('TEACHER')` | admin has `teaching.manage`; mentor has `mentor.students`, and `/teacher/students` is registered for it in `routePermissions` |
-| `JobController` (`/api/career/**`) | `hasRole('STUDENT')` | student only — this one agrees |
+| Controller                         | Backend guard                  | Frontend believes it can be called by                                                                                         |
+| :--------------------------------- | :----------------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
+| `PlacementController`              | `hasRole('PLACEMENT_OFFICER')` | admin, super_admin, placement_officer                                                                                         |
+| `MentorController` (`/mentor/**`)  | `hasRole('MENTOR')`            | admin has `mentor.assign`                                                                                                     |
+| `TeacherController`                | `hasRole('TEACHER')`           | admin has `teaching.manage`; mentor has `mentor.students`, and `/teacher/students` is registered for it in `routePermissions` |
+| `JobController` (`/api/career/**`) | `hasRole('STUDENT')`           | student only — this one agrees                                                                                                |
 
 An admin opening `/admin/career/jobs` or a mentor opening `/teacher/students` passes the client guard and
 then gets a wall of 403s.
@@ -324,11 +324,11 @@ Harmless but it forces exact-origin CORS forever and rules out `allowedOriginPat
 
 ### 4.1 Pagination has two shapes
 
-| Endpoint | Serialized shape |
-| :--- | :--- |
-| `GET /api/courses` | `PageResponse` → `{ items, page, pageSize, total, totalPages }` |
+| Endpoint                      | Serialized shape                                                |
+| :---------------------------- | :-------------------------------------------------------------- |
+| `GET /api/courses`            | `PageResponse` → `{ items, page, pageSize, total, totalPages }` |
 | `GET /api/recordings/teacher` | raw Spring `Page` → `{ content, pageable, totalElements, ... }` |
-| `GET /api/admin/recordings` | raw Spring `Page` |
+| `GET /api/admin/recordings`   | raw Spring `Page`                                               |
 
 The frontend already special-cases both (`recording.service.ts:128` maps `.content` → `.items`), so nothing
 is broken — but returning `PageImpl` directly also triggers Spring Boot's serialization warning and locks
@@ -341,10 +341,10 @@ elsewhere emits Spring's **0-based** `page.getNumber()`. Pick one.
 
 ### 4.2 Query parameters the frontend sends and the backend ignores
 
-| Caller | Sends | Backend accepts |
-| :--- | :--- | :--- |
-| `course.service.ts:41` | `search, category, level, maxPrice, minRating, sort, page, pageSize` | only `search, category, page, pageSize` |
-| `job.service.ts:21` | `search, type, workMode, sort` | **nothing** — `getJobs()` takes no params |
+| Caller                 | Sends                                                                | Backend accepts                           |
+| :--------------------- | :------------------------------------------------------------------- | :---------------------------------------- |
+| `course.service.ts:41` | `search, category, level, maxPrice, minRating, sort, page, pageSize` | only `search, category, page, pageSize`   |
+| `job.service.ts:21`    | `search, type, workMode, sort`                                       | **nothing** — `getJobs()` takes no params |
 
 The course filter sidebar (`routes/courses.index.tsx`) and the job filters render, accept input, and do
 nothing. `level`, `maxPrice`, `minRating` and `sort` are silently dropped.

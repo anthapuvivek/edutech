@@ -108,7 +108,14 @@ function AdminRecordingsPage() {
   };
 
   const getStatusBadge = (status: RecordingStatus) => {
-    const config: Record<RecordingStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "info" }> = {
+    const config: Record<
+      RecordingStatus,
+      {
+        label: string;
+        variant:
+          "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "info";
+      }
+    > = {
       DRAFT: { label: "Draft", variant: "secondary" },
       UPLOADING: { label: "Uploading", variant: "outline" },
       PROCESSING: { label: "Processing", variant: "info" },
@@ -118,8 +125,8 @@ function AdminRecordingsPage() {
       FAILED: { label: "Failed", variant: "destructive" },
     };
 
-    const c = config[status] || { label: status, variant: "outline" };
-    return <Badge variant={c.variant as any}>{c.label}</Badge>;
+    const c = config[status] || { label: status, variant: "outline" as const };
+    return <Badge variant={c.variant}>{c.label}</Badge>;
   };
 
   return (
@@ -219,7 +226,9 @@ function AdminRecordingsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="text-sm font-medium text-foreground">{r.teacherName}</div>
-                    <div className="text-xs text-muted-foreground">ID: {r.teacherId.substring(0, 8)}</div>
+                    <div className="text-xs text-muted-foreground">
+                      ID: {r.teacherId.substring(0, 8)}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm font-medium text-foreground">{r.courseTitle}</div>
@@ -258,7 +267,7 @@ function AdminRecordingsPage() {
                             <Globe className="mr-2 size-4" /> Publish Class
                           </DropdownMenuItem>
                         )}
-                        
+
                         {r.status === "PUBLISHED" && (
                           <DropdownMenuItem
                             onClick={() => unpublishMutation.mutate(r.id)}
@@ -268,11 +277,18 @@ function AdminRecordingsPage() {
                           </DropdownMenuItem>
                         )}
 
-                        <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => {
-                          if (confirm("Are you sure you want to delete this recording? This will permanently remove it from storage.")) {
-                            deleteMutation.mutate(r.id);
-                          }
-                        }}>
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onClick={() => {
+                            if (
+                              confirm(
+                                "Are you sure you want to delete this recording? This will permanently remove it from storage.",
+                              )
+                            ) {
+                              deleteMutation.mutate(r.id);
+                            }
+                          }}
+                        >
                           <Trash2 className="mr-2 size-4" /> Delete Recording
                         </DropdownMenuItem>
                       </DropdownMenuContent>

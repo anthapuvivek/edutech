@@ -26,6 +26,8 @@ export const routePermissions: Record<string, Permission[]> = {
   // Teaching / mentoring views. Mentors reuse the existing student-progress
   // screens read-only; they never get the teaching management surface.
   "/teacher/dashboard": ["teaching.manage"],
+  "/teacher/live-classes": ["teaching.manage"],
+  "/teacher/recordings": ["teaching.manage"],
   "/teacher/students": ["teaching.manage", "mentor.students"],
 
   // Platform administration.

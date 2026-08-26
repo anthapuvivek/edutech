@@ -26,10 +26,7 @@ import type { RecordingStatus } from "@/types/recording";
 
 export const Route = createFileRoute("/teacher/recordings/$id")({
   head: () => ({
-    meta: [
-      { title: "Recording Details — Teacher Portal" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Recording Details — Teacher Portal" }, { name: "robots", content: "noindex" }],
   }),
   component: RecordingDetailsPage,
 });
@@ -97,7 +94,9 @@ function RecordingDetailsPage() {
       <div className="surface-panel p-10 text-center space-y-4">
         <AlertCircle className="size-12 text-destructive mx-auto" />
         <h2 className="text-xl font-medium text-foreground">Class recording not found</h2>
-        <p className="text-muted-foreground">The recording may have been deleted or you do not have permission to view it.</p>
+        <p className="text-muted-foreground">
+          The recording may have been deleted or you do not have permission to view it.
+        </p>
         <Button asChild variant="outline">
           <Link to="/teacher/recordings">Back to recordings</Link>
         </Button>
@@ -117,7 +116,14 @@ function RecordingDetailsPage() {
   };
 
   const getStatusBadge = (status: RecordingStatus) => {
-    const config: Record<RecordingStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "info" }> = {
+    const config: Record<
+      RecordingStatus,
+      {
+        label: string;
+        variant:
+          "default" | "secondary" | "destructive" | "outline" | "success" | "warning" | "info";
+      }
+    > = {
       DRAFT: { label: "Draft", variant: "secondary" },
       UPLOADING: { label: "Uploading", variant: "outline" },
       PROCESSING: { label: "Processing", variant: "info" },
@@ -127,8 +133,8 @@ function RecordingDetailsPage() {
       FAILED: { label: "Failed", variant: "destructive" },
     };
 
-    const c = config[status] || { label: status, variant: "outline" };
-    return <Badge variant={c.variant as any}>{c.label}</Badge>;
+    const c = config[status] || { label: status, variant: "outline" as const };
+    return <Badge variant={c.variant}>{c.label}</Badge>;
   };
 
   return (
@@ -149,7 +155,8 @@ function RecordingDetailsPage() {
               <div>
                 <h1 className="text-2xl font-bold text-foreground">{recording.title}</h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Mapped to <strong>{recording.courseTitle}</strong> · {recording.moduleTitle} · {recording.lessonTitle}
+                  Mapped to <strong>{recording.courseTitle}</strong> · {recording.moduleTitle} ·{" "}
+                  {recording.lessonTitle}
                 </p>
               </div>
               <div className="shrink-0">{getStatusBadge(recording.status)}</div>
@@ -158,7 +165,8 @@ function RecordingDetailsPage() {
             <div className="mt-6 grid gap-4 sm:grid-cols-3 border-y py-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <Calendar className="size-4" />
-                Date: {new Date(recording.classDate).toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                Date:{" "}
+                {new Date(recording.classDate).toLocaleDateString("en-IN", { dateStyle: "medium" })}
               </span>
               <span className="flex items-center gap-1.5">
                 <Clock className="size-4" />
@@ -184,7 +192,10 @@ function RecordingDetailsPage() {
               !isPlayingPreview ? (
                 <div className="relative aspect-video w-full flex flex-col items-center justify-center text-ink-foreground p-8">
                   <img
-                    src={recording.thumbnailUrl || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=70"}
+                    src={
+                      recording.thumbnailUrl ||
+                      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=70"
+                    }
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover opacity-30"
                   />
@@ -223,7 +234,7 @@ function RecordingDetailsPage() {
         <div className="space-y-6">
           <section className="surface-panel p-6 space-y-4">
             <h2 className="text-lg font-bold text-foreground">Actions</h2>
-            
+
             {recording.status === "PUBLISHED" ? (
               <Button
                 variant="outline"
@@ -231,16 +242,20 @@ function RecordingDetailsPage() {
                 onClick={() => unpublishMutation.mutate()}
                 disabled={unpublishMutation.isPending}
               >
-                {unpublishMutation.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
+                {unpublishMutation.isPending ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : null}
                 Unpublish Class
               </Button>
-            ) : (recording.status === "READY" || recording.status === "UNPUBLISHED") ? (
+            ) : recording.status === "READY" || recording.status === "UNPUBLISHED" ? (
               <Button
                 className="w-full bg-success text-success-foreground hover:bg-success/90"
                 onClick={() => publishMutation.mutate()}
                 disabled={publishMutation.isPending}
               >
-                {publishMutation.isPending ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
+                {publishMutation.isPending ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : null}
                 <Globe className="mr-2 size-4" /> Publish Class
               </Button>
             ) : null}
@@ -257,7 +272,9 @@ function RecordingDetailsPage() {
               variant="outline"
               className="w-full text-destructive border-destructive/30 hover:bg-destructive/10"
               onClick={() => {
-                if (confirm("Are you sure you want to delete this recording? This cannot be undone.")) {
+                if (
+                  confirm("Are you sure you want to delete this recording? This cannot be undone.")
+                ) {
                   deleteMutation.mutate();
                 }
               }}
@@ -282,16 +299,22 @@ function RecordingDetailsPage() {
                   <Loader2 className="size-4 animate-spin text-muted-foreground" />
                 </div>
               ) : statsQuery.isError || !stats ? (
-                <p className="text-sm text-muted-foreground text-center">Analytics not available for this course.</p>
+                <p className="text-sm text-muted-foreground text-center">
+                  Analytics not available for this course.
+                </p>
               ) : (
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="surface-panel p-3 border text-center">
-                      <span className="block text-2xl font-bold text-foreground">{stats.totalStudents}</span>
+                      <span className="block text-2xl font-bold text-foreground">
+                        {stats.totalStudents}
+                      </span>
                       <span className="text-xs text-muted-foreground">Enrolled Students</span>
                     </div>
                     <div className="surface-panel p-3 border text-center">
-                      <span className="block text-2xl font-bold text-foreground">{stats.studentsStarted}</span>
+                      <span className="block text-2xl font-bold text-foreground">
+                        {stats.studentsStarted}
+                      </span>
                       <span className="text-xs text-muted-foreground">Started Watching</span>
                     </div>
                   </div>
@@ -303,18 +326,23 @@ function RecordingDetailsPage() {
                     </div>
                     <Progress value={stats.completionRate} className="h-2" />
                     <p className="text-xs text-muted-foreground">
-                      {stats.studentsCompleted} of {stats.studentsStarted} active viewers reached 90% completion.
+                      {stats.studentsCompleted} of {stats.studentsStarted} active viewers reached
+                      90% completion.
                     </p>
                   </div>
 
                   <div className="space-y-4 border-t pt-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Average Progress</span>
-                      <span className="font-semibold text-foreground">{stats.averageWatchPercentage}%</span>
+                      <span className="font-semibold text-foreground">
+                        {stats.averageWatchPercentage}%
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Average Watch Duration</span>
-                      <span className="font-semibold text-foreground">{formatDuration(stats.averageWatchDuration)}</span>
+                      <span className="font-semibold text-foreground">
+                        {formatDuration(stats.averageWatchDuration)}
+                      </span>
                     </div>
                   </div>
                 </>

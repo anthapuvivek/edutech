@@ -20,7 +20,10 @@ export function assertPermission(permission: Permission): void {
   const role = currentRole();
   if (!role) throw new ApiError(401, "Your session has expired. Please sign in again.");
   if (!can(role, permission)) {
-    throw new ApiError(403, `Your role (${role.replace(/_/g, " ")}) is not authorized for this action.`);
+    throw new ApiError(
+      403,
+      `Your role (${role.replace(/_/g, " ")}) is not authorized for this action.`,
+    );
   }
 }
 
@@ -37,7 +40,8 @@ export function guardService<T extends object>(
     get(target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver);
       if (typeof value !== "function") return value;
-      const permission = (overrides as Record<string, Permission | undefined>)[prop as string] ?? defaultPermission;
+      const permission =
+        (overrides as Record<string, Permission | undefined>)[prop as string] ?? defaultPermission;
       return (...args: unknown[]) => {
         assertPermission(permission);
         return (value as unknown as (...a: unknown[]) => unknown).apply(target, args);

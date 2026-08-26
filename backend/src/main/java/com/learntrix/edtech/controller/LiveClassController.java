@@ -51,4 +51,39 @@ public class LiveClassController {
         List<LiveClassResponse> liveClasses = liveClassService.getTeacherLiveClasses(teacherId);
         return ApiResponse.success(liveClasses);
     }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/teacher/live-classes/{id}")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<LiveClassResponse> getTeacherLiveClass(@PathVariable UUID id) {
+        UUID teacherId = SecurityUtil.getCurrentUserId();
+        LiveClassResponse liveClass = liveClassService.getLiveClassById(id, teacherId);
+        return ApiResponse.success(liveClass);
+    }
+
+    @PutMapping("/teacher/live-classes/{id}")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<LiveClassResponse> updateLiveClass(
+            @PathVariable UUID id,
+            @RequestBody Map<String, Object> body) {
+        UUID teacherId = SecurityUtil.getCurrentUserId();
+        LiveClassResponse liveClass = liveClassService.updateLiveClass(id, body, teacherId);
+        return ApiResponse.success(liveClass);
+    }
+
+    @PatchMapping("/teacher/live-classes/{id}/cancel")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<LiveClassResponse> cancelLiveClass(@PathVariable UUID id) {
+        UUID teacherId = SecurityUtil.getCurrentUserId();
+        LiveClassResponse liveClass = liveClassService.cancelLiveClass(id, teacherId);
+        return ApiResponse.success(liveClass);
+    }
+
+    @DeleteMapping("/teacher/live-classes/{id}")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<Void> deleteLiveClass(@PathVariable UUID id) {
+        UUID teacherId = SecurityUtil.getCurrentUserId();
+        liveClassService.deleteLiveClass(id, teacherId);
+        return ApiResponse.success(null);
+    }
 }
