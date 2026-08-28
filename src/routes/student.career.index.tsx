@@ -83,7 +83,7 @@ function CareerDashboardPage() {
             </div>
             <Progress value={data.readiness.overall} className="mt-4" />
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {data.readiness.components.map((c) => (
+              {(data.readiness?.components ?? []).map((c) => (
                 <div key={c.label}>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">{c.label}</span>
@@ -96,16 +96,16 @@ function CareerDashboardPage() {
           </section>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard label="Applications" value={data.applications.length} icon={Briefcase} />
+            <StatCard label="Applications" value={(data.applications ?? []).length} icon={Briefcase} />
             <StatCard
               label="Interviews"
-              value={data.upcomingInterviews.length}
+              value={(data.upcomingInterviews ?? []).length}
               icon={CalendarClock}
             />
-            <StatCard label="Saved jobs" value={data.savedJobs.length} icon={Bookmark} />
+            <StatCard label="Saved jobs" value={(data.savedJobs ?? []).length} icon={Bookmark} />
             <StatCard
               label="Referral options"
-              value={data.referralOpportunities.length}
+              value={(data.referralOpportunities ?? []).length}
               icon={Handshake}
             />
           </div>
@@ -119,7 +119,7 @@ function CareerDashboardPage() {
                 </Button>
               </div>
               <ul className="divide-y divide-border">
-                {data.recommendedJobs.map((job) => (
+                {(data.recommendedJobs ?? []).map((job) => (
                   <li
                     key={job.id}
                     className="flex flex-wrap items-center justify-between gap-3 py-3"
@@ -145,7 +145,7 @@ function CareerDashboardPage() {
             <section className="surface-panel p-6">
               <h2 className="text-display mb-4 text-xl">Placement readiness</h2>
               <ul className="space-y-2.5">
-                {data.checklist.map((item) => (
+                {(data.checklist ?? []).map((item) => (
                   <li key={item.label} className="flex items-start gap-2 text-sm">
                     {item.status === "complete" ? (
                       <CheckCircle2 className="mt-0.5 size-4 text-success" aria-hidden />
@@ -167,9 +167,9 @@ function CareerDashboardPage() {
 
             <section className="surface-panel p-6">
               <h2 className="text-display mb-4 text-xl">Upcoming interviews</h2>
-              {data.upcomingInterviews.length ? (
+              {(data.upcomingInterviews ?? []).length ? (
                 <ul className="space-y-3 text-sm">
-                  {data.upcomingInterviews.map((a) => (
+                  {(data.upcomingInterviews ?? []).map((a) => (
                     <li key={a.id}>
                       <p className="font-medium">
                         {a.companyName} — {a.role}
@@ -190,7 +190,7 @@ function CareerDashboardPage() {
             <section className="surface-panel p-6">
               <h2 className="text-display mb-4 text-xl">Internships</h2>
               <ul className="space-y-3 text-sm">
-                {data.recommendedInternships.map((job) => (
+                {(data.recommendedInternships ?? []).map((job) => (
                   <li key={job.id} className="flex items-center justify-between gap-3">
                     <span>
                       {job.title}
@@ -207,7 +207,7 @@ function CareerDashboardPage() {
                 <Target className="size-4" aria-hidden /> Skills to improve
               </h2>
               <div className="flex flex-wrap gap-2">
-                {data.skillsToImprove.map((s) => (
+                {(data.skillsToImprove ?? []).map((s) => (
                   <Badge key={s} variant="warning">
                     {s}
                   </Badge>
@@ -223,7 +223,7 @@ function CareerDashboardPage() {
                 <Handshake className="size-4" aria-hidden /> Referral opportunities
               </h2>
               <ul className="divide-y divide-border">
-                {data.referralOpportunities.map((r) => (
+                {(data.referralOpportunities ?? []).map((r) => (
                   <li
                     key={r.id}
                     className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm"
@@ -249,7 +249,7 @@ function CareerDashboardPage() {
                 <Bell className="size-4" aria-hidden /> Career alerts
               </h2>
               <ul className="space-y-3 text-sm">
-                {data.notifications.map((n) => (
+                {(data.notifications ?? []).map((n) => (
                   <li key={n.id}>
                     <p>{n.title}</p>
                     <p className="text-xs text-muted-foreground">

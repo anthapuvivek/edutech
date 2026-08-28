@@ -1,0 +1,9 @@
+$kind: http-request
+name: List Courses
+url: '{{baseUrl}}/api/courses'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

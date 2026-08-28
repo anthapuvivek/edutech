@@ -75,7 +75,7 @@ function MyCourses() {
         />
       ) : (
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {enrollments.data.map((e) => {
+          {(enrollments.data ?? []).map((e) => {
             const locked =
               e.status === "payment_pending" ||
               e.status === "expired" ||

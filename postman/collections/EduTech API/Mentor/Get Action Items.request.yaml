@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Action Items
+url: '{{baseUrl}}/api/mentor/action-items'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

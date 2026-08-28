@@ -240,8 +240,8 @@ function AdminDashboard() {
         <Panel title="Placement funnel" description="Career readiness through verified placement">
           {overview.data ? (
             <div className="space-y-3">
-              {overview.data.placementFunnel.map((stage) => {
-                const max = overview.data.placementFunnel[0]!.value;
+              {(overview.data.placementFunnel ?? []).map((stage) => {
+                const max = overview.data.placementFunnel?.[0]?.value || 1;
                 return (
                   <div key={stage.stage}>
                     <div className="flex items-center justify-between text-xs">
@@ -325,7 +325,7 @@ function AdminDashboard() {
                 {i + 1}
               </span>
               <div>
-                <p className="text-sm font-medium">
+                <div className="text-sm font-medium">
                   {step.label}{" "}
                   {step.complete ? (
                     <Badge variant="success" className="ml-1 align-middle">
@@ -336,7 +336,7 @@ function AdminDashboard() {
                       Pending
                     </Badge>
                   )}
-                </p>
+                </div>
                 <p className="text-xs text-muted-foreground">{step.description}</p>
               </div>
             </li>

@@ -1,0 +1,9 @@
+$kind: http-request
+name: Cancel Live Class
+url: '{{baseUrl}}/api/teacher/live-classes/{{id}}/cancel'
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

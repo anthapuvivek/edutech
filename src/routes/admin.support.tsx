@@ -312,7 +312,7 @@ function TicketThread({ id, onChanged }: { id: string; onChanged: () => void }) 
       </div>
 
       <ul className="my-4 space-y-3">
-        {t.messages.map((m) => (
+        {(t.messages ?? []).map((m) => (
           <li
             key={m.id}
             className={
@@ -336,7 +336,7 @@ function TicketThread({ id, onChanged }: { id: string; onChanged: () => void }) 
               <span>{new Date(m.at).toLocaleString()}</span>
             </div>
             <p className="mt-1 text-sm">{m.body}</p>
-            {m.attachments.map((a) => (
+            {(m.attachments ?? []).map((a) => (
               <p key={a.id} className="mt-1 text-xs text-muted-foreground">
                 📎 {a.name} ({a.sizeKb} KB)
               </p>

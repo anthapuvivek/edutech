@@ -1,0 +1,36 @@
+$kind: http-example
+name: '200 Success'
+request: {}
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": [
+          {
+            "id": "t1",
+            "studentName": "Rahul Verma",
+            "avatarUrl": "https://cdn.learntrix.com/avatars/rahul.jpg",
+            "courseTitle": "Full Stack Java Development",
+            "company": "Infosys",
+            "role": "Software Engineer",
+            "text": "Learntrix transformed my career. The hands-on projects and mentor support helped me land my dream job at Infosys within 3 months of completing the course.",
+            "rating": 5,
+            "placedAt": "2024-02-01"
+          },
+          {
+            "id": "t2",
+            "studentName": "Sneha Reddy",
+            "avatarUrl": "https://cdn.learntrix.com/avatars/sneha.jpg",
+            "courseTitle": "Data Science with Python",
+            "company": "TCS",
+            "role": "Data Analyst",
+            "text": "The curriculum is industry-aligned and the placement support is exceptional. Highly recommend to anyone looking to switch careers.",
+            "rating": 5,
+            "placedAt": "2024-01-15"
+          }
+        ]
+      }

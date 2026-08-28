@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Interviews
+url: '{{baseUrl}}/api/placement/interviews'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

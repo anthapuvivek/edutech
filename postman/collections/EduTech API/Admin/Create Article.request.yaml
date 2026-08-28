@@ -1,0 +1,17 @@
+$kind: http-request
+name: Create Article
+url: '{{baseUrl}}/api/admin/articles'
+method: POST
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "title": "",
+      "content": "",
+      "category": ""
+    }

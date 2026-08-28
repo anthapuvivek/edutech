@@ -1,0 +1,35 @@
+$kind: http-example
+name: '200 Success'
+request: {}
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": [
+          {
+            "id": "c1d2e3f4-a5b6-7890-cdef-123456789012",
+            "name": "Full Stack Development",
+            "slug": "full-stack",
+            "iconUrl": "https://cdn.learntrix.com/icons/fullstack.svg",
+            "courseCount": 12
+          },
+          {
+            "id": "d2e3f4a5-b6c7-8901-defa-234567890123",
+            "name": "Data Science",
+            "slug": "data-science",
+            "iconUrl": "https://cdn.learntrix.com/icons/datascience.svg",
+            "courseCount": 8
+          },
+          {
+            "id": "e3f4a5b6-c7d8-9012-efab-345678901234",
+            "name": "DevOps & Cloud",
+            "slug": "devops-cloud",
+            "iconUrl": "https://cdn.learntrix.com/icons/devops.svg",
+            "courseCount": 5
+          }
+        ]
+      }

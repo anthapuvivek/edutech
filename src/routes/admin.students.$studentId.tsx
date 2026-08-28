@@ -76,6 +76,18 @@ function StudentDetail() {
 
   const s = student.data;
 
+  const skills = s.skills ?? [];
+  const links = s.links ?? {};
+  const timeline = s.timeline ?? [];
+  const enrollments = s.enrollments ?? [];
+  const attendance = s.attendance ?? [];
+  const assessments = s.assessments ?? [];
+  const applications = s.applications ?? [];
+  const documents = s.documents ?? [];
+  const payments = s.payments ?? [];
+  const certificates = s.certificates ?? [];
+  const activity = s.activity ?? [];
+
   async function applyStatus(next: StudentAccountStatus) {
     try {
       await adminService.setStudentStatus(studentId, next, reason);
@@ -99,6 +111,18 @@ function StudentDetail() {
         description={`${s.studentId} · ${s.courseTitle} · ${s.batchName} · Trainer ${s.trainerName}`}
         action={
           <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                void adminService
+                  .resendStudentWelcomeEmail(studentId)
+                  .then(() => toast.success("Welcome activation email resent successfully."))
+                  .catch(() => toast.error("Could not resend email."))
+              }
+            >
+              Resend Welcome Email
+            </Button>
             {statusActions.map((action) => (
               <AlertDialog key={action}>
                 <AlertDialogTrigger asChild>
@@ -160,7 +184,7 @@ function StudentDetail() {
         </Panel>
         <Panel title="Placement">
           <StatusBadge value={s.placementStatus} />
-          <p className="mt-2 text-2xl font-semibold">{s.applications.length}</p>
+          <p className="mt-2 text-2xl font-semibold">{applications.length}</p>
           <p className="text-xs text-muted-foreground">Active applications</p>
         </Panel>
       </div>
@@ -210,14 +234,18 @@ function StudentDetail() {
 
           <Panel title="Profile & links">
             <div className="flex flex-wrap gap-1.5">
-              {s.skills.map((skill) => (
-                <Badge key={skill} variant="outline">
-                  {skill}
-                </Badge>
-              ))}
+              {skills.length > 0 ? (
+                skills.map((skill) => (
+                  <Badge key={skill} variant="outline">
+                    {skill}
+                  </Badge>
+                ))
+              ) : (
+                <span className="text-xs text-muted-foreground">No skills listed</span>
+              )}
             </div>
             <ul className="mt-4 space-y-1 text-sm">
-              {Object.entries(s.links).map(([key, url]) =>
+              {Object.entries(links).map(([key, url]) =>
                 url ? (
                   <li key={key}>
                     <span className="capitalize text-muted-foreground">{key}: </span>
@@ -244,27 +272,31 @@ function StudentDetail() {
             className="lg:col-span-2"
             description="Registration through verified placement"
           >
-            <ol className="space-y-3">
-              {s.timeline.map((step) => (
-                <li key={step.id} className="flex items-start gap-3">
-                  <span
-                    className={`mt-1 size-2.5 shrink-0 rounded-full ${
-                      step.state === "done"
-                        ? "bg-accent"
-                        : step.state === "current"
-                          ? "bg-primary"
-                          : "bg-muted"
-                    }`}
-                  />
-                  <div>
-                    <p className="text-sm font-medium">{step.stage}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {step.detail} · {step.occurredAt}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            {timeline.length > 0 ? (
+              <ol className="space-y-3">
+                {timeline.map((step) => (
+                  <li key={step.id} className="flex items-start gap-3">
+                    <span
+                      className={`mt-1 size-2.5 shrink-0 rounded-full ${
+                        step.state === "done"
+                          ? "bg-accent"
+                          : step.state === "current"
+                            ? "bg-primary"
+                            : "bg-muted"
+                      }`}
+                    />
+                    <div>
+                      <p className="text-sm font-medium">{step.stage}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {step.detail} · {step.occurredAt}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="text-xs text-muted-foreground">No timeline events recorded.</p>
+            )}
           </Panel>
         </TabsContent>
 
@@ -295,27 +327,35 @@ function StudentDetail() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {s.enrollments.map((e) => (
-                  <TableRow key={e.id}>
-                    <TableCell>{e.courseTitle}</TableCell>
-                    <TableCell className="text-sm">
-                      {e.batchName}
-                      <div className="text-xs text-muted-foreground">{e.trainerName}</div>
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      {e.startDate} → {e.endDate}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge value={e.courseStatus} />
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge value={e.paymentStatus} />
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge value={e.careerEligible ? "eligible" : "not_eligible"} />
+                {enrollments.length > 0 ? (
+                  enrollments.map((e) => (
+                    <TableRow key={e.id}>
+                      <TableCell>{e.courseTitle}</TableCell>
+                      <TableCell className="text-sm">
+                        {e.batchName}
+                        <div className="text-xs text-muted-foreground">{e.trainerName}</div>
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {e.startDate} → {e.endDate}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge value={e.courseStatus} />
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge value={e.paymentStatus} />
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge value={e.careerEligible ? "eligible" : "not_eligible"} />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-4 text-center text-xs text-muted-foreground">
+                      No enrollments found.
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </Panel>
@@ -337,40 +377,48 @@ function StudentDetail() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {s.attendance.map((a) => (
-                  <TableRow key={a.date}>
-                    <TableCell>{a.date}</TableCell>
-                    <TableCell>{a.classTitle}</TableCell>
-                    <TableCell>{a.batchName}</TableCell>
-                    <TableCell>
-                      <StatusBadge value={a.status} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Select
-                        defaultValue={a.status}
-                        onValueChange={(value) =>
-                          void adminService
-                            .correctAttendance({ studentId, date: a.date, status: value })
-                            .then(() => toast.success("Attendance correction submitted."))
-                        }
-                      >
-                        <SelectTrigger
-                          className="ml-auto w-36"
-                          aria-label={`Correct attendance for ${a.date}`}
+                {attendance.length > 0 ? (
+                  attendance.map((a) => (
+                    <TableRow key={a.date}>
+                      <TableCell>{a.date}</TableCell>
+                      <TableCell>{a.classTitle}</TableCell>
+                      <TableCell>{a.batchName}</TableCell>
+                      <TableCell>
+                        <StatusBadge value={a.status} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Select
+                          defaultValue={a.status}
+                          onValueChange={(value) =>
+                            void adminService
+                              .correctAttendance({ studentId, date: a.date, status: value })
+                              .then(() => toast.success("Attendance correction submitted."))
+                          }
                         >
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {["present", "absent", "late", "excused"].map((v) => (
-                            <SelectItem key={v} value={v} className="capitalize">
-                              {v}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                          <SelectTrigger
+                            className="ml-auto w-36"
+                            aria-label={`Correct attendance for ${a.date}`}
+                          >
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {["present", "absent", "late", "excused"].map((v) => (
+                              <SelectItem key={v} value={v} className="capitalize">
+                                {v}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="py-4 text-center text-xs text-muted-foreground">
+                      No attendance records found.
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </Panel>
@@ -397,14 +445,22 @@ function StudentDetail() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {s.assessments.map((a) => (
-                  <TableRow key={a.id}>
-                    <TableCell className="capitalize">{a.kind}</TableCell>
-                    <TableCell>{a.title}</TableCell>
-                    <TableCell className="text-right">{a.score}%</TableCell>
-                    <TableCell>{a.submittedAt}</TableCell>
+                {assessments.length > 0 ? (
+                  assessments.map((a) => (
+                    <TableRow key={a.id}>
+                      <TableCell className="capitalize">{a.kind}</TableCell>
+                      <TableCell>{a.title}</TableCell>
+                      <TableCell className="text-right">{a.score}%</TableCell>
+                      <TableCell>{a.submittedAt}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-4 text-center text-xs text-muted-foreground">
+                      No assessments recorded.
+                    </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </Panel>
@@ -466,16 +522,24 @@ function StudentDetail() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {s.applications.map((a) => (
-                  <TableRow key={a.id}>
-                    <TableCell>{a.company}</TableCell>
-                    <TableCell>{a.role}</TableCell>
-                    <TableCell>{a.appliedAt}</TableCell>
-                    <TableCell>
-                      <StatusBadge value={a.status} />
+                {applications.length > 0 ? (
+                  applications.map((a) => (
+                    <TableRow key={a.id}>
+                      <TableCell>{a.company}</TableCell>
+                      <TableCell>{a.role}</TableCell>
+                      <TableCell>{a.appliedAt}</TableCell>
+                      <TableCell>
+                        <StatusBadge value={a.status} />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-4 text-center text-xs text-muted-foreground">
+                      No active applications.
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </Panel>
@@ -497,32 +561,40 @@ function StudentDetail() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {s.documents.map((d) => (
-                  <TableRow key={d.id}>
-                    <TableCell>{humanize(d.kind)}</TableCell>
-                    <TableCell>{d.name}</TableCell>
-                    <TableCell>{d.uploadedAt}</TableCell>
-                    <TableCell>
-                      <StatusBadge value={d.reviewStatus} />
-                    </TableCell>
-                    <TableCell className="space-x-2 text-right">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => toast.success("Approval submitted.")}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => toast.info("Removal requires backend confirmation.")}
-                      >
-                        Remove
-                      </Button>
+                {documents.length > 0 ? (
+                  documents.map((d) => (
+                    <TableRow key={d.id}>
+                      <TableCell>{humanize(d.kind)}</TableCell>
+                      <TableCell>{d.name}</TableCell>
+                      <TableCell>{d.uploadedAt}</TableCell>
+                      <TableCell>
+                        <StatusBadge value={d.reviewStatus} />
+                      </TableCell>
+                      <TableCell className="space-x-2 text-right">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => toast.success("Approval submitted.")}
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => toast.info("Removal requires backend confirmation.")}
+                        >
+                          Remove
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="py-4 text-center text-xs text-muted-foreground">
+                      No documents uploaded yet.
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
             <div className="mt-4 grid gap-2 sm:max-w-sm">
@@ -547,44 +619,60 @@ function StudentDetail() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {s.payments.map((p) => (
-                  <TableRow key={p.id}>
-                    <TableCell>{p.description}</TableCell>
-                    <TableCell className="text-right">{formatPrice(p.amount)}</TableCell>
-                    <TableCell>
-                      <StatusBadge value={p.status} />
+                {payments.length > 0 ? (
+                  payments.map((p) => (
+                    <TableRow key={p.id}>
+                      <TableCell>{p.description}</TableCell>
+                      <TableCell className="text-right">{formatPrice(p.amount)}</TableCell>
+                      <TableCell>
+                        <StatusBadge value={p.status} />
+                      </TableCell>
+                      <TableCell>{p.paidAt}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-4 text-center text-xs text-muted-foreground">
+                      No payments recorded.
                     </TableCell>
-                    <TableCell>{p.paidAt}</TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </Panel>
           <Panel title="Certificates">
-            <ul className="space-y-2 text-sm">
-              {s.certificates.map((c) => (
-                <li
-                  key={c.id}
-                  className="flex items-center justify-between rounded-md border border-border px-3 py-2"
-                >
-                  <span>{c.title}</span>
-                  <span className="text-xs text-muted-foreground">{c.issuedAt}</span>
-                </li>
-              ))}
-            </ul>
+            {certificates.length > 0 ? (
+              <ul className="space-y-2 text-sm">
+                {certificates.map((c) => (
+                  <li
+                    key={c.id}
+                    className="flex items-center justify-between rounded-md border border-border px-3 py-2"
+                  >
+                    <span>{c.title}</span>
+                    <span className="text-xs text-muted-foreground">{c.issuedAt}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xs text-muted-foreground">No certificates issued yet.</p>
+            )}
           </Panel>
         </TabsContent>
 
         <TabsContent value="activity">
           <Panel title="Activity history">
-            <ul className="divide-y divide-border text-sm">
-              {s.activity.map((a) => (
-                <li key={a.id} className="flex items-center justify-between py-2.5">
-                  <span>{a.label}</span>
-                  <span className="text-xs text-muted-foreground">{a.occurredAt}</span>
-                </li>
-              ))}
-            </ul>
+            {activity.length > 0 ? (
+              <ul className="divide-y divide-border text-sm">
+                {activity.map((a) => (
+                  <li key={a.id} className="flex items-center justify-between py-2.5">
+                    <span>{a.label}</span>
+                    <span className="text-xs text-muted-foreground">{a.occurredAt}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xs text-muted-foreground">No recent activity recorded.</p>
+            )}
           </Panel>
         </TabsContent>
       </Tabs>

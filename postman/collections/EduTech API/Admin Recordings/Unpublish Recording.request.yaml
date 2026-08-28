@@ -1,0 +1,9 @@
+$kind: http-request
+name: Unpublish Recording
+url: '{{baseUrl}}/api/admin/recordings/{{id}}/unpublish'
+method: POST
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

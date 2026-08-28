@@ -52,4 +52,13 @@ public class StudentController {
         List<ActivityItemResponse> activity = studentService.getActivity(studentId);
         return ApiResponse.success(activity);
     }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/leaderboard")
+    public ApiResponse<List<com.learntrix.edtech.dto.student.LeaderboardEntryResponse>> getLeaderboard(
+            @org.springframework.web.bind.annotation.RequestParam(value = "scope", required = false, defaultValue = "global") String scope) {
+        UUID studentId = SecurityUtil.getCurrentUserId();
+        List<com.learntrix.edtech.dto.student.LeaderboardEntryResponse> leaderboard = studentService.getLeaderboard(studentId, scope);
+        return ApiResponse.success(leaderboard);
+    }
 }

@@ -1,0 +1,9 @@
+$kind: http-request
+name: Update Attendance
+url: '{{baseUrl}}/api/admin/attendance'
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

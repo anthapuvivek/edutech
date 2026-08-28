@@ -291,7 +291,7 @@ function CourseCataloguePage() {
           ) : (
             <>
               <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                {courses.data.items.map((course) => (
+                {(courses.data?.items ?? []).map((course) => (
                   <CourseCard key={course.id} course={course} />
                 ))}
               </div>

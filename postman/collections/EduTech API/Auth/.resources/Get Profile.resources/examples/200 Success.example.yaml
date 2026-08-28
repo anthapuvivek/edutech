@@ -1,0 +1,22 @@
+$kind: http-example
+name: '200 Success'
+request: {}
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          "name": "Arjun Sharma",
+          "email": "student@learntrix.com",
+          "role": "STUDENT",
+          "avatarUrl": "https://cdn.learntrix.com/avatars/arjun.jpg",
+          "studentId": "LTX-2024-001",
+          "status": "active",
+          "createdAt": "2024-01-15T10:30:00Z"
+        }
+      }

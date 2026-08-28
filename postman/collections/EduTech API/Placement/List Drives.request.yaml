@@ -1,0 +1,9 @@
+$kind: http-request
+name: List Drives
+url: '{{baseUrl}}/api/placement/drives'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

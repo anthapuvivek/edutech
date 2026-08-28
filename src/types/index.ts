@@ -58,6 +58,7 @@ export interface Course {
   originalPrice?: number | undefined;
   currency: "INR" | "USD";
   thumbnailUrl: string;
+  status?: "DRAFT" | "PUBLISHED" | "ARCHIVED" | string | undefined;
   // Nullable to match the API: courses.instructor_id is ON DELETE SET NULL,
   // so a course can legitimately have no instructor.
   instructor: Instructor | null;

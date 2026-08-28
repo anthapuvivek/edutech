@@ -1,0 +1,9 @@
+$kind: http-request
+name: Admin List Jobs
+url: '{{baseUrl}}/api/admin/career/jobs'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

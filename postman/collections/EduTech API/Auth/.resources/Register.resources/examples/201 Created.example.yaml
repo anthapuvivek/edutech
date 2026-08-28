@@ -1,0 +1,34 @@
+$kind: http-example
+name: '201 Created'
+request:
+  body:
+    type: json
+    content: |-
+      {
+        "name": "Priya Patel",
+        "email": "priya.patel@gmail.com",
+        "password": "Secure@123"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "user": {
+            "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+            "name": "Priya Patel",
+            "email": "priya.patel@gmail.com",
+            "role": "STUDENT",
+            "avatarUrl": null,
+            "studentId": null,
+            "status": "pending",
+            "createdAt": "2024-03-10T09:00:00Z"
+          },
+          "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiMmMzZDRlNSIsInJvbGUiOiJTVFVERU5UIiwiZXhwIjoxNzA5MDAwMDAwfQ.xyz789",
+          "expiresAt": "2024-04-10T09:00:00Z"
+        }
+      }

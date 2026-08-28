@@ -1,0 +1,9 @@
+$kind: http-request
+name: Delete Recording
+url: '{{baseUrl}}/api/recordings/{{id}}'
+method: DELETE
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

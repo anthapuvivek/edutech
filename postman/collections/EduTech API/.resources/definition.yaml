@@ -1,0 +1,5 @@
+$kind: collection
+name: EduTech API
+description: All backend APIs for the EduTech (Learntrix) platform, organized by domain.
+variables:
+  baseUrl: http://localhost:8081

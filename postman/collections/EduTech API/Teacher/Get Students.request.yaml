@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Students
+url: '{{baseUrl}}/api/teacher/students'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

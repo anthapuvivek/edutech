@@ -37,7 +37,7 @@ const nav: PortalNavItem[] = [
 
   { section: "Operations", label: "Students", to: "/admin/students", icon: Users },
   { label: "Teachers", to: "/admin/teachers", icon: GraduationCap },
-  { label: "Courses", icon: BookOpen },
+  { label: "Courses", to: "/admin/courses", icon: BookOpen },
   { label: "Batches", to: "/admin/batches", icon: CalendarDays },
   { label: "Attendance", to: "/admin/attendance", icon: CalendarCheck },
   { label: "Learning & Performance", to: "/admin/performance", icon: TrendingUp },

@@ -49,6 +49,9 @@ public class AdminStudentDetailResponse {
     private List<AttendanceDetail> attendance;
     private List<AssessmentDetail> assessments;
     private List<ApplicationDetail> applications;
+    private List<PaymentDetail> payments;
+    private List<CertificateDetail> certificates;
+    private List<ActivityDetail> activity;
 
     @Getter
     @Setter
@@ -141,5 +144,40 @@ public class AdminStudentDetailResponse {
         private String role;
         private String appliedAt;
         private String status;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class PaymentDetail {
+        private String id;
+        private String description;
+        private double amount;
+        private String status;
+        private String paidAt;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class CertificateDetail {
+        private String id;
+        private String title;
+        private String issuedAt;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ActivityDetail {
+        private String id;
+        private String label;
+        private String occurredAt;
     }
 }

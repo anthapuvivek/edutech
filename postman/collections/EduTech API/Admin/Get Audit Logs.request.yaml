@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Audit Logs
+url: '{{baseUrl}}/api/admin/audit-logs'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Overview
+url: '{{baseUrl}}/api/admin/overview'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

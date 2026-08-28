@@ -70,7 +70,7 @@ function AdminCompanies() {
             <Panel
               key={c.id}
               title={c.name}
-              description={`${c.industry} · ${c.locations.join(", ")}`}
+              description={`${c.industry} · ${(c.locations ?? []).join(", ")}`}
               action={
                 c.officialPartner ? (
                   <Badge variant="success" className="gap-1">
@@ -83,7 +83,7 @@ function AdminCompanies() {
             >
               <p className="text-sm text-muted-foreground">{c.description}</p>
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {c.roles.map((role) => (
+                {(c.roles ?? []).map((role) => (
                   <Badge key={role} variant="outline">
                     {role}
                   </Badge>

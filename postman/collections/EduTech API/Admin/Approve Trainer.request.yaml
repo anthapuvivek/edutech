@@ -1,0 +1,9 @@
+$kind: http-request
+name: Approve Trainer
+url: '{{baseUrl}}/api/admin/trainers/{{id}}/approval'
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

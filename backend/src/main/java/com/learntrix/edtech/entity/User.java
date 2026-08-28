@@ -46,6 +46,18 @@ public class User extends AuditableEntity {
     )
     private Set<Role> roles = new HashSet<>();
 
+    @Column(name = "email_verification_token")
+    private String emailVerificationToken;
+
+    @Column(name = "email_verification_token_expiry")
+    private Instant emailVerificationTokenExpiry;
+
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_token_expiry")
+    private Instant passwordResetTokenExpiry;
+
     @Column(name = "last_login_at")
     private Instant lastLoginAt;
 

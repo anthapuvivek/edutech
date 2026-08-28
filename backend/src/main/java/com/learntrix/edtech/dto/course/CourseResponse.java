@@ -31,6 +31,7 @@ public class CourseResponse {
     private Integer originalPrice;
     private String currency;
     private String thumbnailUrl;
+    private String status;
     private InstructorResponse instructor;
     private List<String> badges;
     private Instant updatedAt;

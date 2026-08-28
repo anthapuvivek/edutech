@@ -13,8 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/placement")
-@PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
+@RequestMapping("/api")
 public class PlacementController {
 
     private final UserRepository userRepository;
@@ -49,7 +48,8 @@ public class PlacementController {
     // (Enrollment.course, Job.company, ...) and open-in-view is disabled, so without
     // an open session these endpoints fail with LazyInitializationException.
     @Transactional(readOnly = true)
-    @GetMapping("/stats")
+    @GetMapping("/placement/stats")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<PlacementStatsResponse> getStats() {
         int studentCount = (int) userRepository.findAll().stream()
                 .filter(u -> u.getRoles().stream().anyMatch(r -> "STUDENT".equalsIgnoreCase(r.getName())))
@@ -74,7 +74,8 @@ public class PlacementController {
     }
 
     @Transactional(readOnly = true)
-    @GetMapping("/analytics")
+    @GetMapping("/placement/analytics")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<PlacementAnalyticsResponse> getAnalytics() {
         int studentCount = (int) userRepository.findAll().stream()
                 .filter(u -> u.getRoles().stream().anyMatch(r -> "STUDENT".equalsIgnoreCase(r.getName())))
@@ -100,7 +101,8 @@ public class PlacementController {
     }
 
     @Transactional(readOnly = true)
-    @GetMapping("/students")
+    @GetMapping("/placement/students")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<PlacementEligibleStudentResponse>> getStudents(
             @RequestParam(value = "eligibility", required = false) String eligibility,
             @RequestParam(value = "search", required = false) String search) {
@@ -129,7 +131,8 @@ public class PlacementController {
     }
 
     @Transactional(readOnly = true)
-    @GetMapping("/drives")
+    @GetMapping("/placement/drives")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<PlacementDriveResponse>> getDrives() {
         List<PlacementDrive> drives = placementDriveRepository.findAll();
         List<PlacementDriveResponse> responses = drives.stream()
@@ -138,7 +141,8 @@ public class PlacementController {
         return ApiResponse.success(responses);
     }
 
-    @PostMapping("/drives")
+    @PostMapping("/placement/drives")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<Map<String, Object>> createDrive(@RequestBody Map<String, Object> body) {
         PlacementDrive drive = new PlacementDrive();
         drive.setId(UUID.randomUUID());
@@ -159,7 +163,8 @@ public class PlacementController {
         return ApiResponse.success(Map.of("ok", true));
     }
 
-    @PatchMapping("/drives/{id}/stage")
+    @PatchMapping("/placement/drives/{id}/stage")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<Map<String, Object>> updateDriveStage(
             @PathVariable("id") UUID id,
             @RequestBody Map<String, String> body) {
@@ -172,7 +177,8 @@ public class PlacementController {
     }
 
     @Transactional(readOnly = true)
-    @GetMapping("/applications")
+    @GetMapping("/placement/applications")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<PlacementApplicationResponse>> getApplications(
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "search", required = false) String search) {
@@ -197,7 +203,8 @@ public class PlacementController {
         return ApiResponse.success(responses);
     }
 
-    @PatchMapping("/applications/status")
+    @PatchMapping("/placement/applications/status")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<Map<String, Object>> updateApplicationStatus(@RequestBody Map<String, Object> body) {
         List<String> idsStr = (List<String>) body.get("ids");
         String status = (String) body.get("status");
@@ -214,7 +221,8 @@ public class PlacementController {
     }
 
     @Transactional(readOnly = true)
-    @GetMapping("/interviews")
+    @GetMapping("/placement/interviews")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<PlacementInterviewResponse>> getInterviews() {
         List<PlacementInterview> interviews = placementInterviewRepository.findAll();
         List<PlacementInterviewResponse> responses = interviews.stream()
@@ -223,7 +231,8 @@ public class PlacementController {
         return ApiResponse.success(responses);
     }
 
-    @PostMapping("/interviews")
+    @PostMapping("/placement/interviews")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<Map<String, Object>> scheduleInterview(@RequestBody Map<String, Object> body) {
         UUID studentId = UUID.fromString((String) body.get("studentId"));
         User student = userRepository.findById(studentId).orElse(null);
@@ -251,7 +260,8 @@ public class PlacementController {
     }
 
     @Transactional(readOnly = true)
-    @GetMapping("/offers")
+    @GetMapping("/placement/offers")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<PlacementOfferResponse>> getOffers() {
         List<PlacementOffer> offers = placementOfferRepository.findAll();
         List<PlacementOfferResponse> responses = offers.stream()
@@ -260,7 +270,8 @@ public class PlacementController {
         return ApiResponse.success(responses);
     }
 
-    @PostMapping("/offers")
+    @PostMapping("/placement/offers")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<Map<String, Object>> recordOffer(@RequestBody Map<String, Object> body) {
         UUID studentId = UUID.fromString((String) body.get("studentId"));
         User student = userRepository.findById(studentId).orElse(null);
@@ -294,7 +305,8 @@ public class PlacementController {
         return ApiResponse.success(Map.of("ok", true));
     }
 
-    @PatchMapping("/offers/{id}/status")
+    @PatchMapping("/placement/offers/{id}/status")
+    @PreAuthorize("hasAnyRole('PLACEMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<Map<String, Object>> updateOfferStatus(
             @PathVariable("id") UUID id,
             @RequestBody Map<String, String> body) {
@@ -304,6 +316,79 @@ public class PlacementController {
             placementOfferRepository.save(offer);
         }
         return ApiResponse.success(Map.of("ok", true));
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/student/placement-drives")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN', 'SUPER_ADMIN', 'PLACEMENT_OFFICER')")
+    public ApiResponse<List<PlacementDriveResponse>> getStudentDrives() {
+        List<PlacementDrive> drives = placementDriveRepository.findAll();
+        List<PlacementDriveResponse> responses = drives.stream()
+                .filter(d -> !"Draft".equalsIgnoreCase(d.getStage()) && !"Cancelled".equalsIgnoreCase(d.getStage()))
+                .map(this::mapToDriveResponse)
+                .collect(Collectors.toList());
+        return ApiResponse.success(responses);
+    }
+
+    @PostMapping("/student/placement-drives/{driveId}/apply")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN', 'SUPER_ADMIN', 'PLACEMENT_OFFICER')")
+    public ApiResponse<Map<String, Object>> applyToDrive(@PathVariable("driveId") UUID driveId) {
+        return ApiResponse.success(Map.of("ok", true, "applied", true));
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/admin/career/jobs")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'PLACEMENT_OFFICER')")
+    public ApiResponse<List<com.learntrix.edtech.dto.career.JobResponse>> getAdminCareerJobs() {
+        List<Job> jobs = jobRepository.findAll();
+        List<com.learntrix.edtech.dto.career.JobResponse> list = jobs.stream()
+                .map(j -> com.learntrix.edtech.dto.career.JobResponse.builder()
+                        .id(j.getId())
+                        .title(j.getTitle())
+                        .companyId(j.getCompany().getId())
+                        .companyName(j.getCompany().getName())
+                        .category("Software Engineering")
+                        .type(j.getType())
+                        .location(j.getLocation())
+                        .workMode(j.getWorkMode())
+                        .experience("0-1 Years")
+                        .salaryRange(j.getCtcRange())
+                        .skills(List.of("Java", "Spring Boot", "SQL"))
+                        .postedAt(j.getPostedAt() == null ? null : j.getPostedAt().toString())
+                        .deadline(j.getApplicationDeadline() == null ? null : j.getApplicationDeadline().toString())
+                        .matchPercent(85)
+                        .saved(false)
+                        .build())
+                .collect(Collectors.toList());
+        return ApiResponse.success(list);
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/admin/career/companies")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'PLACEMENT_OFFICER')")
+    public ApiResponse<List<com.learntrix.edtech.dto.career.CompanyResponse>> getAdminCareerCompanies() {
+        return ApiResponse.success(List.of());
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/admin/career/applications")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'PLACEMENT_OFFICER')")
+    public ApiResponse<List<PlacementApplicationResponse>> getAdminCareerApplications() {
+        return getApplications(null, null);
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/admin/career/referrals")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'PLACEMENT_OFFICER')")
+    public ApiResponse<List<Map<String, Object>>> getAdminCareerReferrals() {
+        return ApiResponse.success(List.of());
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/admin/career/eligibility-rules")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'PLACEMENT_OFFICER')")
+    public ApiResponse<List<Map<String, Object>>> getAdminEligibilityRules() {
+        return ApiResponse.success(List.of());
     }
 
     private PlacementEligibleStudentResponse mapToEligibleStudentResponse(User student) {

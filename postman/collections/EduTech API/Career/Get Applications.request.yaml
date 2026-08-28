@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Applications
+url: '{{baseUrl}}/api/career/applications'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

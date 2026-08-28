@@ -74,4 +74,26 @@ export const courseService = {
     if (!env.useMocks) return apiRequest<PlatformStat[]>("/stats");
     return mockDelay(mockStats);
   },
+
+  async enroll(courseId: string): Promise<import("@/types/lms").Enrollment> {
+    if (!env.useMocks) {
+      return apiRequest<import("@/types/lms").Enrollment>(`/courses/${courseId}/enroll`, {
+        method: "POST",
+      });
+    }
+    return mockDelay({
+      id: `enr-${Date.now()}`,
+      courseId,
+      courseSlug: "full-stack-engineering",
+      courseTitle: "Full Stack Engineering Program",
+      instructorName: "Durga Prasad",
+      thumbnailUrl: "",
+      status: "active",
+      progressPercent: 0,
+      lessonsCompleted: 0,
+      lessonsTotal: 24,
+      enrolledAt: new Date().toISOString(),
+    });
+  },
 };
+

@@ -1,0 +1,28 @@
+$kind: http-example
+name: '200 Success'
+request: {}
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": {
+          "id": "enr-001",
+          "courseId": "crs-001",
+          "courseSlug": "full-stack-java",
+          "courseTitle": "Full Stack Java Development",
+          "instructorName": "Vikram Nair",
+          "thumbnailUrl": "https://cdn.learntrix.com/courses/fullstack-java.jpg",
+          "status": "active",
+          "progressPercent": 0,
+          "lessonsCompleted": 0,
+          "lessonsTotal": 240,
+          "lastLessonTitle": null,
+          "nextLessonTitle": "Introduction to Java",
+          "enrolledAt": "2024-03-10T10:00:00Z",
+          "expiresAt": "2025-03-10T10:00:00Z"
+        }
+      }

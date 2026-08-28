@@ -1,0 +1,16 @@
+$kind: http-request
+name: Update Recording
+url: '{{baseUrl}}/api/recordings/{{id}}'
+method: PUT
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "title": "",
+      "description": ""
+    }

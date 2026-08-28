@@ -142,52 +142,34 @@ public class TeacherController {
             @RequestParam(value = "course", required = false) String courseTitle) {
         UUID teacherId = SecurityUtil.getCurrentUserId();
         List<Batch> batches = batchRepository.findByTeacherIdOrderByStartDateAsc(teacherId);
+        List<Course> teacherCourses = courseRepository.findByInstructorId(teacherId);
+        List<UUID> courseIds = teacherCourses.stream().map(Course::getId).collect(Collectors.toList());
 
-        if (batches.isEmpty()) {
-            return ApiResponse.success(List.of());
-        }
+        List<Enrollment> enrollments = enrollmentRepository.findByCourseIdIn(courseIds);
 
-        Set<UUID> teacherStudentIds = batches.stream()
+        // If batches exist with students, prioritize batch students
+        Set<UUID> batchStudentIds = batches.stream()
                 .flatMap(batch -> batch.getStudents().stream())
                 .map(User::getId)
                 .collect(Collectors.toSet());
 
-        List<TeacherStudentResponse> students = batches.stream()
-                .flatMap(batch -> batch.getStudents().stream())
-                .distinct()
-                .filter(student -> {
+        List<Enrollment> targetEnrollments;
+        if (!batchStudentIds.isEmpty()) {
+            targetEnrollments = enrollments.stream()
+                    .filter(e -> batchStudentIds.contains(e.getStudent().getId()))
+                    .collect(Collectors.toList());
+        } else {
+            targetEnrollments = enrollments;
+        }
+
+        List<TeacherStudentResponse> students = targetEnrollments.stream()
+                .filter(e -> {
                     if (courseTitle != null && !courseTitle.trim().isEmpty() && !"All".equalsIgnoreCase(courseTitle)) {
-                        return batchRepository.findByTeacherIdOrderByStartDateAsc(teacherId).stream()
-                                .filter(b -> b.getCourse().getTitle().equalsIgnoreCase(courseTitle))
-                                .flatMap(b -> b.getStudents().stream())
-                                .anyMatch(s -> s.getId().equals(student.getId()));
+                        return e.getCourse().getTitle().equalsIgnoreCase(courseTitle);
                     }
                     return true;
                 })
-                .map(student -> {
-                    Optional<Enrollment> enrollment = enrollmentRepository.findByStudentId(student.getId()).stream()
-                            .filter(e -> e.getCourse() != null && batches.stream().anyMatch(b -> b.getCourse().getId().equals(e.getCourse().getId())))
-                            .findFirst();
-                    Enrollment e = enrollment.orElse(null);
-                    if (e == null) {
-                        return TeacherStudentResponse.builder()
-                                .id(student.getId())
-                                .name(student.getName())
-                                .email(student.getEmail())
-                                .courseTitle(batches.get(0).getCourse().getTitle())
-                                .progressPercent(0)
-                                .lessonsCompleted(0)
-                                .quizScore(0)
-                                .assignments("0/0")
-                                .problemsSolved(0)
-                                .points(0)
-                                .rank(0)
-                                .lastActive("never")
-                                .status("active")
-                                .build();
-                    }
-                    return mapToStudentResponse(e);
-                })
+                .map(this::mapToStudentResponse)
                 .collect(Collectors.toList());
 
         return ApiResponse.success(students);
@@ -197,31 +179,31 @@ public class TeacherController {
     @Transactional(readOnly = true)
     public ApiResponse<TeacherStudentResponse> getStudent(@PathVariable("id") UUID studentId) {
         UUID teacherId = SecurityUtil.getCurrentUserId();
-        // Only return student if they belong to a batch assigned to this teacher
         List<Batch> batches = batchRepository.findByTeacherIdOrderByStartDateAsc(teacherId);
+        List<Course> teacherCourses = courseRepository.findByInstructorId(teacherId);
+        List<UUID> courseIds = teacherCourses.stream().map(Course::getId).collect(Collectors.toList());
+
         boolean studentIsInTeacherBatch = batches.stream()
                 .flatMap(b -> b.getStudents().stream())
                 .anyMatch(s -> s.getId().equals(studentId));
 
-        if (!studentIsInTeacherBatch) {
-            return ApiResponse.success(null);
-        }
-
-        // Find matching enrollment for progress data
-        List<UUID> courseIds = batches.stream().map(b -> b.getCourse().getId()).collect(Collectors.toList());
         Optional<Enrollment> enrollment = enrollmentRepository.findByCourseIdIn(courseIds).stream()
                 .filter(e -> e.getStudent().getId().equals(studentId))
                 .findFirst();
 
+        if (!studentIsInTeacherBatch && enrollment.isEmpty()) {
+            return ApiResponse.success(null);
+        }
+
         if (enrollment.isEmpty()) {
-            // Student is in the batch but not enrolled — return basic info
             User student = userRepository.findById(studentId).orElse(null);
             if (student == null) return ApiResponse.success(null);
+            String title = !batches.isEmpty() ? batches.get(0).getCourse().getTitle() : "General";
             return ApiResponse.success(TeacherStudentResponse.builder()
                     .id(student.getId())
                     .name(student.getName())
                     .email(student.getEmail())
-                    .courseTitle(batches.get(0).getCourse().getTitle())
+                    .courseTitle(title)
                     .progressPercent(0).lessonsCompleted(0).quizScore(0)
                     .assignments("0/0").problemsSolved(0).points(0).rank(0)
                     .lastActive("never").status("active").build());

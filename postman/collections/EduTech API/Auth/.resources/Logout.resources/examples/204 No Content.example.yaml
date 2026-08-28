@@ -1,0 +1,9 @@
+$kind: http-example
+name: '204 No Content'
+request: {}
+response:
+  statusCode: 204
+  statusText: No Content
+  body:
+    type: text
+    content: ''

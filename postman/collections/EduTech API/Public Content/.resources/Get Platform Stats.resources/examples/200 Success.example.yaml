@@ -1,0 +1,34 @@
+$kind: http-example
+name: '200 Success'
+request: {}
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": [
+          {
+            "label": "Students Trained",
+            "value": "12,500+",
+            "icon": "users"
+          },
+          {
+            "label": "Placement Rate",
+            "value": "94%",
+            "icon": "briefcase"
+          },
+          {
+            "label": "Hiring Partners",
+            "value": "200+",
+            "icon": "building"
+          },
+          {
+            "label": "Avg. Salary Hike",
+            "value": "3.2x",
+            "icon": "trending-up"
+          }
+        ]
+      }

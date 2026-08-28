@@ -6,10 +6,13 @@ import com.learntrix.edtech.common.exception.ConflictException;
 import com.learntrix.edtech.common.exception.ResourceNotFoundException;
 import com.learntrix.edtech.common.response.ApiResponse;
 import com.learntrix.edtech.common.util.SecurityUtil;
+import com.learntrix.edtech.dto.auth.ForgotPasswordRequest;
 import com.learntrix.edtech.dto.auth.LoginRequest;
 import com.learntrix.edtech.dto.auth.LoginResponse;
 import com.learntrix.edtech.dto.auth.RegisterRequest;
+import com.learntrix.edtech.dto.auth.ResetPasswordRequest;
 import com.learntrix.edtech.dto.auth.UserResponse;
+import com.learntrix.edtech.dto.auth.VerifyEmailRequest;
 import com.learntrix.edtech.entity.Role;
 import com.learntrix.edtech.entity.StudentProfile;
 import com.learntrix.edtech.entity.User;
@@ -28,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Set;
@@ -40,6 +44,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final StudentProfileRepository studentProfileRepository;
+    private final com.learntrix.edtech.repository.AccountActivationTokenRepository activationTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
@@ -53,11 +58,13 @@ public class AuthController {
             UserRepository userRepository,
             RoleRepository roleRepository,
             StudentProfileRepository studentProfileRepository,
+            com.learntrix.edtech.repository.AccountActivationTokenRepository activationTokenRepository,
             PasswordEncoder passwordEncoder,
             JwtProvider jwtProvider) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.studentProfileRepository = studentProfileRepository;
+        this.activationTokenRepository = activationTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
     }
@@ -124,6 +131,86 @@ public class AuthController {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", currentUserId));
 
         return ApiResponse.success(mapToUserResponse(user));
+    }
+
+    @PostMapping("/forgot-password")
+    public ApiResponse<Map<String, Boolean>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        String email = request.getEmail().trim().toLowerCase();
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setPasswordResetToken(UUID.randomUUID().toString());
+            user.setPasswordResetTokenExpiry(Instant.now().plusSeconds(3600)); // 1 hour
+            userRepository.save(user);
+        }
+        return ApiResponse.success(Map.of("sent", true));
+    }
+
+    @PostMapping({"/reset-password", "/activate"})
+    public ApiResponse<Map<String, Boolean>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        String token = request.getToken();
+
+        // 1. Check account activation token repository
+        Optional<com.learntrix.edtech.entity.AccountActivationToken> activationTokenOpt = activationTokenRepository.findByToken(token);
+        if (activationTokenOpt.isPresent()) {
+            com.learntrix.edtech.entity.AccountActivationToken activationToken = activationTokenOpt.get();
+            if (activationToken.isUsed()) {
+                throw new BusinessException("TOKEN_ALREADY_USED", "This activation link has already been used.", HttpStatus.BAD_REQUEST);
+            }
+            if (activationToken.isExpired()) {
+                throw new BusinessException("TOKEN_EXPIRED", "The activation link has expired. Please request a new one.", HttpStatus.BAD_REQUEST);
+            }
+
+            User user = userRepository.findById(activationToken.getUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", activationToken.getUserId()));
+
+            user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+            user.setStatus("ACTIVE");
+            user.setEmailVerified(true);
+            user.setPasswordResetToken(null);
+            user.setPasswordResetTokenExpiry(null);
+            userRepository.save(user);
+
+            activationToken.setUsedAt(Instant.now());
+            activationTokenRepository.save(activationToken);
+
+            return ApiResponse.success(Map.of("ok", true, "activated", true));
+        }
+
+        // 2. Fallback to password reset token on user entity
+        User user = userRepository.findByPasswordResetToken(token)
+                .orElseThrow(() -> new BusinessException("INVALID_TOKEN", "Invalid or expired password reset token.", HttpStatus.BAD_REQUEST));
+
+        if (user.getPasswordResetTokenExpiry() != null && user.getPasswordResetTokenExpiry().isBefore(Instant.now())) {
+            throw new BusinessException("TOKEN_EXPIRED", "The password reset token has expired.", HttpStatus.BAD_REQUEST);
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setStatus("ACTIVE");
+        user.setEmailVerified(true);
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiry(null);
+        userRepository.save(user);
+
+        return ApiResponse.success(Map.of("ok", true));
+    }
+
+    @PostMapping("/verify-email")
+    public ApiResponse<Map<String, Boolean>> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+        String token = request.getToken();
+        User user = userRepository.findByEmailVerificationToken(token)
+                .orElseThrow(() -> new BusinessException("INVALID_TOKEN", "Invalid or expired email verification token.", HttpStatus.BAD_REQUEST));
+
+        if (user.getEmailVerificationTokenExpiry() != null && user.getEmailVerificationTokenExpiry().isBefore(Instant.now())) {
+            throw new BusinessException("TOKEN_EXPIRED", "The email verification token has expired.", HttpStatus.BAD_REQUEST);
+        }
+
+        user.setEmailVerified(true);
+        user.setEmailVerificationToken(null);
+        user.setEmailVerificationTokenExpiry(null);
+        userRepository.save(user);
+
+        return ApiResponse.success(Map.of("verified", true));
     }
 
     @PostMapping("/logout")

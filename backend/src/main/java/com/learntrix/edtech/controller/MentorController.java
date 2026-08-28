@@ -226,6 +226,91 @@ public class MentorController {
         return ApiResponse.success(List.of());
     }
 
+    @Transactional(readOnly = true)
+    @GetMapping("/student/mentor")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<Map<String, Object>> getStudentMentorView() {
+        UUID studentId = SecurityUtil.getCurrentUserId();
+        List<User> mentors = userRepository.findAll().stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> "MENTOR".equalsIgnoreCase(r.getName())))
+                .collect(Collectors.toList());
+
+        User mentor = mentors.isEmpty() ? null : mentors.get(0);
+        Map<String, Object> mentorMap = null;
+        if (mentor != null) {
+            mentorMap = Map.of(
+                    "id", mentor.getId().toString(),
+                    "name", mentor.getName(),
+                    "email", mentor.getEmail(),
+                    "avatarUrl", mentor.getAvatarUrl() != null ? mentor.getAvatarUrl() : "",
+                    "phone", "+91 99999 88888"
+            );
+        }
+
+        List<MentoringSession> sessions = mentoringSessionRepository.findAll().stream()
+                .filter(s -> s.getStudent().getId().equals(studentId))
+                .collect(Collectors.toList());
+
+        List<MentorSessionResponse> sessionResponses = sessions.stream()
+                .map(this::mapToSessionResponse)
+                .collect(Collectors.toList());
+
+        MentorSessionResponse nextSession = sessionResponses.stream()
+                .filter(s -> "Scheduled".equalsIgnoreCase(s.getStatus()))
+                .findFirst().orElse(null);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("mentor", mentorMap);
+        response.put("nextSession", nextSession);
+        response.put("sessions", sessionResponses);
+        response.put("actionItems", List.of());
+
+        return ApiResponse.success(response);
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/admin/mentor-assignments")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<List<Map<String, Object>>> getMentorAssignments() {
+        List<User> mentors = userRepository.findAll().stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> "MENTOR".equalsIgnoreCase(r.getName())))
+                .collect(Collectors.toList());
+        List<User> students = userRepository.findAll().stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> "STUDENT".equalsIgnoreCase(r.getName())))
+                .collect(Collectors.toList());
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (!mentors.isEmpty() && !students.isEmpty()) {
+            User m = mentors.get(0);
+            for (int i = 0; i < students.size(); i++) {
+                User s = students.get(i);
+                result.add(Map.of(
+                        "id", "ma-" + s.getId(),
+                        "mentorId", m.getId().toString(),
+                        "mentorName", m.getName(),
+                        "studentId", s.getId().toString(),
+                        "studentName", s.getName(),
+                        "courseTitle", "Java Backend with Spring Boot",
+                        "assignedAt", Instant.now().toString(),
+                        "assignedBy", "Admin"
+                ));
+            }
+        }
+        return ApiResponse.success(result);
+    }
+
+    @PostMapping("/admin/mentor-assignments")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<Map<String, Object>> createMentorAssignment(@RequestBody Map<String, Object> body) {
+        return ApiResponse.success(Map.of("ok", true));
+    }
+
+    @DeleteMapping("/admin/mentor-assignments/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<Map<String, Object>> deleteMentorAssignment(@PathVariable("id") String id) {
+        return ApiResponse.success(Map.of("ok", true));
+    }
+
     private MentorStudentResponse mapToMentorStudentResponse(User student) {
         Optional<StudentProfile> profileOpt = studentProfileRepository.findByUserId(student.getId());
         List<Enrollment> enrollments = enrollmentRepository.findByStudentId(student.getId());

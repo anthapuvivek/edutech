@@ -31,6 +31,7 @@ import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
 import { Route as AdminBatchesRouteImport } from './routes/admin.batches'
 import { Route as AdminCmsRouteImport } from './routes/admin.cms'
 import { Route as AdminCommunicationRouteImport } from './routes/admin.communication'
+import { Route as AdminCoursesRouteImport } from './routes/admin.courses'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
@@ -182,6 +183,11 @@ const AdminCmsRoute = AdminCmsRouteImport.update({
 const AdminCommunicationRoute = AdminCommunicationRouteImport.update({
   id: '/communication',
   path: '/communication',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCoursesRoute = AdminCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
@@ -421,6 +427,7 @@ export interface FileRoutesByFullPath {
   '/admin/batches': typeof AdminBatchesRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/communication': typeof AdminCommunicationRoute
+  '/admin/courses': typeof AdminCoursesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -487,6 +494,7 @@ export interface FileRoutesByTo {
   '/admin/batches': typeof AdminBatchesRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/communication': typeof AdminCommunicationRoute
+  '/admin/courses': typeof AdminCoursesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -553,6 +561,7 @@ export interface FileRoutesById {
   '/admin/batches': typeof AdminBatchesRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/communication': typeof AdminCommunicationRoute
+  '/admin/courses': typeof AdminCoursesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -621,6 +630,7 @@ export interface FileRouteTypes {
     | '/admin/batches'
     | '/admin/cms'
     | '/admin/communication'
+    | '/admin/courses'
     | '/admin/dashboard'
     | '/admin/events'
     | '/admin/notifications'
@@ -687,6 +697,7 @@ export interface FileRouteTypes {
     | '/admin/batches'
     | '/admin/cms'
     | '/admin/communication'
+    | '/admin/courses'
     | '/admin/dashboard'
     | '/admin/events'
     | '/admin/notifications'
@@ -752,6 +763,7 @@ export interface FileRouteTypes {
     | '/admin/batches'
     | '/admin/cms'
     | '/admin/communication'
+    | '/admin/courses'
     | '/admin/dashboard'
     | '/admin/events'
     | '/admin/notifications'
@@ -970,6 +982,13 @@ declare module '@tanstack/react-router' {
       path: '/communication'
       fullPath: '/admin/communication'
       preLoaderRoute: typeof AdminCommunicationRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/courses': {
+      id: '/admin/courses'
+      path: '/courses'
+      fullPath: '/admin/courses'
+      preLoaderRoute: typeof AdminCoursesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/dashboard': {
@@ -1277,6 +1296,7 @@ interface AdminRouteChildren {
   AdminBatchesRoute: typeof AdminBatchesRoute
   AdminCmsRoute: typeof AdminCmsRoute
   AdminCommunicationRoute: typeof AdminCommunicationRoute
+  AdminCoursesRoute: typeof AdminCoursesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEventsRoute: typeof AdminEventsRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
@@ -1308,6 +1328,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBatchesRoute: AdminBatchesRoute,
   AdminCmsRoute: AdminCmsRoute,
   AdminCommunicationRoute: AdminCommunicationRoute,
+  AdminCoursesRoute: AdminCoursesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminEventsRoute: AdminEventsRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,

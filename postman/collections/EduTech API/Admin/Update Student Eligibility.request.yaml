@@ -1,0 +1,9 @@
+$kind: http-request
+name: Update Student Eligibility
+url: '{{baseUrl}}/api/admin/students/{{id}}/eligibility'
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

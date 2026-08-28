@@ -1,0 +1,9 @@
+$kind: http-request
+name: List Staff
+url: '{{baseUrl}}/api/rbac/staff'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

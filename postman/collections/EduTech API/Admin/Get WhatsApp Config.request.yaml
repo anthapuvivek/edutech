@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get WhatsApp Config
+url: '{{baseUrl}}/api/admin/communication/whatsapp'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

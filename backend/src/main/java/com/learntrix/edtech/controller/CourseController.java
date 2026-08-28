@@ -90,6 +90,15 @@ public class CourseController {
     }
 
     @Transactional(readOnly = true)
+    @GetMapping("/courses/{id}/access")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ApiResponse<java.util.Map<String, Object>> checkAccess(@PathVariable("id") UUID id) {
+        UUID studentId = SecurityUtil.getCurrentUserId();
+        java.util.Map<String, Object> access = courseService.checkCourseAccess(id, studentId);
+        return ApiResponse.success(access);
+    }
+
+    @Transactional(readOnly = true)
     @GetMapping("/student/enrollments")
     @PreAuthorize("hasRole('STUDENT')")
     public ApiResponse<List<EnrollmentResponse>> getStudentEnrollments() {

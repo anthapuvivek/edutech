@@ -1,0 +1,9 @@
+$kind: http-request
+name: Update Staff Status
+url: '{{baseUrl}}/api/rbac/staff/{{id}}/status'
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

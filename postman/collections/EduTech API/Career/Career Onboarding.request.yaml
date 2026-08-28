@@ -1,0 +1,17 @@
+$kind: http-request
+name: Career Onboarding
+url: '{{baseUrl}}/api/career/onboarding'
+method: POST
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "goals": [],
+      "preferredRoles": [],
+      "location": ""
+    }

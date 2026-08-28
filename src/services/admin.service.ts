@@ -18,7 +18,9 @@ import {
   mockWhatsAppSettings,
 } from "@/mock/admin";
 import { mockAdminStats, mockEvents } from "@/mock/lms";
+import { mockCourses } from "@/mock/courses";
 import { apiRequest, mockDelay } from "@/services/api-client";
+import type { Course } from "@/types";
 import type {
   AdminApplication,
   AdminArticle,
@@ -74,9 +76,13 @@ const adminServiceRaw = {
     if (!env.useMocks) return apiRequest<AdminStudentDetail>(`/admin/students/${id}`);
     return mockDelay(mockAdminStudentDetail(id));
   },
-  async createStudent(payload: Record<string, unknown>): Promise<{ ok: true }> {
+  async createStudent(payload: Record<string, unknown>): Promise<{ ok: boolean; id?: string; email?: string; identifier?: string }> {
     if (!env.useMocks) return apiRequest("/admin/students", { method: "POST", body: payload });
-    return mockDelay({ ok: true } as const);
+    return mockDelay({ ok: true, identifier: "LTX-2026-9999" });
+  },
+  async resendStudentWelcomeEmail(id: string): Promise<{ ok: boolean; message?: string }> {
+    if (!env.useMocks) return apiRequest(`/admin/students/${id}/resend-welcome-email`, { method: "POST" });
+    return mockDelay({ ok: true, message: "Welcome email resent successfully." });
   },
   async setStudentStatus(
     id: string,
@@ -112,6 +118,14 @@ const adminServiceRaw = {
   async trainers(): Promise<AdminTrainer[]> {
     if (!env.useMocks) return apiRequest<AdminTrainer[]>("/admin/trainers");
     return mockDelay(mockTrainers);
+  },
+  async createTeacher(payload: Record<string, unknown>): Promise<{ ok: boolean; id?: string; email?: string; identifier?: string }> {
+    if (!env.useMocks) return apiRequest("/admin/teachers", { method: "POST", body: payload });
+    return mockDelay({ ok: true, identifier: "LTX-T-2026-9999" });
+  },
+  async resendTeacherWelcomeEmail(id: string): Promise<{ ok: boolean; message?: string }> {
+    if (!env.useMocks) return apiRequest(`/admin/teachers/${id}/resend-welcome-email`, { method: "POST" });
+    return mockDelay({ ok: true, message: "Welcome email resent successfully." });
   },
   async approveTrainer(id: string, approve: boolean): Promise<{ ok: true }> {
     if (!env.useMocks)
@@ -197,6 +211,40 @@ const adminServiceRaw = {
     if (!env.useMocks) return apiRequest<AuditLogEntry[]>("/admin/audit-logs");
     return mockDelay(mockAuditLogs);
   },
+
+  // Courses ------------------------------------------------------------------
+  async courses(query?: { search?: string; category?: string; status?: string; sort?: string }): Promise<Course[]> {
+    if (!env.useMocks) return apiRequest<Course[]>("/admin/courses", { query: query as Record<string, string | number | boolean | undefined> });
+    return mockDelay(mockCourses as Course[]);
+  },
+  async course(id: string): Promise<Course> {
+    if (!env.useMocks) return apiRequest<Course>(`/admin/courses/${id}`);
+    return mockDelay((mockCourses.find((c) => c.id === id) || mockCourses[0]) as Course);
+  },
+  async createCourse(payload: Record<string, unknown>): Promise<Course> {
+    if (!env.useMocks) return apiRequest<Course>("/admin/courses", { method: "POST", body: payload });
+    return mockDelay({ id: `crs-${Date.now()}`, ...payload } as unknown as Course);
+  },
+  async updateCourse(id: string, payload: Record<string, unknown>): Promise<Course> {
+    if (!env.useMocks) return apiRequest<Course>(`/admin/courses/${id}`, { method: "PUT", body: payload });
+    return mockDelay({ id, ...payload } as unknown as Course);
+  },
+  async publishCourse(id: string): Promise<Course> {
+    if (!env.useMocks) return apiRequest<Course>(`/admin/courses/${id}/publish`, { method: "PATCH" });
+    return mockDelay({ id, status: "PUBLISHED" } as unknown as Course);
+  },
+  async unpublishCourse(id: string): Promise<Course> {
+    if (!env.useMocks) return apiRequest<Course>(`/admin/courses/${id}/unpublish`, { method: "PATCH" });
+    return mockDelay({ id, status: "DRAFT" } as unknown as Course);
+  },
+  async setCourseStatus(id: string, status: string): Promise<Course> {
+    if (!env.useMocks) return apiRequest<Course>(`/admin/courses/${id}/status`, { method: "PATCH", body: { status } });
+    return mockDelay({ id, status } as unknown as Course);
+  },
+  async deleteCourse(id: string): Promise<{ ok: boolean }> {
+    if (!env.useMocks) return apiRequest<{ ok: boolean }>(`/admin/courses/${id}`, { method: "DELETE" });
+    return mockDelay({ ok: true });
+  },
 };
 
 /**
@@ -214,3 +262,4 @@ export const adminService = guardService(adminServiceRaw, "platform.manage", {
   eligibilityRules: "placement.students.view",
   auditLogs: "audit.view",
 });
+

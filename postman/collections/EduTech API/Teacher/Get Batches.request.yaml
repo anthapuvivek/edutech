@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Batches
+url: '{{baseUrl}}/api/teacher/batches'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

@@ -1,0 +1,15 @@
+$kind: http-request
+name: Update Drive Stage
+url: '{{baseUrl}}/api/placement/drives/{{id}}/stage'
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "stage": ""
+    }

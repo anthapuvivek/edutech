@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Live Class
+url: '{{baseUrl}}/api/teacher/live-classes/{{id}}'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

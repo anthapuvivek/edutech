@@ -69,7 +69,7 @@ function CareerProfilePage() {
           <div>
             <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Skills</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              {p.skills.map((s) => (
+              {(p.skills ?? []).map((s) => (
                 <Badge key={s} variant="outline">
                   {s}
                 </Badge>
@@ -78,8 +78,8 @@ function CareerProfilePage() {
           </div>
 
           <dl className="grid gap-4 sm:grid-cols-2">
-            <Field label="Preferred roles" value={p.preferredRoles.join(", ")} />
-            <Field label="Preferred locations" value={p.preferredLocations.join(", ")} />
+            <Field label="Preferred roles" value={(p.preferredRoles ?? []).join(", ")} />
+            <Field label="Preferred locations" value={(p.preferredLocations ?? []).join(", ")} />
             <Field label="Work mode" value={p.workMode} />
             <Field label="Experience" value={p.experienceLevel} />
             <Field label="Expected salary" value={p.expectedSalary ?? "Not specified"} />
@@ -119,7 +119,7 @@ function CareerProfilePage() {
             <p className="text-display text-3xl leading-none">{p.completionPercent}%</p>
             <Progress value={p.completionPercent} className="mt-3" />
             <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
-              {p.missingItems.map((item) => (
+              {(p.missingItems ?? []).map((item) => (
                 <li key={item}>• {item}</li>
               ))}
             </ul>
@@ -131,14 +131,14 @@ function CareerProfilePage() {
               <div className="space-y-4 text-sm">
                 <p className="text-muted-foreground">Target · {skills.data.targetRole}</p>
                 <div className="flex flex-wrap gap-2">
-                  {skills.data.strong.map((s) => (
+                  {(skills.data.strong ?? []).map((s) => (
                     <Badge key={s} variant="success">
                       {s}
                     </Badge>
                   ))}
                 </div>
                 <div className="space-y-2">
-                  {skills.data.needsImprovement.map((s) => (
+                  {(skills.data.needsImprovement ?? []).map((s) => (
                     <div key={s.skill}>
                       <div className="flex justify-between text-xs">
                         <span>{s.skill}</span>
@@ -149,7 +149,7 @@ function CareerProfilePage() {
                   ))}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {skills.data.missing.map((s) => (
+                  {(skills.data.missing ?? []).map((s) => (
                     <Badge key={s} variant="warning">
                       Missing · {s}
                     </Badge>

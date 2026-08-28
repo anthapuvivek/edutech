@@ -331,6 +331,14 @@ public class ClassRecordingService {
 
     @Transactional(readOnly = true)
     public RecordingProgressResponse getProgress(UUID recordingId, UUID studentId) {
+        ClassRecording recording = recordingRepository.findById(recordingId)
+                .orElseThrow(() -> new ResourceNotFoundException("ClassRecording", "id", recordingId));
+
+        boolean enrolled = enrollmentRepository.existsByStudentIdAndCourseId(studentId, recording.getCourse().getId());
+        if (!enrolled) {
+            throw new CourseAccessDeniedException("You must be enrolled in the course to view progress");
+        }
+
         return progressRepository.findByStudentIdAndRecordingId(studentId, recordingId)
                 .map(p -> RecordingProgressResponse.builder()
                         .watchedSeconds(p.getWatchedSeconds())
@@ -340,7 +348,7 @@ public class ClassRecordingService {
                         .build())
                 .orElse(RecordingProgressResponse.builder()
                         .watchedSeconds(0)
-                        .durationSeconds(0)
+                        .durationSeconds(recording.getDurationSeconds() != null ? recording.getDurationSeconds() : 0)
                         .completed(false)
                         .lastWatchedAt(Instant.now())
                         .build());

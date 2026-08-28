@@ -137,7 +137,7 @@ function JobPortalPage() {
               </p>
 
               <div className="flex flex-wrap gap-2">
-                {job.skills.map((s) => (
+                {(job.skills ?? []).map((s) => (
                   <Badge key={s} variant="outline">
                     {s}
                   </Badge>

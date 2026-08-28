@@ -87,29 +87,37 @@ function LeadProfile() {
         <div className="space-y-6 lg:col-span-2">
           <Panel title="Communication history">
             <ul className="space-y-3">
-              {data.communications.map((c) => (
-                <li key={c.id} className="rounded-md border border-border p-3">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span className="font-medium text-foreground">{c.channel}</span>
-                    <span>{new Date(c.at).toLocaleString()}</span>
-                  </div>
-                  <p className="mt-1 text-sm">{c.summary}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">by {c.by}</p>
-                </li>
-              ))}
+              {(data.communications ?? []).length > 0 ? (
+                (data.communications ?? []).map((c) => (
+                  <li key={c.id} className="rounded-md border border-border p-3">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">{c.channel}</span>
+                      <span>{new Date(c.at).toLocaleString()}</span>
+                    </div>
+                    <p className="mt-1 text-sm">{c.summary}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">by {c.by}</p>
+                  </li>
+                ))
+              ) : (
+                <li className="text-xs text-muted-foreground">No communication records.</li>
+              )}
             </ul>
           </Panel>
 
           <Panel title="Notes">
             <ul className="mb-4 space-y-2">
-              {data.notes.map((n) => (
-                <li key={n.id} className="rounded-md bg-muted/50 p-3 text-sm">
-                  {n.body}
-                  <span className="mt-1 block text-xs text-muted-foreground">
-                    {n.by} · {new Date(n.at).toLocaleDateString()}
-                  </span>
-                </li>
-              ))}
+              {(data.notes ?? []).length > 0 ? (
+                (data.notes ?? []).map((n) => (
+                  <li key={n.id} className="rounded-md bg-muted/50 p-3 text-sm">
+                    {n.body}
+                    <span className="mt-1 block text-xs text-muted-foreground">
+                      {n.by} · {new Date(n.at).toLocaleDateString()}
+                    </span>
+                  </li>
+                ))
+              ) : (
+                <li className="text-xs text-muted-foreground">No notes added.</li>
+              )}
             </ul>
             <Textarea
               rows={3}
@@ -132,22 +140,26 @@ function LeadProfile() {
 
           <Panel title="Follow-ups">
             <ul className="mb-4 space-y-2">
-              {data.followUps.map((f) => (
-                <li
-                  key={f.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3 text-sm"
-                >
-                  <div>
-                    <p className="font-medium">
-                      {f.date} · {f.time}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {f.notes} · next: {f.nextAction} · {f.assignedTo}
-                    </p>
-                  </div>
-                  <StatusBadge value={f.status} />
-                </li>
-              ))}
+              {(data.followUps ?? []).length > 0 ? (
+                (data.followUps ?? []).map((f) => (
+                  <li
+                    key={f.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3 text-sm"
+                  >
+                    <div>
+                      <p className="font-medium">
+                        {f.date} · {f.time}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {f.notes} · next: {f.nextAction} · {f.assignedTo}
+                      </p>
+                    </div>
+                    <StatusBadge value={f.status} />
+                  </li>
+                ))
+              ) : (
+                <li className="text-xs text-muted-foreground">No scheduled follow-ups.</li>
+              )}
             </ul>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
@@ -251,13 +263,13 @@ function LeadProfile() {
 
           <Panel title="Enquiry & payment history">
             <ul className="space-y-2 text-sm">
-              {data.enquiryHistory.map((e) => (
+              {(data.enquiryHistory ?? []).map((e) => (
                 <li key={e.id} className="rounded-md bg-muted/50 p-2 text-xs">
                   {e.subject} · {new Date(e.at).toLocaleDateString()}
                 </li>
               ))}
-              {data.paymentHistory.length ? (
-                data.paymentHistory.map((p) => (
+              {(data.paymentHistory ?? []).length > 0 ? (
+                (data.paymentHistory ?? []).map((p) => (
                   <li
                     key={p.id}
                     className="flex items-center justify-between rounded-md border border-border p-2 text-xs"

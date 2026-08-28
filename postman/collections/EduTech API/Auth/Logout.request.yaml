@@ -1,0 +1,4 @@
+$kind: http-request
+name: Logout
+url: '{{baseUrl}}/api/auth/logout'
+method: POST

@@ -53,6 +53,9 @@ class AdminBatchWorkflowIntegrationTest {
     private BatchRepository batchRepository;
 
     @Autowired
+    private com.learntrix.edtech.repository.LiveClassRepository liveClassRepository;
+
+    @Autowired
     private EnrollmentRepository enrollmentRepository;
 
     @Autowired
@@ -73,11 +76,12 @@ class AdminBatchWorkflowIntegrationTest {
     @BeforeEach
     void setUp() {
         // Clean state — order matters to avoid FK violations
+        liveClassRepository.deleteAll();
         batchRepository.deleteAll();
         enrollmentRepository.deleteAll();
         studentProfileRepository.deleteAll();
-        userRepository.deleteAll();
         courseRepository.deleteAll();
+        userRepository.deleteAll();
 
         Role adminRole = roleRepository.findByName("ADMIN").orElseGet(() -> {
             Role r = new Role();

@@ -1,0 +1,9 @@
+$kind: http-request
+name: Delete Live Class
+url: '{{baseUrl}}/api/teacher/live-classes/{{id}}'
+method: DELETE
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

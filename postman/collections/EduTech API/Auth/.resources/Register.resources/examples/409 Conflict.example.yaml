@@ -1,0 +1,24 @@
+$kind: http-example
+name: '409 Conflict'
+request:
+  body:
+    type: json
+    content: |-
+      {
+        "name": "Priya Patel",
+        "email": "existing@learntrix.com",
+        "password": "Secure@123"
+      }
+response:
+  statusCode: 409
+  statusText: Conflict
+  body:
+    type: json
+    content: |-
+      {
+        "success": false,
+        "error": {
+          "code": "CONFLICT",
+          "message": "An account with this email already exists"
+        }
+      }

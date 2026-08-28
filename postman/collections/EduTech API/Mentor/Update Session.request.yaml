@@ -1,0 +1,16 @@
+$kind: http-request
+name: Update Session
+url: '{{baseUrl}}/api/mentor/sessions/{{id}}'
+method: PATCH
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "status": "",
+      "notes": ""
+    }

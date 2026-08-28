@@ -1,0 +1,9 @@
+$kind: http-request
+name: List Mentor Assignments
+url: '{{baseUrl}}/api/admin/mentor-assignments'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

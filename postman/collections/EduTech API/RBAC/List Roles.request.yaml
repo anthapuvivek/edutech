@@ -1,0 +1,9 @@
+$kind: http-request
+name: List Roles
+url: '{{baseUrl}}/api/rbac/roles'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

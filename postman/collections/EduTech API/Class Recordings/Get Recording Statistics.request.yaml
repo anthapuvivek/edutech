@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Recording Statistics
+url: '{{baseUrl}}/api/recordings/{{id}}/statistics'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

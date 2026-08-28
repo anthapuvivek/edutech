@@ -1,0 +1,9 @@
+$kind: http-request
+name: Admin List Companies
+url: '{{baseUrl}}/api/admin/career/companies'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

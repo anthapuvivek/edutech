@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Referrals
+url: '{{baseUrl}}/api/career/referrals'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

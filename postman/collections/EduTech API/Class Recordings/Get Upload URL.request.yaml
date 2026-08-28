@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Upload URL
+url: '{{baseUrl}}/api/recordings/{{id}}/upload'
+method: POST
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

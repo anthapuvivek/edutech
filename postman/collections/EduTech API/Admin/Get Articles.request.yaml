@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Articles
+url: '{{baseUrl}}/api/admin/articles'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

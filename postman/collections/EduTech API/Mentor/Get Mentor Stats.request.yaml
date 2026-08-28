@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Mentor Stats
+url: '{{baseUrl}}/api/mentor/stats'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

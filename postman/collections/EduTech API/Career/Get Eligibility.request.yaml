@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Eligibility
+url: '{{baseUrl}}/api/career/eligibility'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

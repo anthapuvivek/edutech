@@ -31,8 +31,8 @@ function ResetPasswordPage() {
 
   return (
     <AuthShell
-      title="Set a new password"
-      description="Choose a strong password you haven't used before."
+      title="Set your password"
+      description="Choose a strong password to activate your account and start using Learntrix."
     >
       <form
         className="space-y-4"
@@ -42,11 +42,21 @@ function ResetPasswordPage() {
             toast.error("Passwords do not match.");
             return;
           }
+
+          const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+          const token = searchParams?.get("token") || "mock-token";
+
           setLoading(true);
-          await authService.resetPassword("mock-token", password);
-          setLoading(false);
-          toast.success("Password updated. Please log in.");
-          void navigate({ to: "/login" });
+          try {
+            await authService.resetPassword(token, password);
+            toast.success("Password created and account activated! Please log in.");
+            void navigate({ to: "/login" });
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : "Unable to set password. Link may be invalid or expired.";
+            toast.error(msg);
+          } finally {
+            setLoading(false);
+          }
         }}
       >
         <div className="space-y-2">

@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Activity
+url: '{{baseUrl}}/api/student/activity'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

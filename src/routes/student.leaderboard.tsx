@@ -101,7 +101,7 @@ function LeaderboardPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {board.data.map((row) => (
+              {(board.data ?? []).map((row) => (
                 <TableRow key={row.studentId} className={cn(row.isCurrentUser && "bg-accent/10")}>
                   <TableCell className="font-medium">#{row.rank}</TableCell>
                   <TableCell>

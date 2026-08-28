@@ -1,0 +1,17 @@
+$kind: http-request
+name: Update Live Class
+url: '{{baseUrl}}/api/teacher/live-classes/{{id}}'
+method: PUT
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "title": "",
+      "scheduledAt": "",
+      "duration": 60
+    }

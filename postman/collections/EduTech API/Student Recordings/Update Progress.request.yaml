@@ -1,0 +1,16 @@
+$kind: http-request
+name: Update Progress
+url: '{{baseUrl}}/api/student/recordings/{{id}}/progress'
+method: POST
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "progress": 0,
+      "watchedSeconds": 0
+    }

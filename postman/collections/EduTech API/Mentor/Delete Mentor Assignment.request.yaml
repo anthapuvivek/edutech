@@ -1,0 +1,9 @@
+$kind: http-request
+name: Delete Mentor Assignment
+url: '{{baseUrl}}/api/admin/mentor-assignments/{{id}}'
+method: DELETE
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

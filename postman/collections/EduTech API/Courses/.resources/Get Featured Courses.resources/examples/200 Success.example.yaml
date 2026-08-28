@@ -1,0 +1,107 @@
+$kind: http-example
+name: '200 Success'
+request: {}
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "data": [
+          {
+            "id": "crs-001",
+            "slug": "full-stack-java",
+            "title": "Full Stack Java Development",
+            "subtitle": "Master Java, Spring Boot, React and deploy production apps",
+            "category": "Full Stack Development",
+            "skills": ["Java", "Spring Boot", "React", "PostgreSQL", "Docker"],
+            "level": "Beginner",
+            "language": "English",
+            "durationHours": 120,
+            "lessonCount": 240,
+            "rating": 4.8,
+            "ratingCount": 1240,
+            "studentCount": 3200,
+            "price": 29999,
+            "originalPrice": 59999,
+            "currency": "INR",
+            "thumbnailUrl": "https://cdn.learntrix.com/courses/fullstack-java.jpg",
+            "instructor": {
+              "id": "ins-001",
+              "name": "Vikram Nair",
+              "title": "Senior Software Engineer",
+              "avatarUrl": "https://cdn.learntrix.com/instructors/vikram.jpg",
+              "bio": "10+ years at TCS and Wipro",
+              "rating": 4.9,
+              "students": 5000
+            },
+            "badges": ["Bestseller", "Job Guarantee"],
+            "updatedAt": "2024-03-01T00:00:00Z",
+            "modules": []
+          },
+          {
+            "id": "crs-002",
+            "slug": "data-science-python",
+            "title": "Data Science with Python",
+            "subtitle": "Master Python, Pandas, ML and build real-world data pipelines",
+            "category": "Data Science",
+            "skills": ["Python", "Pandas", "NumPy", "Scikit-learn", "TensorFlow"],
+            "level": "Intermediate",
+            "language": "English",
+            "durationHours": 100,
+            "lessonCount": 200,
+            "rating": 4.7,
+            "ratingCount": 980,
+            "studentCount": 2400,
+            "price": 24999,
+            "originalPrice": 49999,
+            "currency": "INR",
+            "thumbnailUrl": "https://cdn.learntrix.com/courses/data-science-python.jpg",
+            "instructor": {
+              "id": "ins-002",
+              "name": "Ananya Krishnan",
+              "title": "Data Scientist",
+              "avatarUrl": "https://cdn.learntrix.com/instructors/ananya.jpg",
+              "bio": "8+ years at Amazon and Flipkart",
+              "rating": 4.8,
+              "students": 3800
+            },
+            "badges": ["Top Rated"],
+            "updatedAt": "2024-02-15T00:00:00Z",
+            "modules": []
+          },
+          {
+            "id": "crs-003",
+            "slug": "devops-aws",
+            "title": "DevOps & AWS Cloud Engineering",
+            "subtitle": "Master CI/CD, Docker, Kubernetes and AWS cloud infrastructure",
+            "category": "DevOps & Cloud",
+            "skills": ["Docker", "Kubernetes", "AWS", "Jenkins", "Terraform"],
+            "level": "Advanced",
+            "language": "English",
+            "durationHours": 90,
+            "lessonCount": 180,
+            "rating": 4.9,
+            "ratingCount": 760,
+            "studentCount": 1800,
+            "price": 34999,
+            "originalPrice": 69999,
+            "currency": "INR",
+            "thumbnailUrl": "https://cdn.learntrix.com/courses/devops-aws.jpg",
+            "instructor": {
+              "id": "ins-003",
+              "name": "Rohan Mehta",
+              "title": "DevOps Architect",
+              "avatarUrl": "https://cdn.learntrix.com/instructors/rohan.jpg",
+              "bio": "12+ years at Microsoft and Accenture",
+              "rating": 4.9,
+              "students": 4200
+            },
+            "badges": ["New", "Job Guarantee"],
+            "updatedAt": "2024-03-05T00:00:00Z",
+            "modules": []
+          }
+        ]
+      }

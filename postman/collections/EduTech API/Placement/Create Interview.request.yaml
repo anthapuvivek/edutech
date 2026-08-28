@@ -1,0 +1,18 @@
+$kind: http-request
+name: Create Interview
+url: '{{baseUrl}}/api/placement/interviews'
+method: POST
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'
+body:
+  type: json
+  content: |-
+    {
+      "applicationId": "",
+      "scheduledAt": "",
+      "type": "",
+      "interviewerIds": []
+    }

@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Sessions
+url: '{{baseUrl}}/api/mentor/sessions'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

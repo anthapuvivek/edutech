@@ -66,6 +66,9 @@ public class Course extends AuditableEntity {
     @Column(nullable = false, length = 3)
     private String currency = "INR";
 
+    @Column(nullable = false, length = 20)
+    private String status = "PUBLISHED"; // DRAFT, PUBLISHED, ARCHIVED
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instructor_id")
     private User instructor;

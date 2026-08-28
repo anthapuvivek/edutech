@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Featured Courses
+url: '{{baseUrl}}/api/courses/featured'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

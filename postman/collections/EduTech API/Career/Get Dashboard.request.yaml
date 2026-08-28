@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Dashboard
+url: '{{baseUrl}}/api/career/dashboard'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

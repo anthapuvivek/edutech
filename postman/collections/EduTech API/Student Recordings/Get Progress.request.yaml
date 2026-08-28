@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get Progress
+url: '{{baseUrl}}/api/student/recordings/{{id}}/progress'
+method: GET
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{authToken}}'

@@ -10,9 +10,11 @@ import {
   Star,
   Users,
 } from "lucide-react";
+import { useState } from "react";
 
 import { EmptyState } from "@/components/common/EmptyState";
 import { EnquiryForm } from "@/components/courses/EnquiryForm";
+import { EnrollmentDialog } from "@/components/courses/EnrollmentDialog";
 import {
   Accordion,
   AccordionContent,
@@ -23,10 +25,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/useAuth";
 import { PublicLayout } from "@/layouts/PublicLayout";
 import { discountPercent, formatCompact, formatPrice } from "@/lib/format";
 import { courseService } from "@/services/course.service";
+import { studentService } from "@/services/student.service";
 import type { Course } from "@/types";
+
 
 export const Route = createFileRoute("/courses/$slug")({
   head: ({ params }) => {
@@ -50,7 +55,7 @@ export const Route = createFileRoute("/courses/$slug")({
 });
 
 function buildCurriculum(course: Course) {
-  return course.skills.map((skill, index) => ({
+  return (course.skills ?? []).map((skill, index) => ({
     title: `Module ${index + 1} · ${skill}`,
     lessons: [
       { title: `Introduction to ${skill}`, duration: "12:40", preview: index === 0 },
@@ -63,7 +68,15 @@ function buildCurriculum(course: Course) {
 
 function CourseDetailPage() {
   const { slug } = Route.useParams();
+  const { user, isAuthenticated } = useAuth();
+  const [enrollDialogOpen, setEnrollDialogOpen] = useState(false);
+
   const query = useQuery({ queryKey: ["course", slug], queryFn: () => courseService.bySlug(slug) });
+  const enrollmentsQuery = useQuery({
+    queryKey: ["student", "enrollments"],
+    queryFn: () => studentService.enrollments(),
+    enabled: isAuthenticated && user?.role === "student",
+  });
 
   if (query.isPending) {
     return (
@@ -100,9 +113,15 @@ function CourseDetailPage() {
   }
 
   const course = query.data;
+  const isAlreadyEnrolled = Boolean(
+    (enrollmentsQuery.data ?? []).some(
+      (e) => e.courseId === course.id || e.courseSlug === course.slug,
+    ),
+  );
   const curriculum = buildCurriculum(course);
   const discount = discountPercent(course.price, course.originalPrice);
   const outcomes = [
+
     `Build production-grade projects using ${course.skills[0]}`,
     "Apply engineering best practices used by senior teams",
     "Solve interview-level problems with confidence",
@@ -180,7 +199,7 @@ function CourseDetailPage() {
             <div className="mt-8 border-t border-border pt-6">
               <h3 className="text-sm font-semibold">Skills you'll gain</h3>
               <div className="mt-3 flex flex-wrap gap-2">
-                {course.skills.map((skill) => (
+                {(course.skills ?? []).map((skill) => (
                   <Badge key={skill} variant="outline">
                     {skill}
                   </Badge>
@@ -396,7 +415,21 @@ function CourseDetailPage() {
               ) : null}
             </div>
             <div className="mt-5 grid gap-2">
-              <Button size="lg">Enrol now</Button>
+              {isAlreadyEnrolled ? (
+                <Button
+                  size="lg"
+                  className="bg-success text-success-foreground hover:bg-success/90"
+                  asChild
+                >
+                  <Link to="/student/dashboard">
+                    Go to Student Dashboard
+                  </Link>
+                </Button>
+              ) : (
+                <Button size="lg" onClick={() => setEnrollDialogOpen(true)}>
+                  Enrol now
+                </Button>
+              )}
               <Button size="lg" variant="outline" asChild>
                 <a href="#enquire">Enquire</a>
               </Button>
@@ -422,6 +455,14 @@ function CourseDetailPage() {
           </div>
         </aside>
       </div>
+
+      <EnrollmentDialog
+        course={course}
+        open={enrollDialogOpen}
+        onOpenChange={setEnrollDialogOpen}
+        isAlreadyEnrolled={isAlreadyEnrolled}
+      />
     </PublicLayout>
   );
 }
+

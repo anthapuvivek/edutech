@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Download, Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -59,6 +59,7 @@ export const Route = createFileRoute("/admin/students/")({
 const ALL = "all";
 
 function AdminStudents() {
+  const queryClient = useQueryClient();
   const students = useQuery({
     queryKey: ["admin", "students"],
     queryFn: () => adminService.students(),
@@ -99,13 +100,44 @@ function AdminStudents() {
   async function handleCreate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
+    const getString = (key: string) => (form.get(key) as string | null)?.trim() || undefined;
+    const gradYearStr = form.get("graduationYear") as string | null;
+    const payload: Record<string, unknown> = {
+      fullName: getString("fullName"),
+      email: (form.get("email") as string | null)?.trim().toLowerCase(),
+      phone: getString("phone"),
+      dateOfBirth: getString("dateOfBirth"),
+      location: getString("location"),
+      education: getString("education"),
+      college: getString("college"),
+      graduationYear: gradYearStr && gradYearStr.trim() ? Number(gradYearStr) : undefined,
+      qualification: getString("qualification"),
+      skills: getString("skills"),
+      github: getString("github"),
+      linkedin: getString("linkedin"),
+      leetcode: getString("leetcode"),
+      hackerrank: getString("hackerrank"),
+      gender: getString("gender") || "unspecified",
+      accountStatus: getString("accountStatus") || "pending",
+    };
+
     setSaving(true);
     try {
-      await adminService.createStudent(Object.fromEntries(form.entries()));
-      toast.success("Student submitted for onboarding. The backend will issue the student ID.");
+      const res = await adminService.createStudent(payload);
+      toast.success(
+        res?.identifier
+          ? `Student ${res.identifier} onboarded! Welcome activation email sent.`
+          : "Student onboarded! Welcome activation email sent.",
+      );
       setOpen(false);
-    } catch {
-      toast.error("Could not create the student. Please try again.");
+      await queryClient.invalidateQueries({ queryKey: ["admin", "students"] });
+      void students.refetch();
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : "Could not create the student. Please check the form and try again.";
+      toast.error(message);
     } finally {
       setSaving(false);
     }
@@ -345,7 +377,21 @@ function AdminStudents() {
                     <TableCell>
                       <StatusBadge value={s.status} />
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="space-x-1 text-right">
+                      {s.status === "pending" ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() =>
+                            void adminService
+                              .resendStudentWelcomeEmail(s.id)
+                              .then(() => toast.success(`Activation email resent to ${s.email}`))
+                              .catch(() => toast.error("Could not resend email."))
+                          }
+                        >
+                          Resend Invite
+                        </Button>
+                      ) : null}
                       <Button size="sm" variant="outline" asChild>
                         <Link to="/admin/students/$studentId" params={{ studentId: s.id }}>
                           View
