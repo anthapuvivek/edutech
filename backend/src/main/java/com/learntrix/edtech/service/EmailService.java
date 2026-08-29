@@ -21,6 +21,9 @@ public class EmailService {
     @Value("${app.client-url:http://localhost:8080}")
     private String clientUrl;
 
+    @Value("${spring.mail.host:}")
+    private String mailHost;
+
     @Value("${spring.mail.username:no-reply@learntrix.com}")
     private String fromAddress;
 
@@ -67,33 +70,27 @@ public class EmailService {
                 user.getEmail(), roleName, identifier != null ? identifier : "N/A", activationUrl, activationUrl, activationUrl
         );
 
-        LOGGER.info("================================================================================");
-        LOGGER.info("DISPATCHING WELCOME ACTIVATION EMAIL");
-        LOGGER.info("To: {}", user.getEmail());
-        LOGGER.info("Role: {}", roleName);
-        LOGGER.info("Identifier: {}", identifier);
-        LOGGER.info("Activation URL: {}", activationUrl);
-        LOGGER.info("================================================================================");
+        LOGGER.info("Attempting to send activation email to {}", user.getEmail());
 
-        if (mailSender != null) {
-            try {
-                MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-                helper.setFrom(fromAddress, "LearntriX Platform");
-                helper.setTo(user.getEmail());
-                helper.setSubject(subject);
-                helper.setText(textContent, htmlContent);
-                mailSender.send(message);
-                LOGGER.info("Welcome email sent successfully via SMTP to {}", user.getEmail());
-                return true;
-            } catch (Exception e) {
-                LOGGER.warn("SMTP mail dispatch failed for {}: {}. Logged activation URL above for dev verification.",
-                        user.getEmail(), e.getMessage());
-                return true; // Gracefully handled
-            }
-        } else {
-            LOGGER.info("JavaMailSender not configured. Email logged to console for development.");
+        if (mailSender == null || mailHost == null || mailHost.trim().isEmpty()) {
+            LOGGER.warn("JavaMailSender / SMTP host is not configured (MAIL_HOST unset). Failed to send activation email to {}", user.getEmail());
+            return false;
+        }
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            String sender = (fromAddress != null && !fromAddress.trim().isEmpty()) ? fromAddress.trim() : "no-reply@learntrix.com";
+            helper.setFrom(sender, "LearntriX Platform");
+            helper.setTo(user.getEmail());
+            helper.setSubject(subject);
+            helper.setText(textContent, htmlContent);
+            mailSender.send(message);
+            LOGGER.info("Activation email sent successfully to {}", user.getEmail());
             return true;
+        } catch (Exception e) {
+            LOGGER.error("Failed to send activation email to {}: {}", user.getEmail(), e.getMessage());
+            return false;
         }
     }
 }

@@ -83,11 +83,21 @@ function AdminTeachers() {
     setSaving(true);
     try {
       const res = await adminService.createTeacher(payload);
-      toast.success(
-        res?.identifier
-          ? `Trainer ${res.identifier} onboarded! Welcome activation email sent.`
-          : "Trainer onboarded! Welcome activation email sent.",
-      );
+      if (res?.emailStatus === "FAILED") {
+        toast.warning(
+          res.message ||
+            (res?.identifier
+              ? `Trainer ${res.identifier} created, but activation email could not be sent.`
+              : "Trainer created, but activation email could not be sent."),
+        );
+      } else {
+        toast.success(
+          res?.message ||
+            (res?.identifier
+              ? `Trainer ${res.identifier} onboarded! Welcome activation email sent.`
+              : "Trainer onboarded! Welcome activation email sent."),
+        );
+      }
       setOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["admin", "trainers"] });
       void trainers.refetch();
@@ -224,7 +234,13 @@ function AdminTeachers() {
                         onClick={() =>
                           void adminService
                             .resendTeacherWelcomeEmail(t.id)
-                            .then(() => toast.success(`Activation email resent to ${t.email}`))
+                            .then((res) => {
+                              if (res?.emailStatus === "FAILED") {
+                                toast.warning(res.message || "Failed to send activation email.");
+                              } else {
+                                toast.success(res?.message || `Activation email resent to ${t.email}`);
+                              }
+                            })
                             .catch(() => toast.error("Could not resend email."))
                         }
                       >

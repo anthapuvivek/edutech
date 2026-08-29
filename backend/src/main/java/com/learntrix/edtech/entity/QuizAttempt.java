@@ -28,11 +28,17 @@ public class QuizAttempt {
 
     private Integer score;
 
+    @Column(name = "passed")
+    @Builder.Default
+    private Boolean passed = false;
+
     @Column(name = "started_at", nullable = false)
+    @Builder.Default
     private Instant startedAt = Instant.now();
 
     @Column(name = "submitted_at")
     private Instant submittedAt;
 
+    @Builder.Default
     private String status = "Completed";
 }

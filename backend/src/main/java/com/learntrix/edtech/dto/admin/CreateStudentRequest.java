@@ -36,6 +36,11 @@ public class CreateStudentRequest {
     private String hackerrank;
     private String accountStatus;
 
+    // Optional immediate allocation fields
+    private java.util.UUID courseId;
+    private java.util.UUID teacherId;
+    private java.util.UUID batchId;
+
     public String resolveName() {
         if (fullName != null && !fullName.trim().isEmpty()) {
             return fullName.trim();

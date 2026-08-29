@@ -76,13 +76,13 @@ const adminServiceRaw = {
     if (!env.useMocks) return apiRequest<AdminStudentDetail>(`/admin/students/${id}`);
     return mockDelay(mockAdminStudentDetail(id));
   },
-  async createStudent(payload: Record<string, unknown>): Promise<{ ok: boolean; id?: string; email?: string; identifier?: string }> {
+  async createStudent(payload: Record<string, unknown>): Promise<{ ok: boolean; id?: string; email?: string; identifier?: string; emailStatus?: string; message?: string }> {
     if (!env.useMocks) return apiRequest("/admin/students", { method: "POST", body: payload });
-    return mockDelay({ ok: true, identifier: "LTX-2026-9999" });
+    return mockDelay({ ok: true, identifier: "LTX-2026-9999", emailStatus: "SENT", message: "Student onboarded successfully. Activation email sent." });
   },
-  async resendStudentWelcomeEmail(id: string): Promise<{ ok: boolean; message?: string }> {
+  async resendStudentWelcomeEmail(id: string): Promise<{ ok: boolean; emailStatus?: string; message?: string }> {
     if (!env.useMocks) return apiRequest(`/admin/students/${id}/resend-welcome-email`, { method: "POST" });
-    return mockDelay({ ok: true, message: "Welcome email resent successfully." });
+    return mockDelay({ ok: true, emailStatus: "SENT", message: "Welcome email resent successfully." });
   },
   async setStudentStatus(
     id: string,
@@ -99,6 +99,34 @@ const adminServiceRaw = {
   async createEnrollment(payload: Record<string, unknown>): Promise<{ ok: true }> {
     if (!env.useMocks) return apiRequest("/admin/enrollments", { method: "POST", body: payload });
     return mockDelay({ ok: true } as const);
+  },
+  async getStudentAllocations(studentId: string): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>(`/admin/students/${studentId}/allocations`);
+    return mockDelay([]);
+  },
+  async allocateStudent(payload: {
+    studentId: string;
+    courseId: string;
+    teacherId?: string | undefined;
+    batchId?: string | undefined;
+    status?: string | undefined;
+  }): Promise<any> {
+    if (!env.useMocks) return apiRequest("/admin/allocations", { method: "POST", body: payload });
+    return mockDelay({ id: `alloc-${Date.now()}`, ...payload });
+  },
+  async reassignAllocation(id: string, payload: {
+    studentId: string;
+    courseId: string;
+    teacherId?: string | undefined;
+    batchId?: string | undefined;
+    status?: string | undefined;
+  }): Promise<any> {
+    if (!env.useMocks) return apiRequest(`/admin/allocations/${id}`, { method: "PUT", body: payload });
+    return mockDelay({ id, ...payload });
+  },
+  async removeAllocation(id: string): Promise<{ ok: boolean }> {
+    if (!env.useMocks) return apiRequest<{ ok: boolean }>(`/admin/allocations/${id}`, { method: "DELETE" });
+    return mockDelay({ ok: true });
   },
   async overrideEligibility(id: string, payload: Record<string, unknown>): Promise<{ ok: true }> {
     if (!env.useMocks)
@@ -119,13 +147,13 @@ const adminServiceRaw = {
     if (!env.useMocks) return apiRequest<AdminTrainer[]>("/admin/trainers");
     return mockDelay(mockTrainers);
   },
-  async createTeacher(payload: Record<string, unknown>): Promise<{ ok: boolean; id?: string; email?: string; identifier?: string }> {
+  async createTeacher(payload: Record<string, unknown>): Promise<{ ok: boolean; id?: string; email?: string; identifier?: string; emailStatus?: string; message?: string }> {
     if (!env.useMocks) return apiRequest("/admin/teachers", { method: "POST", body: payload });
-    return mockDelay({ ok: true, identifier: "LTX-T-2026-9999" });
+    return mockDelay({ ok: true, identifier: "LTX-T-2026-9999", emailStatus: "SENT", message: "Teacher onboarded successfully. Activation email sent." });
   },
-  async resendTeacherWelcomeEmail(id: string): Promise<{ ok: boolean; message?: string }> {
+  async resendTeacherWelcomeEmail(id: string): Promise<{ ok: boolean; emailStatus?: string; message?: string }> {
     if (!env.useMocks) return apiRequest(`/admin/teachers/${id}/resend-welcome-email`, { method: "POST" });
-    return mockDelay({ ok: true, message: "Welcome email resent successfully." });
+    return mockDelay({ ok: true, emailStatus: "SENT", message: "Welcome email resent successfully." });
   },
   async approveTrainer(id: string, approve: boolean): Promise<{ ok: true }> {
     if (!env.useMocks)

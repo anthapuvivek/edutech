@@ -169,5 +169,70 @@ export const teacherService = {
   async togglePublish(id: string, published: boolean): Promise<PlatformEvent> {
     return this.updateLiveClass(id, { published });
   },
+
+  async courses(): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>("/teacher/courses");
+    return mockDelay([]);
+  },
+
+  async batches(): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>("/teacher/batches");
+    return mockDelay([]);
+  },
+
+  async assignments(): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>("/teacher/assignments");
+    return mockDelay([]);
+  },
+
+  async createAssignment(payload: Record<string, unknown>): Promise<any> {
+    if (!env.useMocks) return apiRequest("/teacher/assignments", { method: "POST", body: payload });
+    return mockDelay({ id: `asg-${Date.now()}`, ...payload });
+  },
+
+  async assignmentSubmissions(assignmentId: string): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>(`/teacher/assignments/${assignmentId}/submissions`);
+    return mockDelay([]);
+  },
+
+  async gradeSubmission(assignmentId: string, submissionId: string, payload: Record<string, unknown>): Promise<any> {
+    if (!env.useMocks) return apiRequest(`/teacher/assignments/${assignmentId}/submissions/${submissionId}/grade`, { method: "POST", body: payload });
+    return mockDelay({ id: submissionId, ...payload });
+  },
+
+  async quizzes(): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>("/teacher/quizzes");
+    return mockDelay([]);
+  },
+
+  async createQuiz(payload: Record<string, unknown>): Promise<any> {
+    if (!env.useMocks) return apiRequest("/teacher/quizzes", { method: "POST", body: payload });
+    return mockDelay({ id: `qz-${Date.now()}`, ...payload });
+  },
+
+  async materials(): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>("/teacher/materials");
+    return mockDelay([]);
+  },
+
+  async createMaterial(payload: Record<string, unknown>): Promise<any> {
+    if (!env.useMocks) return apiRequest("/teacher/materials", { method: "POST", body: payload });
+    return mockDelay({ id: `mat-${Date.now()}`, ...payload });
+  },
+
+  async deleteMaterial(id: string): Promise<void> {
+    if (!env.useMocks) return apiRequest(`/teacher/materials/${id}`, { method: "DELETE" });
+    return mockDelay(undefined);
+  },
+
+  async announcements(): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>("/teacher/announcements");
+    return mockDelay([]);
+  },
+
+  async createAnnouncement(payload: Record<string, unknown>): Promise<any> {
+    if (!env.useMocks) return apiRequest("/teacher/announcements", { method: "POST", body: payload });
+    return mockDelay({ id: `ann-${Date.now()}`, ...payload });
+  },
 };
 

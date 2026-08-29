@@ -37,5 +37,8 @@ public class AssignmentSubmission {
     @Column(columnDefinition = "TEXT")
     private String feedback;
 
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
     private String status = "Submitted";
 }

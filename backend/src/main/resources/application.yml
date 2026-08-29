@@ -2,6 +2,11 @@ server:
   port: 8081
 
 spring:
+  config:
+    import:
+      - "optional:file:.env[.properties]"
+      - "optional:file:../.env[.properties]"
+      - "optional:file:backend/.env[.properties]"
   profiles:
     active: dev
   application:
@@ -29,6 +34,21 @@ spring:
       write-dates-as-timestamps: false
     deserialization:
       fail-on-unknown-properties: false
+  mail:
+    host: ${MAIL_HOST:${SPRING_MAIL_HOST:}}
+    port: ${MAIL_PORT:${SPRING_MAIL_PORT:587}}
+    username: ${MAIL_USERNAME:${SPRING_MAIL_USERNAME:}}
+    password: ${MAIL_PASSWORD:${SPRING_MAIL_PASSWORD:}}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:true}}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:true}}
+            required: ${MAIL_SMTP_STARTTLS_REQUIRED:${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_REQUIRED:false}}
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
 springdoc:
   api-docs:
@@ -46,6 +66,7 @@ management:
       show-details: when-authorized
 
 app:
+  client-url: ${APP_CLIENT_URL:http://localhost:8080}
   jwt:
     secret: ${JWT_SECRET:learntrix-secret-key-32chars-dev-only}
     access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}

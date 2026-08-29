@@ -1,18 +1,19 @@
 package com.learntrix.edtech.entity;
 
+import com.learntrix.edtech.common.audit.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.Instant;
+
 import java.util.UUID;
 
 @Entity
-@Table(name = "assignments")
+@Table(name = "course_materials")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Assignment {
+public class CourseMaterial extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,7 +24,7 @@ public class Assignment {
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teacher_id")
+    @JoinColumn(name = "teacher_id", nullable = false)
     private User teacher;
 
     @Column(nullable = false)
@@ -32,20 +33,13 @@ public class Assignment {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "due_date")
-    private Instant dueDate;
+    @Column(name = "file_url", nullable = false, length = 1024)
+    private String fileUrl;
 
-    private Integer points = 100;
+    @Column(name = "file_type", length = 100)
+    private String fileType;
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "file_size_bytes", nullable = false)
     @Builder.Default
-    private String status = "PUBLISHED";
-
-    @Column(name = "created_at", nullable = false)
-    @Builder.Default
-    private Instant createdAt = Instant.now();
-
-    @Column(name = "updated_at", nullable = false)
-    @Builder.Default
-    private Instant updatedAt = Instant.now();
+    private Long fileSizeBytes = 0L;
 }

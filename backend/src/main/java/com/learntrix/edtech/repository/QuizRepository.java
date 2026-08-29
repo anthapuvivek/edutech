@@ -9,4 +9,6 @@ import java.util.UUID;
 @Repository
 public interface QuizRepository extends JpaRepository<Quiz, UUID> {
     List<Quiz> findByCourseId(UUID courseId);
+    List<Quiz> findByCourseIdIn(List<UUID> courseIds);
+    List<Quiz> findByTeacherId(UUID teacherId);
 }

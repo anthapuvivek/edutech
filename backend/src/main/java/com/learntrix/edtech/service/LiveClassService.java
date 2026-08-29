@@ -32,18 +32,21 @@ public class LiveClassService {
     private final CourseRepository courseRepository;
     private final BatchRepository batchRepository;
     private final UserRepository userRepository;
+    private final CourseAccessService courseAccessService;
 
     public LiveClassService(
             LiveClassRepository liveClassRepository,
             EnrollmentRepository enrollmentRepository,
             CourseRepository courseRepository,
             BatchRepository batchRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            CourseAccessService courseAccessService) {
         this.liveClassRepository = liveClassRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.courseRepository = courseRepository;
         this.batchRepository = batchRepository;
         this.userRepository = userRepository;
+        this.courseAccessService = courseAccessService;
     }
 
     @Transactional(readOnly = true)
@@ -79,22 +82,26 @@ public class LiveClassService {
             liveClass.setTitle((String) body.get("title"));
         }
 
-        if (body.containsKey("courseId")) {
+        if (body.containsKey("courseId") && body.get("courseId") != null && !body.get("courseId").toString().isBlank()) {
             UUID courseId = UUID.fromString((String) body.get("courseId"));
+            courseAccessService.verifyTeacherCanManageCourse(teacherId, courseId);
             Course course = courseRepository.findById(courseId)
                     .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
             liveClass.setCourse(course);
         }
 
-        if (body.containsKey("batchId")) {
+        if (body.containsKey("batchId") && body.get("batchId") != null && !body.get("batchId").toString().isBlank()) {
             UUID batchId = UUID.fromString((String) body.get("batchId"));
             Batch batch = batchRepository.findById(batchId)
                     .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", batchId));
             if (batch.getTeacher() == null || !batch.getTeacher().getId().equals(teacherId)) {
-                throw new ResourceNotFoundException("Batch", "teacher", teacherId);
+                throw new com.learntrix.edtech.common.exception.CourseAccessDeniedException("You are not authorized to schedule classes for this batch");
             }
             liveClass.setBatch(batch);
             liveClass.setTeacher(batch.getTeacher());
+            if (liveClass.getCourse() == null) {
+                liveClass.setCourse(batch.getCourse());
+            }
         }
 
         User teacher = userRepository.findById(teacherId)
@@ -177,6 +184,18 @@ public class LiveClassService {
     public LiveClassResponse getLiveClassById(UUID id, UUID teacherId) {
         LiveClass lc = liveClassRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LiveClass", "id", id));
+        return mapToResponse(lc);
+    }
+
+    @Transactional(readOnly = true)
+    public LiveClassResponse getStudentLiveClassById(UUID id, UUID studentId) {
+        LiveClass lc = liveClassRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("LiveClass", "id", id));
+
+        if (lc.getCourse() != null) {
+            courseAccessService.verifyStudentCanAccessCourse(studentId, lc.getCourse().getId());
+        }
+
         return mapToResponse(lc);
     }
 

@@ -1,18 +1,19 @@
 package com.learntrix.edtech.entity;
 
+import com.learntrix.edtech.common.audit.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.Instant;
+
 import java.util.UUID;
 
 @Entity
-@Table(name = "assignments")
+@Table(name = "course_announcements")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Assignment {
+public class CourseAnnouncement extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,29 +24,16 @@ public class Assignment {
     private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "teacher_id")
+    @JoinColumn(name = "teacher_id", nullable = false)
     private User teacher;
 
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
-    @Column(name = "due_date")
-    private Instant dueDate;
-
-    private Integer points = 100;
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String content;
 
     @Column(nullable = false, length = 50)
     @Builder.Default
-    private String status = "PUBLISHED";
-
-    @Column(name = "created_at", nullable = false)
-    @Builder.Default
-    private Instant createdAt = Instant.now();
-
-    @Column(name = "updated_at", nullable = false)
-    @Builder.Default
-    private Instant updatedAt = Instant.now();
+    private String priority = "NORMAL"; // LOW, NORMAL, HIGH, URGENT
 }

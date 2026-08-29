@@ -35,6 +35,15 @@ public class LiveClassController {
         return ApiResponse.success(liveClasses);
     }
 
+    @Transactional(readOnly = true)
+    @GetMapping("/student/live-classes/{id}")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<LiveClassResponse> getStudentLiveClassById(@PathVariable UUID id) {
+        UUID studentId = SecurityUtil.getCurrentUserId();
+        LiveClassResponse liveClass = liveClassService.getStudentLiveClassById(id, studentId);
+        return ApiResponse.success(liveClass);
+    }
+
     @PostMapping("/teacher/live-classes")
     @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<LiveClassResponse> createLiveClass(@RequestBody Map<String, Object> body) {

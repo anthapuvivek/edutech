@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Plus, ShieldAlert, Trash2, UserCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -17,6 +17,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,11 +73,30 @@ const statusActions: StudentAccountStatus[] = ["active", "inactive", "suspended"
 
 function StudentDetail() {
   const { studentId } = Route.useParams();
+  const queryClient = useQueryClient();
   const student = useQuery({
     queryKey: ["admin", "student", studentId],
     queryFn: () => adminService.student(studentId),
   });
+  const coursesQuery = useQuery({
+    queryKey: ["admin", "courses"],
+    queryFn: () => adminService.courses(),
+  });
+  const trainersQuery = useQuery({
+    queryKey: ["admin", "trainers"],
+    queryFn: () => adminService.trainers(),
+  });
+  const batchesQuery = useQuery({
+    queryKey: ["admin", "batches"],
+    queryFn: () => adminService.batches(),
+  });
+
   const [reason, setReason] = useState("");
+  const [allocOpen, setAllocOpen] = useState(false);
+  const [allocSaving, setAllocSaving] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedTrainer, setSelectedTrainer] = useState("");
+  const [selectedBatch, setSelectedBatch] = useState("");
 
   if (student.isPending) return <Skeleton className="h-[70vh] w-full" />;
   if (student.isError || !student.data)
@@ -98,6 +126,47 @@ function StudentDetail() {
     }
   }
 
+  async function handleAllocate(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!selectedCourse) {
+      toast.error("Please select a course.");
+      return;
+    }
+
+    setAllocSaving(true);
+    try {
+      await adminService.allocateStudent({
+        studentId,
+        courseId: selectedCourse,
+        teacherId: selectedTrainer || undefined,
+        batchId: selectedBatch || undefined,
+        status: "ACTIVE",
+      });
+      toast.success("Student successfully allocated to course & teacher!");
+      setAllocOpen(false);
+      setSelectedCourse("");
+      setSelectedTrainer("");
+      setSelectedBatch("");
+      await queryClient.invalidateQueries({ queryKey: ["admin", "student", studentId] });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "students"] });
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to allocate student.");
+    } finally {
+      setAllocSaving(false);
+    }
+  }
+
+  async function handleRemoveAllocation(allocId: string) {
+    try {
+      await adminService.removeAllocation(allocId);
+      toast.success("Allocation removed successfully. Access revoked.");
+      await queryClient.invalidateQueries({ queryKey: ["admin", "student", studentId] });
+      await queryClient.invalidateQueries({ queryKey: ["admin", "students"] });
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to remove allocation.");
+    }
+  }
+
   return (
     <>
       <Button variant="ghost" size="sm" className="mb-3" asChild>
@@ -117,7 +186,13 @@ function StudentDetail() {
               onClick={() =>
                 void adminService
                   .resendStudentWelcomeEmail(studentId)
-                  .then(() => toast.success("Welcome activation email resent successfully."))
+                  .then((res) => {
+                    if (res?.emailStatus === "FAILED") {
+                      toast.warning(res.message || "Failed to send activation email.");
+                    } else {
+                      toast.success(res?.message || "Welcome activation email resent successfully.");
+                    }
+                  })
                   .catch(() => toast.error("Could not resend email."))
               }
             >
@@ -302,17 +377,81 @@ function StudentDetail() {
 
         <TabsContent value="enrollment">
           <Panel
-            title="Enrollments"
-            description="Course, batch, trainer, dates, payment and career eligibility are all admin-controlled."
+            title="Enrollments & Teacher Allocations"
+            description="Admin-controlled student-teacher-course associations. Access to live classes, assignments, and content is derived from these allocations."
             action={
-              <Button
-                size="sm"
-                onClick={() =>
-                  toast.info("Enrollment creation posts to the backend enrollment service.")
-                }
-              >
-                Create enrollment
-              </Button>
+              <Dialog open={allocOpen} onOpenChange={setAllocOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm">
+                    <UserCheck className="mr-1.5 size-4" aria-hidden /> Allocate Course & Teacher
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Allocate Student to Course & Teacher</DialogTitle>
+                    <DialogDescription>
+                      Associate {s.name} with a Course and Teacher. Content and class access will be granted immediately.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form id="alloc-form" onSubmit={handleAllocate} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="alloc-course">Course *</Label>
+                      <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+                        <SelectTrigger id="alloc-course">
+                          <SelectValue placeholder="Select Course" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(coursesQuery.data ?? []).map((c: any) => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {c.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="alloc-trainer">Assigned Teacher / Trainer</Label>
+                      <Select value={selectedTrainer} onValueChange={setSelectedTrainer}>
+                        <SelectTrigger id="alloc-trainer">
+                          <SelectValue placeholder="Select Teacher (Optional)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(trainersQuery.data ?? []).map((t: any) => (
+                            <SelectItem key={t.id} value={t.id}>
+                              {t.name} ({t.email})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="alloc-batch">Batch</Label>
+                      <Select value={selectedBatch} onValueChange={setSelectedBatch}>
+                        <SelectTrigger id="alloc-batch">
+                          <SelectValue placeholder="Select Batch (Optional)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(batchesQuery.data ?? []).map((b: any) => (
+                            <SelectItem key={b.id} value={b.id}>
+                              {b.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </form>
+                  <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => setAllocOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" form="alloc-form" disabled={allocSaving}>
+                      {allocSaving ? "Allocating…" : "Allocate"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             }
           >
             <Table>
@@ -324,35 +463,47 @@ function StudentDetail() {
                   <TableHead>Course status</TableHead>
                   <TableHead>Payment</TableHead>
                   <TableHead>Career eligible</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {enrollments.length > 0 ? (
                   enrollments.map((e) => (
                     <TableRow key={e.id}>
-                      <TableCell>{e.courseTitle}</TableCell>
+                      <TableCell className="font-medium">{e.courseTitle}</TableCell>
                       <TableCell className="text-sm">
-                        {e.batchName}
-                        <div className="text-xs text-muted-foreground">{e.trainerName}</div>
+                        {e.batchName || "Direct Allocation"}
+                        <div className="text-xs text-muted-foreground">{e.trainerName || "Assigned Trainer"}</div>
                       </TableCell>
                       <TableCell className="text-sm">
-                        {e.startDate} → {e.endDate}
+                        {e.startDate || "N/A"} → {e.endDate || "Ongoing"}
                       </TableCell>
                       <TableCell>
-                        <StatusBadge value={e.courseStatus} />
+                        <StatusBadge value={e.courseStatus || "active"} />
                       </TableCell>
                       <TableCell>
-                        <StatusBadge value={e.paymentStatus} />
+                        <StatusBadge value={e.paymentStatus || "paid"} />
                       </TableCell>
                       <TableCell>
                         <StatusBadge value={e.careerEligible ? "eligible" : "not_eligible"} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 text-destructive hover:bg-destructive/10"
+                          onClick={() => handleRemoveAllocation(e.id)}
+                          title="Remove Allocation"
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="py-4 text-center text-xs text-muted-foreground">
-                      No enrollments found.
+                    <TableCell colSpan={7} className="py-4 text-center text-xs text-muted-foreground">
+                      No enrollments found. Allocate this student to a course and teacher above.
                     </TableCell>
                   </TableRow>
                 )}

@@ -540,8 +540,49 @@ public class AdminController {
         }).toList());
     }
 
+    @PostMapping("/allocations")
+    public ApiResponse<com.learntrix.edtech.dto.admin.StudentAllocationResponse> allocateStudent(
+            @jakarta.validation.Valid @RequestBody com.learntrix.edtech.dto.admin.AllocateStudentRequest request) {
+        return ApiResponse.success(adminOnboardingService.allocateStudent(request));
+    }
+
+    @GetMapping("/students/{id}/allocations")
+    public ApiResponse<List<com.learntrix.edtech.dto.admin.StudentAllocationResponse>> getStudentAllocations(
+            @PathVariable("id") UUID id) {
+        return ApiResponse.success(adminOnboardingService.getStudentAllocations(id));
+    }
+
+    @PutMapping({"/allocations/{id}", "/students/{studentId}/allocations/{id}", "/students/{id}/reassign"})
+    public ApiResponse<com.learntrix.edtech.dto.admin.StudentAllocationResponse> reassignAllocation(
+            @PathVariable("id") UUID id,
+            @RequestBody com.learntrix.edtech.dto.admin.AllocateStudentRequest request) {
+        return ApiResponse.success(adminOnboardingService.reassignAllocation(id, request));
+    }
+
+    @DeleteMapping({"/allocations/{id}", "/students/{studentId}/allocations/{id}"})
+    public ApiResponse<Map<String, Object>> removeAllocation(@PathVariable("id") UUID id) {
+        adminOnboardingService.removeAllocation(id);
+        return ApiResponse.success(Map.of("ok", true, "message", "Student allocation removed successfully"));
+    }
+
     @PostMapping("/enrollments")
     public ApiResponse<Map<String, Object>> createEnrollment(@RequestBody Map<String, Object> body) {
+        if (body.containsKey("studentId") && body.containsKey("courseId")) {
+            UUID studentId = UUID.fromString(String.valueOf(body.get("studentId")));
+            UUID courseId = UUID.fromString(String.valueOf(body.get("courseId")));
+            UUID teacherId = body.get("teacherId") != null ? UUID.fromString(String.valueOf(body.get("teacherId"))) : null;
+            UUID batchId = body.get("batchId") != null ? UUID.fromString(String.valueOf(body.get("batchId"))) : null;
+            String status = body.getOrDefault("status", "ACTIVE").toString();
+
+            com.learntrix.edtech.dto.admin.AllocateStudentRequest req = com.learntrix.edtech.dto.admin.AllocateStudentRequest.builder()
+                    .studentId(studentId)
+                    .courseId(courseId)
+                    .teacherId(teacherId)
+                    .batchId(batchId)
+                    .status(status)
+                    .build();
+            adminOnboardingService.allocateStudent(req);
+        }
         return ApiResponse.success(Map.of("ok", true));
     }
 
@@ -616,19 +657,39 @@ public class AdminController {
         List<Enrollment> enrollments = enrollmentRepository.findByStudentId(student.getId());
 
         String courseTitle = "Unenrolled";
+        String trainerName = "Not Assigned";
+        String batchName = "Not Assigned";
+
         if (!enrollments.isEmpty()) {
-            courseTitle = enrollments.get(0).getCourse().getTitle();
+            Enrollment first = enrollments.get(0);
+            courseTitle = first.getCourse().getTitle();
+            if (first.getTeacher() != null) {
+                trainerName = first.getTeacher().getName();
+            } else if (first.getCourse().getInstructor() != null) {
+                trainerName = first.getCourse().getInstructor().getName();
+            }
+            if (first.getBatch() != null) {
+                batchName = first.getBatch().getName();
+                if ("Not Assigned".equals(trainerName) && first.getBatch().getTeacher() != null) {
+                    trainerName = first.getBatch().getTeacher().getName();
+                }
+            }
         }
 
-        // Determine batch name from batch_students
-        String batchName = "Not Assigned";
-        String trainerName = "N/A";
-        List<Batch> allBatches = batchRepository.findAll();
-        for (Batch batch : allBatches) {
-            if (batch.getStudents().stream().anyMatch(s -> s.getId().equals(student.getId()))) {
-                batchName = batch.getName();
-                trainerName = batch.getTeacher().getName();
-                break;
+        // Also check batchRepository if not assigned via enrollment
+        if ("Not Assigned".equals(batchName)) {
+            List<Batch> allBatches = batchRepository.findAll();
+            for (Batch batch : allBatches) {
+                if (batch.getStudents().stream().anyMatch(s -> s.getId().equals(student.getId()))) {
+                    batchName = batch.getName();
+                    if ("Not Assigned".equals(trainerName) && batch.getTeacher() != null) {
+                        trainerName = batch.getTeacher().getName();
+                    }
+                    if ("Unenrolled".equals(courseTitle) && batch.getCourse() != null) {
+                        courseTitle = batch.getCourse().getTitle();
+                    }
+                    break;
+                }
             }
         }
 

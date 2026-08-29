@@ -64,6 +64,19 @@ function AdminStudents() {
     queryKey: ["admin", "students"],
     queryFn: () => adminService.students(),
   });
+  const coursesQuery = useQuery({
+    queryKey: ["admin", "courses"],
+    queryFn: () => adminService.courses(),
+  });
+  const trainersQuery = useQuery({
+    queryKey: ["admin", "trainers"],
+    queryFn: () => adminService.trainers(),
+  });
+  const batchesQuery = useQuery({
+    queryKey: ["admin", "batches"],
+    queryFn: () => adminService.batches(),
+  });
+
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState(ALL);
   const [career, setCareer] = useState(ALL);
@@ -71,6 +84,10 @@ function AdminStudents() {
   const [attendance, setAttendance] = useState(ALL);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const [selectedCourse, setSelectedCourse] = useState<string>("none");
+  const [selectedTrainer, setSelectedTrainer] = useState<string>("none");
+  const [selectedBatch, setSelectedBatch] = useState<string>("none");
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -119,17 +136,33 @@ function AdminStudents() {
       hackerrank: getString("hackerrank"),
       gender: getString("gender") || "unspecified",
       accountStatus: getString("accountStatus") || "pending",
+      courseId: selectedCourse && selectedCourse !== "none" ? selectedCourse : undefined,
+      teacherId: selectedTrainer && selectedTrainer !== "none" ? selectedTrainer : undefined,
+      batchId: selectedBatch && selectedBatch !== "none" ? selectedBatch : undefined,
     };
 
     setSaving(true);
     try {
       const res = await adminService.createStudent(payload);
-      toast.success(
-        res?.identifier
-          ? `Student ${res.identifier} onboarded! Welcome activation email sent.`
-          : "Student onboarded! Welcome activation email sent.",
-      );
+      if (res?.emailStatus === "FAILED") {
+        toast.warning(
+          res.message ||
+            (res?.identifier
+              ? `Student ${res.identifier} created, but activation email could not be sent.`
+              : "Student created, but activation email could not be sent."),
+        );
+      } else {
+        toast.success(
+          res?.message ||
+            (res?.identifier
+              ? `Student ${res.identifier} onboarded! Welcome activation email sent.`
+              : "Student onboarded! Welcome activation email sent."),
+        );
+      }
       setOpen(false);
+      setSelectedCourse("none");
+      setSelectedTrainer("none");
+      setSelectedBatch("none");
       await queryClient.invalidateQueries({ queryKey: ["admin", "students"] });
       void students.refetch();
     } catch (err: unknown) {
@@ -232,6 +265,64 @@ function AdminStudents() {
                       </SelectContent>
                     </Select>
                   </div>
+
+                  <div className="space-y-1.5 sm:col-span-2 pt-2 border-t">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Optional Teacher & Course Allocation
+                    </p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="alloc-course">Initial Course</Label>
+                    <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+                      <SelectTrigger id="alloc-course">
+                        <SelectValue placeholder="Select Course (Optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None (Allocate Later)</SelectItem>
+                        {(coursesQuery.data ?? []).map((c: any) => (
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label htmlFor="alloc-trainer">Assigned Teacher</Label>
+                    <Select value={selectedTrainer} onValueChange={setSelectedTrainer}>
+                      <SelectTrigger id="alloc-trainer">
+                        <SelectValue placeholder="Select Teacher (Optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {(trainersQuery.data ?? []).map((t: any) => (
+                          <SelectItem key={t.id} value={t.id}>
+                            {t.name} ({t.email})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <Label htmlFor="alloc-batch">Batch</Label>
+                    <Select value={selectedBatch} onValueChange={setSelectedBatch}>
+                      <SelectTrigger id="alloc-batch">
+                        <SelectValue placeholder="Select Batch (Optional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">None</SelectItem>
+                        {(batchesQuery.data ?? []).map((b: any) => (
+                          <SelectItem key={b.id} value={b.id}>
+                            {b.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="space-y-1.5 sm:col-span-2">
                     <Label htmlFor="profilePhoto">Profile photo</Label>
                     <Input id="profilePhoto" name="profilePhoto" type="file" accept="image/*" />
@@ -385,7 +476,13 @@ function AdminStudents() {
                           onClick={() =>
                             void adminService
                               .resendStudentWelcomeEmail(s.id)
-                              .then(() => toast.success(`Activation email resent to ${s.email}`))
+                              .then((res) => {
+                                if (res?.emailStatus === "FAILED") {
+                                  toast.warning(res.message || "Failed to send activation email.");
+                                } else {
+                                  toast.success(res?.message || `Activation email resent to ${s.email}`);
+                                }
+                              })
                               .catch(() => toast.error("Could not resend email."))
                           }
                         >

@@ -49,6 +49,7 @@ public class TeacherController {
     private final UserRepository userRepository;
     private final StudentProfileRepository studentProfileRepository;
     private final BatchRepository batchRepository;
+    private final com.learntrix.edtech.service.CourseAccessService courseAccessService;
 
     public TeacherController(
             CourseRepository courseRepository,
@@ -58,7 +59,8 @@ public class TeacherController {
             RecordingWatchProgressRepository progressRepository,
             UserRepository userRepository,
             StudentProfileRepository studentProfileRepository,
-            BatchRepository batchRepository) {
+            BatchRepository batchRepository,
+            com.learntrix.edtech.service.CourseAccessService courseAccessService) {
         this.courseRepository = courseRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.moduleRepository = moduleRepository;
@@ -67,32 +69,18 @@ public class TeacherController {
         this.userRepository = userRepository;
         this.studentProfileRepository = studentProfileRepository;
         this.batchRepository = batchRepository;
+        this.courseAccessService = courseAccessService;
     }
 
     @GetMapping("/stats")
     public ApiResponse<TeacherStatsResponse> getStats() {
         UUID teacherId = SecurityUtil.getCurrentUserId();
-        List<Course> courses = courseRepository.findByInstructorId(teacherId);
-        
-        if (courses.isEmpty()) {
-            return ApiResponse.success(TeacherStatsResponse.builder()
-                    .totalStudents(0)
-                    .activeStudents(0)
-                    .courses(0)
-                    .averageCompletion(0.0)
-                    .averageQuizScore(0.0)
-                    .problemsSolved(0)
-                    .engagement(0.0)
-                    .upcomingClasses(0)
-                    .build());
-        }
-
-        List<UUID> courseIds = courses.stream().map(Course::getId).collect(Collectors.toList());
-        List<Enrollment> enrollments = enrollmentRepository.findByCourseIdIn(courseIds);
+        List<Enrollment> enrollments = courseAccessService.getTeacherStudentEnrollments(teacherId);
+        List<UUID> courseIds = courseAccessService.getAuthorizedCourseIdsForTeacher(teacherId);
 
         int totalStudents = enrollments.size();
         int activeStudents = (int) enrollments.stream()
-                .filter(e -> "active".equalsIgnoreCase(e.getStatus()))
+                .filter(e -> "active".equalsIgnoreCase(e.getStatus()) || "enrolled".equalsIgnoreCase(e.getStatus()))
                 .count();
 
         double avgCompletion = 0.0;
@@ -107,13 +95,33 @@ public class TeacherController {
         return ApiResponse.success(TeacherStatsResponse.builder()
                 .totalStudents(totalStudents)
                 .activeStudents(activeStudents)
-                .courses(courses.size())
+                .courses(courseIds.size())
                 .averageCompletion(avgCompletion)
                 .averageQuizScore(84.5) // Stub average
                 .problemsSolved(148)    // Stub solved
                 .engagement(92.4)       // Stub engagement
                 .upcomingClasses(2)     // Stub classes
                 .build());
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping("/courses")
+    public ApiResponse<List<com.learntrix.edtech.dto.course.CourseResponse>> getCourses() {
+        UUID teacherId = SecurityUtil.getCurrentUserId();
+        List<UUID> courseIds = courseAccessService.getAuthorizedCourseIdsForTeacher(teacherId);
+        if (courseIds.isEmpty()) return ApiResponse.success(List.of());
+
+        List<com.learntrix.edtech.dto.course.CourseResponse> courses = courseRepository.findAllById(courseIds).stream()
+                .map(c -> com.learntrix.edtech.dto.course.CourseResponse.builder()
+                        .id(c.getId())
+                        .title(c.getTitle())
+                        .slug(c.getSlug())
+                        .category(c.getCategory())
+                        .status(c.getStatus())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ApiResponse.success(courses);
     }
 
     @Transactional(readOnly = true)
@@ -141,28 +149,9 @@ public class TeacherController {
     public ApiResponse<List<TeacherStudentResponse>> getStudents(
             @RequestParam(value = "course", required = false) String courseTitle) {
         UUID teacherId = SecurityUtil.getCurrentUserId();
-        List<Batch> batches = batchRepository.findByTeacherIdOrderByStartDateAsc(teacherId);
-        List<Course> teacherCourses = courseRepository.findByInstructorId(teacherId);
-        List<UUID> courseIds = teacherCourses.stream().map(Course::getId).collect(Collectors.toList());
+        List<Enrollment> enrollments = courseAccessService.getTeacherStudentEnrollments(teacherId);
 
-        List<Enrollment> enrollments = enrollmentRepository.findByCourseIdIn(courseIds);
-
-        // If batches exist with students, prioritize batch students
-        Set<UUID> batchStudentIds = batches.stream()
-                .flatMap(batch -> batch.getStudents().stream())
-                .map(User::getId)
-                .collect(Collectors.toSet());
-
-        List<Enrollment> targetEnrollments;
-        if (!batchStudentIds.isEmpty()) {
-            targetEnrollments = enrollments.stream()
-                    .filter(e -> batchStudentIds.contains(e.getStudent().getId()))
-                    .collect(Collectors.toList());
-        } else {
-            targetEnrollments = enrollments;
-        }
-
-        List<TeacherStudentResponse> students = targetEnrollments.stream()
+        List<TeacherStudentResponse> students = enrollments.stream()
                 .filter(e -> {
                     if (courseTitle != null && !courseTitle.trim().isEmpty() && !"All".equalsIgnoreCase(courseTitle)) {
                         return e.getCourse().getTitle().equalsIgnoreCase(courseTitle);
@@ -179,37 +168,17 @@ public class TeacherController {
     @Transactional(readOnly = true)
     public ApiResponse<TeacherStudentResponse> getStudent(@PathVariable("id") UUID studentId) {
         UUID teacherId = SecurityUtil.getCurrentUserId();
-        List<Batch> batches = batchRepository.findByTeacherIdOrderByStartDateAsc(teacherId);
-        List<Course> teacherCourses = courseRepository.findByInstructorId(teacherId);
-        List<UUID> courseIds = teacherCourses.stream().map(Course::getId).collect(Collectors.toList());
+        if (!courseAccessService.isStudentAssignedToTeacher(studentId, teacherId)) {
+            throw new com.learntrix.edtech.common.exception.CourseAccessDeniedException("You are not authorized to view details for this student");
+        }
 
-        boolean studentIsInTeacherBatch = batches.stream()
-                .flatMap(b -> b.getStudents().stream())
-                .anyMatch(s -> s.getId().equals(studentId));
-
-        Optional<Enrollment> enrollment = enrollmentRepository.findByCourseIdIn(courseIds).stream()
+        List<Enrollment> enrollments = courseAccessService.getTeacherStudentEnrollments(teacherId);
+        Enrollment enrollment = enrollments.stream()
                 .filter(e -> e.getStudent().getId().equals(studentId))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new com.learntrix.edtech.common.exception.ResourceNotFoundException("Student", "id", studentId));
 
-        if (!studentIsInTeacherBatch && enrollment.isEmpty()) {
-            return ApiResponse.success(null);
-        }
-
-        if (enrollment.isEmpty()) {
-            User student = userRepository.findById(studentId).orElse(null);
-            if (student == null) return ApiResponse.success(null);
-            String title = !batches.isEmpty() ? batches.get(0).getCourse().getTitle() : "General";
-            return ApiResponse.success(TeacherStudentResponse.builder()
-                    .id(student.getId())
-                    .name(student.getName())
-                    .email(student.getEmail())
-                    .courseTitle(title)
-                    .progressPercent(0).lessonsCompleted(0).quizScore(0)
-                    .assignments("0/0").problemsSolved(0).points(0).rank(0)
-                    .lastActive("never").status("active").build());
-        }
-
-        return ApiResponse.success(mapToStudentResponse(enrollment.get()));
+        return ApiResponse.success(mapToStudentResponse(enrollment));
     }
 
     private int calculateProgress(UUID studentId, UUID courseId) {

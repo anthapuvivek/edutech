@@ -28,6 +28,9 @@ public class AdminOnboardingService {
     private final AccountActivationTokenRepository activationTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final CourseRepository courseRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final BatchRepository batchRepository;
 
     public AdminOnboardingService(
             UserRepository userRepository,
@@ -36,7 +39,10 @@ public class AdminOnboardingService {
             TeacherProfileRepository teacherProfileRepository,
             AccountActivationTokenRepository activationTokenRepository,
             PasswordEncoder passwordEncoder,
-            EmailService emailService) {
+            EmailService emailService,
+            CourseRepository courseRepository,
+            EnrollmentRepository enrollmentRepository,
+            BatchRepository batchRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.studentProfileRepository = studentProfileRepository;
@@ -44,6 +50,9 @@ public class AdminOnboardingService {
         this.activationTokenRepository = activationTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.courseRepository = courseRepository;
+        this.enrollmentRepository = enrollmentRepository;
+        this.batchRepository = batchRepository;
     }
 
     /**
@@ -136,6 +145,11 @@ public class AdminOnboardingService {
         activationToken.setExpiresAt(expiresAt);
         activationTokenRepository.save(activationToken);
 
+        // Optional immediate allocation
+        if (request.getCourseId() != null) {
+            allocateStudentInternal(savedUser, request.getCourseId(), request.getTeacherId(), request.getBatchId(), "ACTIVE");
+        }
+
         // Dispatch Welcome Email
         boolean emailSent = emailService.sendWelcomeActivationEmail(savedUser, "Student", studentId, token);
 
@@ -148,8 +162,178 @@ public class AdminOnboardingService {
                 .identifier(studentId)
                 .onboardingStatus("INVITED")
                 .emailStatus(emailSent ? "SENT" : "FAILED")
-                .message("Student onboarded successfully. Activation email sent.")
+                .message(emailSent ? "Student onboarded successfully. Activation email sent." : "Student created, but activation email could not be sent.")
                 .ok(true)
+                .build();
+    }
+
+    /**
+     * Allocates a student to a teacher and course (with optional batch).
+     */
+    @Transactional
+    public com.learntrix.edtech.dto.admin.StudentAllocationResponse allocateStudent(
+            com.learntrix.edtech.dto.admin.AllocateStudentRequest request) {
+        User student = userRepository.findById(request.getStudentId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", request.getStudentId()));
+
+        Enrollment enrollment = allocateStudentInternal(
+                student,
+                request.getCourseId(),
+                request.getTeacherId(),
+                request.getBatchId(),
+                request.getStatus() != null ? request.getStatus() : "ACTIVE"
+        );
+
+        return mapToAllocationResponse(enrollment);
+    }
+
+    private Enrollment allocateStudentInternal(User student, UUID courseId, UUID teacherId, UUID batchId, String status) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
+
+        User teacher = null;
+        if (teacherId != null) {
+            teacher = userRepository.findById(teacherId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", teacherId));
+        } else if (course.getInstructor() != null) {
+            teacher = course.getInstructor();
+        }
+
+        Batch batch = null;
+        if (batchId != null) {
+            batch = batchRepository.findById(batchId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", batchId));
+            if (batch.getStudents() != null && !batch.getStudents().contains(student)) {
+                batch.getStudents().add(student);
+                batchRepository.save(batch);
+            }
+            if (teacher == null && batch.getTeacher() != null) {
+                teacher = batch.getTeacher();
+            }
+        }
+
+        Optional<Enrollment> existingOpt = enrollmentRepository.findByStudentIdAndCourseId(student.getId(), course.getId());
+        Enrollment enrollment;
+        if (existingOpt.isPresent()) {
+            enrollment = existingOpt.get();
+            enrollment.setStatus(status != null ? status : "ACTIVE");
+            if (teacher != null) enrollment.setTeacher(teacher);
+            if (batch != null) enrollment.setBatch(batch);
+        } else {
+            enrollment = new Enrollment();
+            enrollment.setStudent(student);
+            enrollment.setCourse(course);
+            enrollment.setTeacher(teacher);
+            enrollment.setBatch(batch);
+            enrollment.setStatus(status != null ? status : "ACTIVE");
+        }
+
+        return enrollmentRepository.save(enrollment);
+    }
+
+    @Transactional(readOnly = true)
+    public List<com.learntrix.edtech.dto.admin.StudentAllocationResponse> getStudentAllocations(UUID studentId) {
+        return enrollmentRepository.findByStudentId(studentId).stream()
+                .map(this::mapToAllocationResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public com.learntrix.edtech.dto.admin.StudentAllocationResponse reassignAllocation(
+            UUID allocationId,
+            com.learntrix.edtech.dto.admin.AllocateStudentRequest request) {
+        Enrollment enrollment = enrollmentRepository.findById(allocationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Enrollment", "id", allocationId));
+
+        User student = enrollment.getStudent();
+
+        // If batch is changing, remove from previous batch
+        if (enrollment.getBatch() != null && (request.getBatchId() == null || !enrollment.getBatch().getId().equals(request.getBatchId()))) {
+            Batch prevBatch = enrollment.getBatch();
+            if (prevBatch.getStudents() != null) {
+                prevBatch.getStudents().removeIf(s -> s.getId().equals(student.getId()));
+                batchRepository.save(prevBatch);
+            }
+            enrollment.setBatch(null);
+        }
+
+        if (request.getCourseId() != null && !enrollment.getCourse().getId().equals(request.getCourseId())) {
+            Course newCourse = courseRepository.findById(request.getCourseId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Course", "id", request.getCourseId()));
+            enrollment.setCourse(newCourse);
+        }
+
+        if (request.getTeacherId() != null) {
+            User newTeacher = userRepository.findById(request.getTeacherId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", request.getTeacherId()));
+            enrollment.setTeacher(newTeacher);
+        }
+
+        if (request.getBatchId() != null) {
+            Batch newBatch = batchRepository.findById(request.getBatchId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", request.getBatchId()));
+            if (newBatch.getStudents() != null && !newBatch.getStudents().contains(student)) {
+                newBatch.getStudents().add(student);
+                batchRepository.save(newBatch);
+            }
+            enrollment.setBatch(newBatch);
+            if (enrollment.getTeacher() == null && newBatch.getTeacher() != null) {
+                enrollment.setTeacher(newBatch.getTeacher());
+            }
+        }
+
+        if (request.getStatus() != null) {
+            enrollment.setStatus(request.getStatus());
+        }
+
+        Enrollment saved = enrollmentRepository.save(enrollment);
+        return mapToAllocationResponse(saved);
+    }
+
+    @Transactional
+    public void removeAllocation(UUID allocationId) {
+        Enrollment enrollment = enrollmentRepository.findById(allocationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Enrollment", "id", allocationId));
+
+        if (enrollment.getBatch() != null) {
+            Batch batch = enrollment.getBatch();
+            if (batch.getStudents() != null) {
+                batch.getStudents().removeIf(s -> s.getId().equals(enrollment.getStudent().getId()));
+                batchRepository.save(batch);
+            }
+        }
+
+        enrollmentRepository.delete(enrollment);
+    }
+
+    private com.learntrix.edtech.dto.admin.StudentAllocationResponse mapToAllocationResponse(Enrollment e) {
+        String teacherName = "Not Assigned";
+        UUID teacherId = null;
+        if (e.getTeacher() != null) {
+            teacherName = e.getTeacher().getName();
+            teacherId = e.getTeacher().getId();
+        } else if (e.getCourse().getInstructor() != null) {
+            teacherName = e.getCourse().getInstructor().getName();
+            teacherId = e.getCourse().getInstructor().getId();
+        }
+
+        String batchName = e.getBatch() != null ? e.getBatch().getName() : "Not Assigned";
+        UUID batchId = e.getBatch() != null ? e.getBatch().getId() : null;
+
+        return com.learntrix.edtech.dto.admin.StudentAllocationResponse.builder()
+                .id(e.getId())
+                .studentId(e.getStudent().getId())
+                .studentName(e.getStudent().getName())
+                .studentEmail(e.getStudent().getEmail())
+                .courseId(e.getCourse().getId())
+                .courseTitle(e.getCourse().getTitle())
+                .courseSlug(e.getCourse().getSlug())
+                .teacherId(teacherId)
+                .teacherName(teacherName)
+                .batchId(batchId)
+                .batchName(batchName)
+                .status(e.getStatus())
+                .createdAt(e.getCreatedAt())
                 .build();
     }
 
@@ -237,7 +421,7 @@ public class AdminOnboardingService {
                 .identifier(employeeId)
                 .onboardingStatus("INVITED")
                 .emailStatus(emailSent ? "SENT" : "FAILED")
-                .message("Teacher onboarded successfully. Activation email sent.")
+                .message(emailSent ? "Teacher onboarded successfully. Activation email sent." : "Trainer created, but activation email could not be sent.")
                 .ok(true)
                 .build();
     }
@@ -288,7 +472,7 @@ public class AdminOnboardingService {
                 .identifier(studentId)
                 .onboardingStatus("INVITED")
                 .emailStatus(emailSent ? "SENT" : "FAILED")
-                .message("Welcome activation email resent successfully.")
+                .message(emailSent ? "Welcome activation email resent successfully." : "Failed to send activation email. Please check email server configuration.")
                 .ok(true)
                 .build();
     }
@@ -338,7 +522,7 @@ public class AdminOnboardingService {
                 .identifier(employeeId)
                 .onboardingStatus("INVITED")
                 .emailStatus(emailSent ? "SENT" : "FAILED")
-                .message("Welcome activation email resent successfully.")
+                .message(emailSent ? "Welcome activation email resent successfully." : "Failed to send activation email. Please check email server configuration.")
                 .ok(true)
                 .build();
     }

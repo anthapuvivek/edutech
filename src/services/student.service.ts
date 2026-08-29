@@ -43,4 +43,69 @@ export const studentService = {
       return apiRequest<LeaderboardEntry[]>("/student/leaderboard", { query: { scope } });
     return mockDelay(mockLeaderboard);
   },
+
+  async assignments(): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>("/student/assignments");
+    return mockDelay([]);
+  },
+
+  async assignment(id: string): Promise<any> {
+    if (!env.useMocks) return apiRequest(`/student/assignments/${id}`);
+    return mockDelay(null);
+  },
+
+  async submitAssignment(id: string, payload: Record<string, unknown>): Promise<any> {
+    if (!env.useMocks) return apiRequest(`/student/assignments/${id}/submit`, { method: "POST", body: payload });
+    return mockDelay({ id: `sub-${Date.now()}`, ...payload });
+  },
+
+  async quizzes(): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>("/student/quizzes");
+    return mockDelay([]);
+  },
+
+  async quiz(id: string): Promise<any> {
+    if (!env.useMocks) return apiRequest(`/student/quizzes/${id}`);
+    return mockDelay(null);
+  },
+
+  async attemptQuiz(id: string, payload: Record<string, unknown>): Promise<any> {
+    if (!env.useMocks) return apiRequest(`/student/quizzes/${id}/attempt`, { method: "POST", body: payload });
+    return mockDelay({ id: `att-${Date.now()}`, ...payload });
+  },
+
+  async quizResults(id: string): Promise<any> {
+    if (!env.useMocks) return apiRequest(`/student/quizzes/${id}/results`);
+    return mockDelay(null);
+  },
+
+  async materials(): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>("/student/materials");
+    return mockDelay([]);
+  },
+
+  async material(id: string): Promise<any> {
+    if (!env.useMocks) return apiRequest(`/student/materials/${id}`);
+    return mockDelay(null);
+  },
+
+  async announcements(): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>("/student/announcements");
+    return mockDelay([]);
+  },
+
+  async announcement(id: string): Promise<any> {
+    if (!env.useMocks) return apiRequest(`/student/announcements/${id}`);
+    return mockDelay(null);
+  },
+
+  async recordings(courseId?: string): Promise<any[]> {
+    if (!env.useMocks) return apiRequest<any[]>("/student/recordings", { query: { courseId } });
+    return mockDelay([]);
+  },
+
+  async recording(id: string): Promise<any> {
+    if (!env.useMocks) return apiRequest(`/student/recordings/${id}`);
+    return mockDelay(null);
+  },
 };
