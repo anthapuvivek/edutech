@@ -84,6 +84,10 @@ const adminServiceRaw = {
     if (!env.useMocks) return apiRequest(`/admin/students/${id}/resend-welcome-email`, { method: "POST" });
     return mockDelay({ ok: true, emailStatus: "SENT", message: "Welcome email resent successfully." });
   },
+  async deleteStudent(id: string): Promise<{ ok: boolean; message?: string }> {
+    if (!env.useMocks) return apiRequest(`/admin/students/${id}`, { method: "DELETE" });
+    return mockDelay({ ok: true, message: "Student account has been deactivated successfully." });
+  },
   async setStudentStatus(
     id: string,
     status: StudentAccountStatus,
@@ -154,6 +158,10 @@ const adminServiceRaw = {
   async resendTeacherWelcomeEmail(id: string): Promise<{ ok: boolean; emailStatus?: string; message?: string }> {
     if (!env.useMocks) return apiRequest(`/admin/teachers/${id}/resend-welcome-email`, { method: "POST" });
     return mockDelay({ ok: true, emailStatus: "SENT", message: "Welcome email resent successfully." });
+  },
+  async deleteTeacher(id: string): Promise<{ ok: boolean; message?: string }> {
+    if (!env.useMocks) return apiRequest(`/admin/teachers/${id}`, { method: "DELETE" });
+    return mockDelay({ ok: true, message: "Teacher account has been deactivated successfully." });
   },
   async approveTrainer(id: string, approve: boolean): Promise<{ ok: true }> {
     if (!env.useMocks)

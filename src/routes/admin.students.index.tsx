@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Download, Plus, Search } from "lucide-react";
+import { Download, Plus, Search, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -35,6 +35,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { adminService } from "@/services/admin.service";
+import { useAuth } from "@/hooks/useAuth";
+import type { AdminStudentRow } from "@/types";
 
 export const Route = createFileRoute("/admin/students/")({
   head: () => ({
@@ -59,6 +61,8 @@ export const Route = createFileRoute("/admin/students/")({
 const ALL = "all";
 
 function AdminStudents() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "super_admin";
   const queryClient = useQueryClient();
   const students = useQuery({
     queryKey: ["admin", "students"],
@@ -84,6 +88,8 @@ function AdminStudents() {
   const [attendance, setAttendance] = useState(ALL);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState<AdminStudentRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [selectedCourse, setSelectedCourse] = useState<string>("none");
   const [selectedTrainer, setSelectedTrainer] = useState<string>("none");
@@ -494,6 +500,17 @@ function AdminStudents() {
                           View
                         </Link>
                       </Button>
+                      {isAdmin ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => setStudentToDelete(s)}
+                          title="Remove student"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      ) : null}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -507,6 +524,52 @@ function AdminStudents() {
           </div>
         )}
       </Panel>
+
+      {/* Student Deletion / Deactivation Confirmation Dialog */}
+      <Dialog open={!!studentToDelete} onOpenChange={(open) => !open && setStudentToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remove Student</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to remove this student?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-2 text-sm text-muted-foreground">
+            <p>
+              This will deactivate <strong>{studentToDelete?.name}</strong> ({studentToDelete?.email}), revoke their active login sessions, and remove them from active batches. Historical academic records will be safely retained.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setStudentToDelete(null)} disabled={deleting}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleting}
+              onClick={async () => {
+                if (!studentToDelete) return;
+                setDeleting(true);
+                try {
+                  const res = await adminService.deleteStudent(studentToDelete.id);
+                  toast.success(res?.message || "Student account deactivated successfully.");
+                  setStudentToDelete(null);
+                  void queryClient.invalidateQueries({ queryKey: ["admin", "students"] });
+                } catch (err: any) {
+                  if (err?.status === 403 || err?.response?.status === 403) {
+                    toast.error("You are not authorized to perform this action.");
+                  } else {
+                    toast.error(err?.message || "Failed to remove student.");
+                  }
+                } finally {
+                  setDeleting(false);
+                }
+              }}
+            >
+              {deleting ? "Removing..." : "Remove Student"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

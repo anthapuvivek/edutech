@@ -12,6 +12,8 @@ spring:
     enabled: false
   kafka:
     bootstrap-servers: ${spring.embedded.kafka.brokers:localhost:9092}
+  mail:
+    host: ""
 
 app:
   jwt:

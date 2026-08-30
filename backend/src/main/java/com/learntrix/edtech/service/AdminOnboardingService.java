@@ -431,12 +431,27 @@ public class AdminOnboardingService {
      * generating a fresh token, and re-dispatching the email.
      */
     @Transactional
-    public OnboardingResponse resendStudentWelcomeEmail(UUID studentUserId) {
-        User user = userRepository.findById(studentUserId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", studentUserId));
+    public OnboardingResponse resendStudentWelcomeEmail(UUID studentId) {
+        if (studentId == null) {
+            throw new IllegalArgumentException("Student ID is required");
+        }
+
+        // Support lookup by User ID or StudentProfile ID
+        User user = userRepository.findById(studentId)
+                .orElseGet(() -> studentProfileRepository.findById(studentId)
+                        .map(sp -> userRepository.findById(sp.getUserId()).orElse(null))
+                        .orElse(null));
+
+        if (user == null) {
+            throw new ResourceNotFoundException("Student", "id", studentId);
+        }
 
         if (user.getRoles().stream().noneMatch(r -> "STUDENT".equalsIgnoreCase(r.getName()))) {
-            throw new IllegalArgumentException("Target user is not a student");
+            throw new com.learntrix.edtech.common.exception.BusinessException("INVALID_ROLE", "Target user is not registered as a student.", org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            throw new com.learntrix.edtech.common.exception.BusinessException("EMAIL_MISSING", "Student email address is missing.", org.springframework.http.HttpStatus.BAD_REQUEST);
         }
 
         // Invalidate prior unused tokens
@@ -457,11 +472,11 @@ public class AdminOnboardingService {
         user.setPasswordResetTokenExpiry(expiresAt);
         userRepository.save(user);
 
-        String studentId = studentProfileRepository.findByUserId(user.getId())
+        String identifier = studentProfileRepository.findByUserId(user.getId())
                 .map(StudentProfile::getStudentId)
                 .orElse("N/A");
 
-        boolean emailSent = emailService.sendWelcomeActivationEmail(user, "Student", studentId, token);
+        boolean emailSent = emailService.sendWelcomeActivationEmail(user, "Student", identifier, token);
 
         return OnboardingResponse.builder()
                 .id(user.getId())
@@ -469,7 +484,7 @@ public class AdminOnboardingService {
                 .email(user.getEmail())
                 .name(user.getName())
                 .role("student")
-                .identifier(studentId)
+                .identifier(identifier)
                 .onboardingStatus("INVITED")
                 .emailStatus(emailSent ? "SENT" : "FAILED")
                 .message(emailSent ? "Welcome activation email resent successfully." : "Failed to send activation email. Please check email server configuration.")
@@ -481,12 +496,27 @@ public class AdminOnboardingService {
      * Resends the welcome activation email for a teacher.
      */
     @Transactional
-    public OnboardingResponse resendTeacherWelcomeEmail(UUID teacherUserId) {
-        User user = userRepository.findById(teacherUserId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", teacherUserId));
+    public OnboardingResponse resendTeacherWelcomeEmail(UUID teacherId) {
+        if (teacherId == null) {
+            throw new IllegalArgumentException("Teacher ID is required");
+        }
+
+        // Support lookup by User ID or TeacherProfile ID
+        User user = userRepository.findById(teacherId)
+                .orElseGet(() -> teacherProfileRepository.findById(teacherId)
+                        .map(tp -> userRepository.findById(tp.getUserId()).orElse(null))
+                        .orElse(null));
+
+        if (user == null) {
+            throw new ResourceNotFoundException("Teacher", "id", teacherId);
+        }
 
         if (user.getRoles().stream().noneMatch(r -> "TEACHER".equalsIgnoreCase(r.getName()))) {
-            throw new IllegalArgumentException("Target user is not a teacher");
+            throw new com.learntrix.edtech.common.exception.BusinessException("INVALID_ROLE", "Target user is not registered as a teacher/trainer.", org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            throw new com.learntrix.edtech.common.exception.BusinessException("EMAIL_MISSING", "Teacher email address is missing.", org.springframework.http.HttpStatus.BAD_REQUEST);
         }
 
         // Invalidate prior unused tokens
@@ -525,6 +555,142 @@ public class AdminOnboardingService {
                 .message(emailSent ? "Welcome activation email resent successfully." : "Failed to send activation email. Please check email server configuration.")
                 .ok(true)
                 .build();
+    }
+
+    /**
+     * Securely deactivates and terminates a student account.
+     * Prevents admin deletion, revokes tokens, updates enrollment states,
+     * and sets account status to INACTIVE.
+     */
+    @Transactional
+    public Map<String, Object> deleteOrDeactivateStudent(UUID studentId, org.springframework.security.core.Authentication authentication) {
+        if (studentId == null) {
+            throw new IllegalArgumentException("Student ID is required");
+        }
+
+        // Support lookup by User ID or StudentProfile ID
+        User user = userRepository.findById(studentId)
+                .orElseGet(() -> studentProfileRepository.findById(studentId)
+                        .map(sp -> userRepository.findById(sp.getUserId()).orElse(null))
+                        .orElse(null));
+
+        if (user == null) {
+            throw new ResourceNotFoundException("Student", "id", studentId);
+        }
+
+        // Prevent deleting administrators
+        if (user.getRoles().stream().anyMatch(r -> "ADMIN".equalsIgnoreCase(r.getName()) || "SUPER_ADMIN".equalsIgnoreCase(r.getName()))) {
+            throw new com.learntrix.edtech.common.exception.BusinessException("CANNOT_DELETE_ADMIN", "Cannot delete or deactivate an administrator account.", org.springframework.http.HttpStatus.FORBIDDEN);
+        }
+
+        // Validate target role
+        if (user.getRoles().stream().noneMatch(r -> "STUDENT".equalsIgnoreCase(r.getName()))) {
+            throw new com.learntrix.edtech.common.exception.BusinessException("INVALID_ROLE", "Target user is not a student.", org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
+        // Prevent self-deactivation
+        if (authentication != null && authentication.getName() != null && (authentication.getName().equalsIgnoreCase(user.getEmail()) || authentication.getName().equalsIgnoreCase(user.getId().toString()))) {
+            throw new com.learntrix.edtech.common.exception.BusinessException("CANNOT_DELETE_SELF", "You cannot delete your own account.", org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
+        // Invalidate unused activation tokens
+        activationTokenRepository.invalidateUnusedTokensForUser(user.getId(), Instant.now());
+
+        // Clear sensitive tokens
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiry(null);
+        user.setEmailVerificationToken(null);
+        user.setEmailVerificationTokenExpiry(null);
+
+        // Mark user status as INACTIVE
+        user.setStatus("INACTIVE");
+        userRepository.save(user);
+
+        // Detach student from active batches
+        List<Batch> batches = batchRepository.findByStudentsContaining(user);
+        for (Batch batch : batches) {
+            batch.getStudents().remove(user);
+            batchRepository.save(batch);
+        }
+
+        // Update active enrollments to INACTIVE
+        List<Enrollment> enrollments = enrollmentRepository.findByStudentId(user.getId());
+        for (Enrollment enrollment : enrollments) {
+            if ("ACTIVE".equalsIgnoreCase(enrollment.getStatus())) {
+                enrollment.setStatus("INACTIVE");
+                enrollmentRepository.save(enrollment);
+            }
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("ok", true);
+        response.put("id", user.getId().toString());
+        response.put("status", "INACTIVE");
+        response.put("message", "Student account has been deactivated successfully.");
+        return response;
+    }
+
+    /**
+     * Securely deactivates and terminates a teacher account.
+     * Prevents admin deletion, revokes tokens, updates profile status,
+     * and sets account status to INACTIVE.
+     */
+    @Transactional
+    public Map<String, Object> deleteOrDeactivateTeacher(UUID teacherId, org.springframework.security.core.Authentication authentication) {
+        if (teacherId == null) {
+            throw new IllegalArgumentException("Teacher ID is required");
+        }
+
+        // Support lookup by User ID or TeacherProfile ID
+        User user = userRepository.findById(teacherId)
+                .orElseGet(() -> teacherProfileRepository.findById(teacherId)
+                        .map(tp -> userRepository.findById(tp.getUserId()).orElse(null))
+                        .orElse(null));
+
+        if (user == null) {
+            throw new ResourceNotFoundException("Teacher", "id", teacherId);
+        }
+
+        // Prevent deleting administrators
+        if (user.getRoles().stream().anyMatch(r -> "ADMIN".equalsIgnoreCase(r.getName()) || "SUPER_ADMIN".equalsIgnoreCase(r.getName()))) {
+            throw new com.learntrix.edtech.common.exception.BusinessException("CANNOT_DELETE_ADMIN", "Cannot delete or deactivate an administrator account.", org.springframework.http.HttpStatus.FORBIDDEN);
+        }
+
+        // Validate target role
+        if (user.getRoles().stream().noneMatch(r -> "TEACHER".equalsIgnoreCase(r.getName()))) {
+            throw new com.learntrix.edtech.common.exception.BusinessException("INVALID_ROLE", "Target user is not registered as a teacher/trainer.", org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
+        // Prevent self-deactivation
+        if (authentication != null && authentication.getName() != null && (authentication.getName().equalsIgnoreCase(user.getEmail()) || authentication.getName().equalsIgnoreCase(user.getId().toString()))) {
+            throw new com.learntrix.edtech.common.exception.BusinessException("CANNOT_DELETE_SELF", "You cannot delete your own account.", org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
+        // Invalidate unused activation tokens
+        activationTokenRepository.invalidateUnusedTokensForUser(user.getId(), Instant.now());
+
+        // Clear sensitive tokens
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiry(null);
+        user.setEmailVerificationToken(null);
+        user.setEmailVerificationTokenExpiry(null);
+
+        // Mark user status as INACTIVE
+        user.setStatus("INACTIVE");
+        userRepository.save(user);
+
+        // Update TeacherProfile approvalStatus if present
+        teacherProfileRepository.findByUserId(user.getId()).ifPresent(profile -> {
+            profile.setApprovalStatus("deactivated");
+            teacherProfileRepository.save(profile);
+        });
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("ok", true);
+        response.put("id", user.getId().toString());
+        response.put("status", "INACTIVE");
+        response.put("message", "Teacher account has been deactivated successfully.");
+        return response;
     }
 
     private String generateSecureActivationToken() {

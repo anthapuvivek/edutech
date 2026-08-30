@@ -47,6 +47,7 @@ public class AuthController {
     private final com.learntrix.edtech.repository.AccountActivationTokenRepository activationTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final com.learntrix.edtech.service.EmailService emailService;
 
     @Value("${app.jwt.access-token-expiration}")
     private long accessTokenExpirationMs;
@@ -60,13 +61,15 @@ public class AuthController {
             StudentProfileRepository studentProfileRepository,
             com.learntrix.edtech.repository.AccountActivationTokenRepository activationTokenRepository,
             PasswordEncoder passwordEncoder,
-            JwtProvider jwtProvider) {
+            JwtProvider jwtProvider,
+            com.learntrix.edtech.service.EmailService emailService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.studentProfileRepository = studentProfileRepository;
         this.activationTokenRepository = activationTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
+        this.emailService = emailService;
     }
 
     @PostMapping("/login")
@@ -137,13 +140,16 @@ public class AuthController {
     public ApiResponse<Map<String, Boolean>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         String email = request.getEmail().trim().toLowerCase();
         Optional<User> userOpt = userRepository.findByEmail(email);
+        boolean sent = false;
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            user.setPasswordResetToken(UUID.randomUUID().toString());
+            String token = UUID.randomUUID().toString().replace("-", "");
+            user.setPasswordResetToken(token);
             user.setPasswordResetTokenExpiry(Instant.now().plusSeconds(3600)); // 1 hour
             userRepository.save(user);
+            sent = emailService.sendPasswordResetEmail(user, token);
         }
-        return ApiResponse.success(Map.of("sent", true));
+        return ApiResponse.success(Map.of("sent", sent));
     }
 
     @PostMapping({"/reset-password", "/activate"})

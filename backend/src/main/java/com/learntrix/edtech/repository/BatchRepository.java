@@ -12,4 +12,5 @@ import com.learntrix.edtech.entity.Batch;
 public interface BatchRepository extends JpaRepository<Batch, UUID> {
     List<Batch> findByTeacherIdOrderByStartDateAsc(UUID teacherId);
     List<Batch> findByCourseIdOrderByStartDateAsc(UUID courseId);
+    List<Batch> findByStudentsContaining(com.learntrix.edtech.entity.User student);
 }

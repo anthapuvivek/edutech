@@ -366,6 +366,18 @@ public class AdminController {
     }
 
     /**
+     * Secure ADMIN-only endpoint to delete/deactivate a student account.
+     */
+    @DeleteMapping("/students/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<Map<String, Object>> deleteStudent(
+            @PathVariable("id") UUID id,
+            org.springframework.security.core.Authentication authentication) {
+        Map<String, Object> result = adminOnboardingService.deleteOrDeactivateStudent(id, authentication);
+        return ApiResponse.success(result);
+    }
+
+    /**
      * Admin teacher onboarding — creates User (PENDING), TeacherProfile, secure activation token,
      * and dispatches the welcome activation email.
      */
@@ -384,6 +396,18 @@ public class AdminController {
             @PathVariable("id") UUID id) {
         com.learntrix.edtech.dto.admin.OnboardingResponse response = adminOnboardingService.resendTeacherWelcomeEmail(id);
         return ApiResponse.success(response);
+    }
+
+    /**
+     * Secure ADMIN-only endpoint to delete/deactivate a teacher account.
+     */
+    @DeleteMapping({"/teachers/{id}", "/trainers/{id}"})
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<Map<String, Object>> deleteTeacher(
+            @PathVariable("id") UUID id,
+            org.springframework.security.core.Authentication authentication) {
+        Map<String, Object> result = adminOnboardingService.deleteOrDeactivateTeacher(id, authentication);
+        return ApiResponse.success(result);
     }
 
     /**

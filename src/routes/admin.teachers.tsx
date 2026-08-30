@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -30,6 +30,8 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { adminService } from "@/services/admin.service";
+import { useAuth } from "@/hooks/useAuth";
+import type { AdminTrainer } from "@/types";
 
 export const Route = createFileRoute("/admin/teachers")({
   head: () => ({
@@ -53,6 +55,8 @@ export const Route = createFileRoute("/admin/teachers")({
 });
 
 function AdminTeachers() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "super_admin";
   const queryClient = useQueryClient();
   const trainers = useQuery({
     queryKey: ["admin", "trainers"],
@@ -60,6 +64,8 @@ function AdminTeachers() {
   });
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [teacherToDelete, setTeacherToDelete] = useState<AdminTrainer | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const data = trainers.data ?? [];
   const pending = data.filter((t) => t.approvalStatus === "pending");
 
@@ -268,6 +274,17 @@ function AdminTeachers() {
                       >
                         Assign
                       </Button>
+                      {isAdmin ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => setTeacherToDelete(t)}
+                          title="Remove trainer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      ) : null}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -276,6 +293,52 @@ function AdminTeachers() {
           </div>
         )}
       </Panel>
+
+      {/* Teacher Deletion / Deactivation Confirmation Dialog */}
+      <Dialog open={!!teacherToDelete} onOpenChange={(open) => !open && setTeacherToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remove Teacher</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to remove this teacher?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-2 text-sm text-muted-foreground">
+            <p>
+              This will deactivate <strong>{teacherToDelete?.name}</strong> ({teacherToDelete?.email}), set their profile status to deactivated, and revoke their access to teaching tools and courses.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTeacherToDelete(null)} disabled={deleting}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleting}
+              onClick={async () => {
+                if (!teacherToDelete) return;
+                setDeleting(true);
+                try {
+                  const res = await adminService.deleteTeacher(teacherToDelete.id);
+                  toast.success(res?.message || "Teacher account deactivated successfully.");
+                  setTeacherToDelete(null);
+                  void queryClient.invalidateQueries({ queryKey: ["admin", "trainers"] });
+                } catch (err: any) {
+                  if (err?.status === 403 || err?.response?.status === 403) {
+                    toast.error("You are not authorized to perform this action.");
+                  } else {
+                    toast.error(err?.message || "Failed to remove teacher.");
+                  }
+                } finally {
+                  setDeleting(false);
+                }
+              }}
+            >
+              {deleting ? "Removing..." : "Remove Teacher"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
