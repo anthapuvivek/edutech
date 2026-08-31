@@ -5,11 +5,18 @@ spring:
     password: ${DB_PASSWORD}
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
+      # Defaults required: no application code uses Redis or Kafka yet, so a deployment
+      # that does not run them must still boot. Without a default, ${REDIS_PORT} reached
+      # the binder as a literal string and production died with
+      # "failed to convert java.lang.String to int". Set the env vars to point at real
+      # infrastructure when a feature starts depending on it.
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
+      repositories:
+        enabled: false
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
   jpa:
     show-sql: false
 
@@ -18,6 +25,13 @@ app:
     secret: ${JWT_SECRET}
     access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}
     refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+
+# Redis is not on any request path today. Leaving its health indicator on would report the
+# whole application DOWN to a load balancer over a dependency nothing uses.
+management:
+  health:
+    redis:
+      enabled: false
 
 logging:
   level:

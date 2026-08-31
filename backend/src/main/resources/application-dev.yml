@@ -14,12 +14,15 @@ spring:
     hibernate:
       ddl-auto: validate
 
+# Profile properties outrank application.yml, so these have to carry the same ${ENV}
+# placeholders - hardcoding them here silently discarded JWT_SECRET from backend/.env and
+# signed every dev token with a secret committed to the repository.
 app:
   jwt:
-    secret: dev-secret-key-change-in-production-min-256-bits-long-string-here
-    access-token-expiration: 900000
-    refresh-token-expiration: 604800000
-    remember-me-expiration: 2592000000
+    secret: ${JWT_SECRET:dev-secret-key-change-in-production-min-256-bits-long-string-here}
+    access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}
+    refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+    remember-me-expiration: ${JWT_REMEMBER_ME_EXPIRATION:2592000000}
 
 logging:
   level:

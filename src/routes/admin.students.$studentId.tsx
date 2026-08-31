@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { MetricBar, Panel, StatusBadge, humanize } from "@/components/portal/AdminBits";
+import { reportResendOutcome } from "@/lib/onboarding-toast";
 import { PageHeader } from "@/components/portal/StatCard";
 import {
   AlertDialog,
@@ -186,6 +187,7 @@ function StudentDetail() {
               onClick={() =>
                 void adminService
                   .resendStudentWelcomeEmail(studentId)
+<<<<<<< HEAD
                   .then((res) => {
                     if (res?.emailStatus === "FAILED") {
                       toast.warning(res.message || "Failed to send activation email.");
@@ -193,6 +195,9 @@ function StudentDetail() {
                       toast.success(res?.message || "Welcome activation email resent successfully.");
                     }
                   })
+=======
+                  .then((res) => reportResendOutcome(res, s.email))
+>>>>>>> b72e728 (application updated)
                   .catch(() => toast.error("Could not resend email."))
               }
             >

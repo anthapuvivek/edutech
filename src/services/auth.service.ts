@@ -29,21 +29,15 @@ export const authService = {
     else window.localStorage.removeItem(STORAGE_KEY);
   },
 
+  /**
+   * In real-backend mode the API is the only authority on credentials. The demo-account
+   * fallback that used to live here accepted ANY password of four or more characters for
+   * a seeded address, so a rejected admin login was upgraded into a valid admin session.
+   * Mock sign-in now happens only under the explicit VITE_USE_MOCKS flag below.
+   */
   async login(payload: LoginPayload): Promise<AuthSession> {
     if (!env.useMocks) {
-      try {
-        return await apiRequest<AuthSession>("/auth/login", { method: "POST", body: payload });
-      } catch (error) {
-        // If the backend is unavailable or 404, check if this is a known demo account
-        const account = mockAccounts.find(
-          (a) => a.email.toLowerCase() === payload.email.trim().toLowerCase(),
-        );
-        if (account && (payload.password === account.password || payload.password.length >= 4)) {
-          const { password: _password, ...user } = account;
-          return mockDelay(buildSession(user, payload.remember ? 30 : 1), 300);
-        }
-        throw error;
-      }
+      return apiRequest<AuthSession>("/auth/login", { method: "POST", body: payload });
     }
 
     const account = mockAccounts.find(
@@ -57,22 +51,14 @@ export const authService = {
     return mockDelay(buildSession(user, payload.remember ? 30 : 1), 500);
   },
 
+  /**
+   * A rejected registration (duplicate email, validation failure) must surface as an
+   * error. Fabricating a session here signed the visitor in as a user that does not
+   * exist in PostgreSQL, so every subsequent API call 401'd against a signed-in shell.
+   */
   async register(payload: RegisterPayload): Promise<AuthSession> {
     if (!env.useMocks) {
-      try {
-        return await apiRequest<AuthSession>("/auth/register", { method: "POST", body: payload });
-      } catch (error) {
-        const user: AuthUser = {
-          id: `u-${Date.now()}`,
-          studentId: `LTX-2026-${Math.floor(1000 + Math.random() * 8999)}`,
-          name: payload.name,
-          email: payload.email,
-          role: "student",
-          status: "active",
-          createdAt: new Date().toISOString(),
-        };
-        return mockDelay(buildSession(user, 1), 400);
-      }
+      return apiRequest<AuthSession>("/auth/register", { method: "POST", body: payload });
     }
 
     const user: AuthUser = {
@@ -87,38 +73,37 @@ export const authService = {
     return mockDelay(buildSession(user, 1), 600);
   },
 
+  /**
+   * The endpoint already answers identically whether or not the address exists, so user
+   * enumeration is prevented server side. Swallowing errors here only hid real outages -
+   * an unreachable API reported "email sent" and the user waited for nothing.
+   */
   async requestPasswordReset(email: string): Promise<{ sent: boolean }> {
     if (!env.useMocks) {
-      try {
-        return await apiRequest("/auth/forgot-password", { method: "POST", body: { email } });
-      } catch {
-        return mockDelay({ sent: true }, 500);
-      }
+      return apiRequest("/auth/forgot-password", { method: "POST", body: { email } });
     }
     return mockDelay({ sent: true }, 500);
   },
 
+  /**
+   * Never falls back to a fabricated success. The activation/reset token is one-time, so
+   * a rejection here (already used, expired, unknown) means the stored password was NOT
+   * changed - reporting "ok" would send the student to a login they cannot pass.
+   */
   async resetPassword(token: string, password: string): Promise<{ ok: boolean }> {
     if (!env.useMocks) {
-      try {
-        return await apiRequest("/auth/reset-password", {
-          method: "POST",
-          body: { token, password },
-        });
-      } catch {
-        return mockDelay({ ok: true }, 500);
-      }
+      return apiRequest("/auth/reset-password", {
+        method: "POST",
+        body: { token, password },
+      });
     }
     return mockDelay({ ok: true }, 500);
   },
 
+  /** Reports the API's actual answer - an unverified address must never read as verified. */
   async verifyEmail(token: string): Promise<{ verified: boolean }> {
     if (!env.useMocks) {
-      try {
-        return await apiRequest("/auth/verify-email", { method: "POST", body: { token } });
-      } catch {
-        return mockDelay({ verified: true }, 500);
-      }
+      return apiRequest("/auth/verify-email", { method: "POST", body: { token } });
     }
     return mockDelay({ verified: true }, 800);
   },

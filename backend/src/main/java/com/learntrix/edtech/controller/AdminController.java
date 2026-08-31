@@ -67,6 +67,7 @@ public class AdminController {
     private final com.learntrix.edtech.service.AdminOnboardingService adminOnboardingService;
     private final CourseService courseService;
     private final PasswordEncoder passwordEncoder;
+    private final com.learntrix.edtech.service.EmailService emailService;
 
     public AdminController(
             UserRepository userRepository,
@@ -79,7 +80,8 @@ public class AdminController {
             LiveClassService liveClassService,
             com.learntrix.edtech.service.AdminOnboardingService adminOnboardingService,
             CourseService courseService,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            com.learntrix.edtech.service.EmailService emailService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.courseRepository = courseRepository;
@@ -91,6 +93,36 @@ public class AdminController {
         this.adminOnboardingService = adminOnboardingService;
         this.courseService = courseService;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
+    }
+
+    /**
+     * Reports whether outbound SMTP is actually configured, so an admin can tell a real
+     * delivery failure apart from a backend that was never given mail credentials.
+     */
+    @GetMapping("/mail/status")
+    public ApiResponse<Map<String, Object>> mailStatus() {
+        return ApiResponse.success(emailService.describeConfiguration());
+    }
+
+    /**
+     * Sends a diagnostic message to prove SMTP works end to end before onboarding anyone.
+     */
+    @PostMapping("/mail/test")
+    public ApiResponse<Map<String, Object>> sendTestMail(@RequestBody Map<String, String> body) {
+        String to = body.get("to");
+        if (to == null || to.isBlank()) {
+            throw new IllegalArgumentException("A 'to' address is required");
+        }
+        com.learntrix.edtech.service.MailDispatchResult result = emailService.sendTestEmail(to.trim());
+        Map<String, Object> payload = new java.util.LinkedHashMap<>();
+        payload.put("to", to.trim());
+        payload.put("status", result.getStatusName());
+        payload.put("sent", result.isSent());
+        if (result.getDetail() != null) {
+            payload.put("error", result.getDetail());
+        }
+        return ApiResponse.success(payload);
     }
 
     @GetMapping("/stats")
@@ -223,10 +255,11 @@ public class AdminController {
     @Transactional(readOnly = true)
     @GetMapping("/students/{id}")
     public ApiResponse<AdminStudentDetailResponse> getStudent(@PathVariable("id") UUID id) {
-        User student = userRepository.findById(id).orElse(null);
-        if (student == null) {
-            return ApiResponse.success(null);
-        }
+        // An id that matches no user is a missing resource, not a successful empty read.
+        // Answering 200 with a null payload made a deleted or mistyped student look like a
+        // server-confirmed record, the same trap PATCH /students/{id}/status already avoids.
+        User student = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student", "id", id));
 
         AdminStudentRowResponse row = mapToStudentRow(student);
         Optional<StudentProfile> profileOpt = studentProfileRepository.findByUserId(id);
@@ -335,12 +368,16 @@ public class AdminController {
     public ApiResponse<Map<String, Object>> setStudentStatus(
             @PathVariable("id") UUID id,
             @RequestBody Map<String, String> body) {
-        User student = userRepository.findById(id).orElse(null);
-        if (student != null) {
-            String status = body.get("status");
-            student.setStatus(status.toUpperCase());
-            userRepository.save(student);
+        String status = body.get("status");
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("A 'status' value is required");
         }
+        // Reporting ok:true for an id that does not exist made a failed update look like a
+        // successful one in the admin UI, so an unknown id is a 404 rather than a silent no-op.
+        User student = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        student.setStatus(status.trim().toUpperCase());
+        userRepository.save(student);
         return ApiResponse.success(Map.of("ok", true));
     }
 
@@ -413,6 +450,10 @@ public class AdminController {
     /**
      * Returns all TEACHER-role users as a trainer list with TeacherProfile metadata and statistics.
      */
+    // open-in-view is off, so the lazy Batch.students / Batch.course associations read below
+    // need an open session — without this the whole trainer directory 500s as soon as any
+    // trainer owns a batch.
+    @Transactional(readOnly = true)
     @GetMapping({"/trainers", "/teachers"})
     public ApiResponse<List<Map<String, Object>>> getTrainers() {
         List<User> teachers = userRepository.findAll().stream()
@@ -476,8 +517,8 @@ public class AdminController {
         if (name.isEmpty()) {
             throw new IllegalArgumentException("Batch name is required");
         }
-        UUID courseId = UUID.fromString(String.valueOf(body.get("courseId")));
-        UUID teacherId = UUID.fromString(String.valueOf(body.get("teacherId")));
+        UUID courseId = requiredUuid(body.get("courseId"), "courseId");
+        UUID teacherId = requiredUuid(body.get("teacherId"), "teacherId");
         User teacher = userRepository.findById(teacherId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", teacherId));
         Course course = courseRepository.findById(courseId)
@@ -499,6 +540,22 @@ public class AdminController {
 
         Batch saved = batchRepository.save(batch);
         return ApiResponse.success(Map.of("id", saved.getId(), "name", saved.getName(), "ok", true));
+    }
+
+    /**
+     * Reads a required UUID out of a raw JSON body. Going through String.valueOf turned a
+     * missing field into the literal "null" and then into "Invalid UUID string: null",
+     * which named neither the field nor the fact that it was simply absent.
+     */
+    private static UUID requiredUuid(Object raw, String field) {
+        if (raw == null || String.valueOf(raw).isBlank()) {
+            throw new IllegalArgumentException("'" + field + "' is required");
+        }
+        try {
+            return UUID.fromString(String.valueOf(raw).trim());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("'" + field + "' is not a valid id");
+        }
     }
 
     @Transactional

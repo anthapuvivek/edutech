@@ -31,25 +31,27 @@ This starts Postgres on `localhost:5432` with database `edtech_dev`, user `edtec
 
 ### 2. Start the backend
 
-From `backend/`:
-
-**bash / Git Bash**
-
-```bash
-export DB_URL='jdbc:postgresql://localhost:5432/edtech_dev'
-export DB_USERNAME=edtech
-export DB_PASSWORD=edtech
-mvn spring-boot:run
-```
+Backend configuration lives in `backend/.env` (gitignored — copy `backend/.env.example`
+if you don't have one). **Spring Boot does not read `.env` files on its own**, so start
+the backend through the launcher scripts, which load it into the process environment:
 
 **PowerShell**
 
 ```powershell
-$env:DB_URL = 'jdbc:postgresql://localhost:5432/edtech_dev'
-$env:DB_USERNAME = 'edtech'
-$env:DB_PASSWORD = 'edtech'
-mvn spring-boot:run
+cd backend
+.un.ps1
 ```
+
+**bash / Git Bash**
+
+```bash
+cd backend
+./run.sh
+```
+
+Running `mvn spring-boot:run` directly still works, but only if you export the variables
+yourself — otherwise the DB password and SMTP credentials never reach the app and
+activation emails silently go nowhere.
 
 > **Java version note:** the pom targets Java 25. On JDK 21–24, add `-Djava.version=21` (or your JDK's version) to the Maven command:
 > `mvn spring-boot:run -Djava.version=21`
@@ -58,6 +60,44 @@ Verify it's up:
 
 - Health: <http://localhost:8081/actuator/health> → `{"status":"UP"}`
 - API docs (Swagger): <http://localhost:8081/swagger-ui.html>
+
+### 2b. Configure outbound email (activation links)
+
+When an admin onboards a student or trainer, the backend creates the account, issues a
+one-time activation token, and emails the recipient a link to set their password. That
+email only goes out if SMTP is configured in `backend/.env`:
+
+```
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your.address@gmail.com
+MAIL_PASSWORD=your-16-char-app-password
+MAIL_FROM=your.address@gmail.com
+APP_CLIENT_URL=http://localhost:8080
+```
+
+For Gmail, `MAIL_PASSWORD` must be a 16-character **App Password** from
+<https://myaccount.google.com/apppasswords> (2-Step Verification must be enabled on the
+account). A normal Gmail password is rejected with `535-5.7.8 Username and Password not
+accepted`.
+
+`APP_CLIENT_URL` is the origin baked into the activation link, so it must match where the
+frontend actually runs — otherwise recipients get a dead link.
+
+Check and test the configuration as an admin:
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8081/api/admin/mail/status
+```
+
+```bash
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{"to":"you@example.com"}' http://localhost:8081/api/admin/mail/test
+```
+
+If SMTP is unset or the server rejects the message, onboarding still creates the account
+but reports `emailStatus: NOT_CONFIGURED` / `FAILED` and returns the `activationUrl` so an
+admin can pass the link on by hand. The admin UI shows the failure and copies that link to
+the clipboard — it never claims an email was delivered when it was not.
 
 ### 3. Start the frontend
 
@@ -108,5 +148,6 @@ Seeded by the Flyway migrations. Password for all accounts: **`password`**
 | `npm run build`                  | Production frontend build       |
 | `npm run lint`                   | ESLint                          |
 | `npx tsc --noEmit`               | Typecheck the frontend          |
-| `mvn spring-boot:run` (backend/) | Run the API (port 8081)         |
+| `.un.ps1` / `./run.sh` (backend/) | Run the API with `.env` loaded (port 8081) |
+| `mvn spring-boot:run` (backend/) | Run the API without `.env` (port 8081) |
 | `mvn test` (backend/)            | Backend tests                   |

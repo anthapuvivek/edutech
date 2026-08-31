@@ -143,6 +143,7 @@ public class AuthController {
         boolean sent = false;
         if (userOpt.isPresent()) {
             User user = userOpt.get();
+<<<<<<< HEAD
             String token = UUID.randomUUID().toString().replace("-", "");
             user.setPasswordResetToken(token);
             user.setPasswordResetTokenExpiry(Instant.now().plusSeconds(3600)); // 1 hour
@@ -150,6 +151,18 @@ public class AuthController {
             sent = emailService.sendPasswordResetEmail(user, token);
         }
         return ApiResponse.success(Map.of("sent", sent));
+=======
+            String resetToken = UUID.randomUUID().toString().replace("-", "")
+                    + UUID.randomUUID().toString().replace("-", "");
+            user.setPasswordResetToken(resetToken);
+            user.setPasswordResetTokenExpiry(Instant.now().plusSeconds(3600)); // 1 hour
+            userRepository.save(user);
+            emailService.sendPasswordResetEmail(user, resetToken, 60);
+        }
+        // Always the same response regardless of whether the address exists, so this endpoint
+        // cannot be used to enumerate registered users.
+        return ApiResponse.success(Map.of("sent", true));
+>>>>>>> b72e728 (application updated)
     }
 
     @PostMapping({"/reset-password", "/activate"})
@@ -171,7 +184,7 @@ public class AuthController {
                     .orElseThrow(() -> new ResourceNotFoundException("User", "id", activationToken.getUserId()));
 
             user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-            user.setStatus("ACTIVE");
+            user.setStatus(statusAfterPasswordChange(user));
             user.setEmailVerified(true);
             user.setPasswordResetToken(null);
             user.setPasswordResetTokenExpiry(null);
@@ -192,7 +205,7 @@ public class AuthController {
         }
 
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setStatus("ACTIVE");
+        user.setStatus(statusAfterPasswordChange(user));
         user.setEmailVerified(true);
         user.setPasswordResetToken(null);
         user.setPasswordResetTokenExpiry(null);
@@ -222,6 +235,22 @@ public class AuthController {
     @PostMapping("/logout")
     public ApiResponse<String> logout() {
         return ApiResponse.success("Successfully logged out");
+    }
+
+    /**
+     * Status to persist once a user has set a new password.
+     *
+     * Setting a password proves control of the mailbox, so it clears PENDING - that is the
+     * whole point of the activation link. It must NOT clear an administrative lock: a
+     * SUSPENDED account that ran forgot-password would otherwise restore its own access,
+     * because the reset endpoint is public and needs no prior session.
+     */
+    private String statusAfterPasswordChange(User user) {
+        String current = user.getStatus();
+        if (current == null || current.isBlank()) {
+            return "ACTIVE";
+        }
+        return "PENDING".equalsIgnoreCase(current) ? "ACTIVE" : current.toUpperCase();
     }
 
     private LoginResponse buildLoginResponse(User user, boolean remember) {

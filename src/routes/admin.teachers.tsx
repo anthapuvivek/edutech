@@ -4,6 +4,8 @@ import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { reportOnboardingOutcome, reportResendOutcome } from "@/lib/onboarding-toast";
+
 import { Panel, StatusBadge } from "@/components/portal/AdminBits";
 import { PageHeader, StatCard } from "@/components/portal/StatCard";
 import { Badge } from "@/components/ui/badge";
@@ -89,6 +91,7 @@ function AdminTeachers() {
     setSaving(true);
     try {
       const res = await adminService.createTeacher(payload);
+<<<<<<< HEAD
       if (res?.emailStatus === "FAILED") {
         toast.warning(
           res.message ||
@@ -104,6 +107,9 @@ function AdminTeachers() {
               : "Trainer onboarded! Welcome activation email sent."),
         );
       }
+=======
+      reportOnboardingOutcome(res, "Trainer");
+>>>>>>> b72e728 (application updated)
       setOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["admin", "trainers"] });
       void trainers.refetch();
@@ -240,6 +246,7 @@ function AdminTeachers() {
                         onClick={() =>
                           void adminService
                             .resendTeacherWelcomeEmail(t.id)
+<<<<<<< HEAD
                             .then((res) => {
                               if (res?.emailStatus === "FAILED") {
                                 toast.warning(res.message || "Failed to send activation email.");
@@ -247,6 +254,9 @@ function AdminTeachers() {
                                 toast.success(res?.message || `Activation email resent to ${t.email}`);
                               }
                             })
+=======
+                            .then((res) => reportResendOutcome(res, t.email))
+>>>>>>> b72e728 (application updated)
                             .catch(() => toast.error("Could not resend email."))
                         }
                       >

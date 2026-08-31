@@ -49,6 +49,40 @@ import type { AdminStats, PlatformEvent } from "@/types/lms";
  * backend remains the authority for authorization, attendance maths,
  * eligibility evaluation, payments and placement verification.
  */
+/**
+ * Result of any endpoint that dispatches an activation / welcome email.
+ *
+ * `emailStatus` is the backend's honest verdict on delivery — the UI must key its
+ * messaging off this rather than off the HTTP 200, because the account is created
+ * even when SMTP is unconfigured or refuses the message. `activationUrl` is always
+ * returned so an admin can hand the link over manually.
+ */
+export interface OnboardingResult {
+  ok: boolean;
+  id?: string;
+  userId?: string;
+  email?: string;
+  name?: string;
+  role?: string;
+  identifier?: string;
+  onboardingStatus?: string;
+  emailStatus?: "SENT" | "FAILED" | "NOT_CONFIGURED";
+  emailError?: string;
+  activationUrl?: string;
+  message?: string;
+}
+
+export interface MailStatus {
+  configured: boolean;
+  host?: string | null;
+  port?: number;
+  username?: string | null;
+  from?: string;
+  fromName?: string;
+  clientUrl?: string;
+  hint?: string;
+}
+
 const adminServiceRaw = {
   async stats(): Promise<AdminStats> {
     if (!env.useMocks) return apiRequest<AdminStats>("/admin/stats");
@@ -76,6 +110,7 @@ const adminServiceRaw = {
     if (!env.useMocks) return apiRequest<AdminStudentDetail>(`/admin/students/${id}`);
     return mockDelay(mockAdminStudentDetail(id));
   },
+<<<<<<< HEAD
   async createStudent(payload: Record<string, unknown>): Promise<{ ok: boolean; id?: string; email?: string; identifier?: string; emailStatus?: string; message?: string }> {
     if (!env.useMocks) return apiRequest("/admin/students", { method: "POST", body: payload });
     return mockDelay({ ok: true, identifier: "LTX-2026-9999", emailStatus: "SENT", message: "Student onboarded successfully. Activation email sent." });
@@ -87,6 +122,15 @@ const adminServiceRaw = {
   async deleteStudent(id: string): Promise<{ ok: boolean; message?: string }> {
     if (!env.useMocks) return apiRequest(`/admin/students/${id}`, { method: "DELETE" });
     return mockDelay({ ok: true, message: "Student account has been deactivated successfully." });
+=======
+  async createStudent(payload: Record<string, unknown>): Promise<OnboardingResult> {
+    if (!env.useMocks) return apiRequest("/admin/students", { method: "POST", body: payload });
+    return mockDelay({ ok: true, identifier: "LTX-2026-9999", emailStatus: "SENT" as const });
+  },
+  async resendStudentWelcomeEmail(id: string): Promise<OnboardingResult> {
+    if (!env.useMocks) return apiRequest(`/admin/students/${id}/resend-welcome-email`, { method: "POST" });
+    return mockDelay({ ok: true, emailStatus: "SENT" as const, message: "Welcome email resent successfully." });
+>>>>>>> b72e728 (application updated)
   },
   async setStudentStatus(
     id: string,
@@ -151,6 +195,7 @@ const adminServiceRaw = {
     if (!env.useMocks) return apiRequest<AdminTrainer[]>("/admin/trainers");
     return mockDelay(mockTrainers);
   },
+<<<<<<< HEAD
   async createTeacher(payload: Record<string, unknown>): Promise<{ ok: boolean; id?: string; email?: string; identifier?: string; emailStatus?: string; message?: string }> {
     if (!env.useMocks) return apiRequest("/admin/teachers", { method: "POST", body: payload });
     return mockDelay({ ok: true, identifier: "LTX-T-2026-9999", emailStatus: "SENT", message: "Teacher onboarded successfully. Activation email sent." });
@@ -162,6 +207,23 @@ const adminServiceRaw = {
   async deleteTeacher(id: string): Promise<{ ok: boolean; message?: string }> {
     if (!env.useMocks) return apiRequest(`/admin/teachers/${id}`, { method: "DELETE" });
     return mockDelay({ ok: true, message: "Teacher account has been deactivated successfully." });
+=======
+  async createTeacher(payload: Record<string, unknown>): Promise<OnboardingResult> {
+    if (!env.useMocks) return apiRequest("/admin/teachers", { method: "POST", body: payload });
+    return mockDelay({ ok: true, identifier: "LTX-T-2026-9999", emailStatus: "SENT" as const });
+  },
+  async resendTeacherWelcomeEmail(id: string): Promise<OnboardingResult> {
+    if (!env.useMocks) return apiRequest(`/admin/teachers/${id}/resend-welcome-email`, { method: "POST" });
+    return mockDelay({ ok: true, emailStatus: "SENT" as const, message: "Welcome email resent successfully." });
+  },
+  async mailStatus(): Promise<MailStatus> {
+    if (!env.useMocks) return apiRequest<MailStatus>("/admin/mail/status");
+    return mockDelay({ configured: true, host: "smtp.mock", from: "no-reply@learntrix.com" });
+  },
+  async sendTestMail(to: string): Promise<{ sent: boolean; status: string; error?: string }> {
+    if (!env.useMocks) return apiRequest("/admin/mail/test", { method: "POST", body: { to } });
+    return mockDelay({ sent: true, status: "SENT" });
+>>>>>>> b72e728 (application updated)
   },
   async approveTrainer(id: string, approve: boolean): Promise<{ ok: true }> {
     if (!env.useMocks)

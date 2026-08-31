@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Panel, StatusBadge } from "@/components/portal/AdminBits";
+import { reportOnboardingOutcome, reportResendOutcome } from "@/lib/onboarding-toast";
 import { PageHeader } from "@/components/portal/StatCard";
 import { Button } from "@/components/ui/button";
 import {
@@ -150,6 +151,7 @@ function AdminStudents() {
     setSaving(true);
     try {
       const res = await adminService.createStudent(payload);
+<<<<<<< HEAD
       if (res?.emailStatus === "FAILED") {
         toast.warning(
           res.message ||
@@ -165,6 +167,9 @@ function AdminStudents() {
               : "Student onboarded! Welcome activation email sent."),
         );
       }
+=======
+      reportOnboardingOutcome(res, "Student");
+>>>>>>> b72e728 (application updated)
       setOpen(false);
       setSelectedCourse("none");
       setSelectedTrainer("none");
@@ -482,6 +487,7 @@ function AdminStudents() {
                           onClick={() =>
                             void adminService
                               .resendStudentWelcomeEmail(s.id)
+<<<<<<< HEAD
                               .then((res) => {
                                 if (res?.emailStatus === "FAILED") {
                                   toast.warning(res.message || "Failed to send activation email.");
@@ -489,6 +495,9 @@ function AdminStudents() {
                                   toast.success(res?.message || `Activation email resent to ${s.email}`);
                                 }
                               })
+=======
+                              .then((res) => reportResendOutcome(res, s.email))
+>>>>>>> b72e728 (application updated)
                               .catch(() => toast.error("Could not resend email."))
                           }
                         >

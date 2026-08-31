@@ -2,15 +2,58 @@ server:
   port: 8081
 
 spring:
+<<<<<<< HEAD
   config:
     import:
       - "optional:file:.env[.properties]"
       - "optional:file:../.env[.properties]"
       - "optional:file:backend/.env[.properties]"
+=======
+  # Spring Boot does not read .env files on its own. Importing it here means the database,
+  # SMTP and JWT settings reach the app however it is launched - backend/run.ps1, a bare
+  # `mvn spring-boot:run`, or an IDE run configuration - instead of only when the launcher
+  # happens to have exported them. Marked optional so a machine without the file (CI, a
+  # container using real environment variables) still starts. Real environment variables
+  # outrank an imported file, so run.ps1 and container env still win.
+  config:
+    import: optional:file:./.env[.properties]
+>>>>>>> b72e728 (application updated)
   profiles:
     active: dev
   application:
     name: edtech-backend
+
+  mail:
+    # Set MAIL_HOST/MAIL_USERNAME/MAIL_PASSWORD in backend/.env (see .env.example).
+    # Without a host Spring Boot creates no JavaMailSender and nothing is ever sent.
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    protocol: smtp
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_SMTP_AUTH:true}
+          starttls:
+            enable: ${MAIL_SMTP_STARTTLS:true}
+            required: ${MAIL_SMTP_STARTTLS:true}
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+        transport:
+          protocol: smtp
+
+  data:
+    redis:
+      repositories:
+        # Every repository in this project is a Spring Data JPA repository backed by
+        # PostgreSQL. With spring-boot-starter-data-redis on the classpath, Redis also
+        # scanned them and logged 33 "Could not safely identify store assignment" lines at
+        # every startup. Turning the Redis repository scan off silences that without
+        # touching the Redis connection factory, which stays available for future use.
+        enabled: false
 
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/learntrix}
@@ -68,9 +111,29 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+  health:
+    # The mail indicator opens an SMTP connection on every health check and reports DOWN
+    # whenever credentials are absent, which would drag the whole app's status down over an
+    # integration that is configured separately. GET /api/admin/mail/status is the
+    # authoritative, far more informative check for outbound email.
+    mail:
+      enabled: false
 
 app:
+<<<<<<< HEAD
   client-url: ${APP_CLIENT_URL:http://localhost:8080}
+=======
+  # Origin used to build activation / password-reset links inside outgoing emails.
+  # Must match where the frontend actually runs.
+  client-url: ${APP_CLIENT_URL:http://localhost:8080}
+  mail:
+    # Address subscribers see in the From header. Defaults to the SMTP account.
+    from: ${MAIL_FROM:${MAIL_USERNAME:no-reply@learntrix.com}}
+    from-name: ${MAIL_FROM_NAME:LearntriX Platform}
+    # When true a send failure is reported to the caller as FAILED instead of
+    # being swallowed, so the admin UI can never claim a mail was delivered.
+    fail-loudly: ${MAIL_FAIL_LOUDLY:true}
+>>>>>>> b72e728 (application updated)
   jwt:
     secret: ${JWT_SECRET:learntrix-secret-key-32chars-dev-only}
     access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}

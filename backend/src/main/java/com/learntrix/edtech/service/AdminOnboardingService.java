@@ -151,8 +151,9 @@ public class AdminOnboardingService {
         }
 
         // Dispatch Welcome Email
-        boolean emailSent = emailService.sendWelcomeActivationEmail(savedUser, "Student", studentId, token);
+        MailDispatchResult mail = emailService.sendWelcomeActivationEmail(savedUser, "Student", studentId, token);
 
+<<<<<<< HEAD
         return OnboardingResponse.builder()
                 .id(savedUser.getId())
                 .userId(savedUser.getId())
@@ -165,6 +166,9 @@ public class AdminOnboardingService {
                 .message(emailSent ? "Student onboarded successfully. Activation email sent." : "Student created, but activation email could not be sent.")
                 .ok(true)
                 .build();
+=======
+        return buildResponse(savedUser, "student", studentId, mail, "Student onboarded successfully.");
+>>>>>>> b72e728 (application updated)
     }
 
     /**
@@ -410,8 +414,9 @@ public class AdminOnboardingService {
         activationTokenRepository.save(activationToken);
 
         // Dispatch Welcome Email
-        boolean emailSent = emailService.sendWelcomeActivationEmail(savedUser, "Teacher", employeeId, token);
+        MailDispatchResult mail = emailService.sendWelcomeActivationEmail(savedUser, "Teacher", employeeId, token);
 
+<<<<<<< HEAD
         return OnboardingResponse.builder()
                 .id(savedUser.getId())
                 .userId(savedUser.getId())
@@ -424,6 +429,9 @@ public class AdminOnboardingService {
                 .message(emailSent ? "Teacher onboarded successfully. Activation email sent." : "Trainer created, but activation email could not be sent.")
                 .ok(true)
                 .build();
+=======
+        return buildResponse(savedUser, "teacher", employeeId, mail, "Teacher onboarded successfully.");
+>>>>>>> b72e728 (application updated)
     }
 
     /**
@@ -476,6 +484,7 @@ public class AdminOnboardingService {
                 .map(StudentProfile::getStudentId)
                 .orElse("N/A");
 
+<<<<<<< HEAD
         boolean emailSent = emailService.sendWelcomeActivationEmail(user, "Student", identifier, token);
 
         return OnboardingResponse.builder()
@@ -490,6 +499,11 @@ public class AdminOnboardingService {
                 .message(emailSent ? "Welcome activation email resent successfully." : "Failed to send activation email. Please check email server configuration.")
                 .ok(true)
                 .build();
+=======
+        MailDispatchResult mail = emailService.sendWelcomeActivationEmail(user, "Student", studentId, token);
+
+        return buildResponse(user, "student", studentId, mail, "Activation link regenerated.");
+>>>>>>> b72e728 (application updated)
     }
 
     /**
@@ -541,18 +555,39 @@ public class AdminOnboardingService {
                 .map(TeacherProfile::getEmployeeId)
                 .orElse("N/A");
 
-        boolean emailSent = emailService.sendWelcomeActivationEmail(user, "Teacher", employeeId, token);
+        MailDispatchResult mail = emailService.sendWelcomeActivationEmail(user, "Teacher", employeeId, token);
+
+        return buildResponse(user, "teacher", employeeId, mail, "Activation link regenerated.");
+    }
+
+    /**
+     * Builds the onboarding response from the real mail outcome. The account is created either
+     * way — {@code ok} stays true — but {@code emailStatus} and {@code message} tell the truth
+     * about delivery so the admin knows when to hand the activation link over manually.
+     */
+    private OnboardingResponse buildResponse(User user, String role, String identifier,
+                                             MailDispatchResult mail, String createdMessage) {
+        String message = mail.isSent()
+                ? createdMessage + " Activation email sent to " + user.getEmail() + "."
+                : createdMessage + " The activation email could NOT be delivered - share the activation link manually.";
 
         return OnboardingResponse.builder()
                 .id(user.getId())
                 .userId(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
-                .role("teacher")
-                .identifier(employeeId)
+                .role(role)
+                .identifier(identifier)
                 .onboardingStatus("INVITED")
+<<<<<<< HEAD
                 .emailStatus(emailSent ? "SENT" : "FAILED")
                 .message(emailSent ? "Welcome activation email resent successfully." : "Failed to send activation email. Please check email server configuration.")
+=======
+                .emailStatus(mail.getStatusName())
+                .emailError(mail.getDetail())
+                .activationUrl(mail.getLink())
+                .message(message)
+>>>>>>> b72e728 (application updated)
                 .ok(true)
                 .build();
     }
