@@ -40,3 +40,20 @@ logging:
 server:
   error:
     include-stacktrace: never
+
+# Video / recording storage. VideoStorageConfig selects the implementation from
+# learntrix.video.storage; both LocalVideoStorageService and S3VideoStorageService
+# already exist in the codebase. An ECS/Fargate container filesystem is ephemeral,
+# so local disk loses every upload on redeploy - S3 is the durable choice on AWS.
+learntrix:
+  video:
+    storage: ${VIDEO_STORAGE:s3}
+
+aws:
+  s3:
+    # No default on purpose: booting against the wrong bucket is worse than failing
+    # fast, and this matches how DB_URL / JWT_SECRET are treated above.
+    bucket: ${AWS_S3_BUCKET}
+    region: ${AWS_S3_REGION:us-east-1}
+  cloudfront:
+    domain: ${AWS_CLOUDFRONT_DOMAIN:}

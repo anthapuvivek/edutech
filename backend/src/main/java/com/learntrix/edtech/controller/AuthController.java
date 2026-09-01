@@ -143,15 +143,6 @@ public class AuthController {
         boolean sent = false;
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-<<<<<<< HEAD
-            String token = UUID.randomUUID().toString().replace("-", "");
-            user.setPasswordResetToken(token);
-            user.setPasswordResetTokenExpiry(Instant.now().plusSeconds(3600)); // 1 hour
-            userRepository.save(user);
-            sent = emailService.sendPasswordResetEmail(user, token);
-        }
-        return ApiResponse.success(Map.of("sent", sent));
-=======
             String resetToken = UUID.randomUUID().toString().replace("-", "")
                     + UUID.randomUUID().toString().replace("-", "");
             user.setPasswordResetToken(resetToken);
@@ -162,7 +153,6 @@ public class AuthController {
         // Always the same response regardless of whether the address exists, so this endpoint
         // cannot be used to enumerate registered users.
         return ApiResponse.success(Map.of("sent", true));
->>>>>>> b72e728 (application updated)
     }
 
     @PostMapping({"/reset-password", "/activate"})

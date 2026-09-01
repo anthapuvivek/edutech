@@ -187,17 +187,7 @@ function StudentDetail() {
               onClick={() =>
                 void adminService
                   .resendStudentWelcomeEmail(studentId)
-<<<<<<< HEAD
-                  .then((res) => {
-                    if (res?.emailStatus === "FAILED") {
-                      toast.warning(res.message || "Failed to send activation email.");
-                    } else {
-                      toast.success(res?.message || "Welcome activation email resent successfully.");
-                    }
-                  })
-=======
                   .then((res) => reportResendOutcome(res, s.email))
->>>>>>> b72e728 (application updated)
                   .catch(() => toast.error("Could not resend email."))
               }
             >

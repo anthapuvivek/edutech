@@ -2,13 +2,6 @@ server:
   port: 8081
 
 spring:
-<<<<<<< HEAD
-  config:
-    import:
-      - "optional:file:.env[.properties]"
-      - "optional:file:../.env[.properties]"
-      - "optional:file:backend/.env[.properties]"
-=======
   # Spring Boot does not read .env files on its own. Importing it here means the database,
   # SMTP and JWT settings reach the app however it is launched - backend/run.ps1, a bare
   # `mvn spring-boot:run`, or an IDE run configuration - instead of only when the launcher
@@ -17,7 +10,6 @@ spring:
   # outrank an imported file, so run.ps1 and container env still win.
   config:
     import: optional:file:./.env[.properties]
->>>>>>> b72e728 (application updated)
   profiles:
     active: dev
   application:
@@ -77,25 +69,6 @@ spring:
       write-dates-as-timestamps: false
     deserialization:
       fail-on-unknown-properties: false
-  mail:
-    host: ${MAIL_HOST:${SPRING_MAIL_HOST:smtp.gmail.com}}
-    port: ${MAIL_PORT:${SPRING_MAIL_PORT:587}}
-    username: ${MAIL_USERNAME:${SPRING_MAIL_USERNAME:}}
-    password: ${MAIL_PASSWORD:${SPRING_MAIL_PASSWORD:}}
-    default-encoding: UTF-8
-    from: ${MAIL_FROM:${MAIL_USERNAME:${SPRING_MAIL_USERNAME:anthapuvivekananda@gmail.com}}}
-    properties:
-      mail:
-        smtp:
-          auth: ${MAIL_SMTP_AUTH:${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:true}}
-          starttls:
-            enable: ${MAIL_SMTP_STARTTLS:${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:true}}
-            required: ${MAIL_SMTP_STARTTLS_REQUIRED:${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_REQUIRED:true}}
-          ssl:
-            trust: ${MAIL_SMTP_SSL_TRUST:smtp.gmail.com}
-          connectiontimeout: 10000
-          timeout: 10000
-          writetimeout: 10000
 
 springdoc:
   api-docs:
@@ -120,9 +93,6 @@ management:
       enabled: false
 
 app:
-<<<<<<< HEAD
-  client-url: ${APP_CLIENT_URL:http://localhost:8080}
-=======
   # Origin used to build activation / password-reset links inside outgoing emails.
   # Must match where the frontend actually runs.
   client-url: ${APP_CLIENT_URL:http://localhost:8080}
@@ -133,7 +103,6 @@ app:
     # When true a send failure is reported to the caller as FAILED instead of
     # being swallowed, so the admin UI can never claim a mail was delivered.
     fail-loudly: ${MAIL_FAIL_LOUDLY:true}
->>>>>>> b72e728 (application updated)
   jwt:
     secret: ${JWT_SECRET:learntrix-secret-key-32chars-dev-only}
     access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}

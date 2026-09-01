@@ -8,6 +8,8 @@ import com.learntrix.edtech.dto.admin.OnboardingResponse;
 import com.learntrix.edtech.entity.*;
 import com.learntrix.edtech.repository.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,9 @@ public class AdminOnboardingService {
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final BatchRepository batchRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public AdminOnboardingService(
             UserRepository userRepository,
@@ -145,7 +150,21 @@ public class AdminOnboardingService {
         activationToken.setExpiresAt(expiresAt);
         activationTokenRepository.save(activationToken);
 
-        // Optional immediate allocation
+        // Optional immediate allocation.
+        //
+        // The teacher link is stored on the Enrollment row - StudentProfile has no teacher
+        // column, and a teacher's roster is built purely from enrollments. So a teacherId
+        // without a courseId has nowhere to live. Refusing it loudly is the only honest
+        // option: silently dropping the selection is what made onboarded students never
+        // reach the trainer the admin picked.
+        if (request.getCourseId() == null && (request.getTeacherId() != null || request.getBatchId() != null)) {
+            throw new com.learntrix.edtech.common.exception.BusinessException(
+                    "COURSE_REQUIRED_FOR_ALLOCATION",
+                    "Select a course as well. A trainer or batch is assigned to a student through a course enrolment, "
+                            + "so without a course the allocation cannot be recorded.",
+                    org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
         if (request.getCourseId() != null) {
             allocateStudentInternal(savedUser, request.getCourseId(), request.getTeacherId(), request.getBatchId(), "ACTIVE");
         }
@@ -153,22 +172,7 @@ public class AdminOnboardingService {
         // Dispatch Welcome Email
         MailDispatchResult mail = emailService.sendWelcomeActivationEmail(savedUser, "Student", studentId, token);
 
-<<<<<<< HEAD
-        return OnboardingResponse.builder()
-                .id(savedUser.getId())
-                .userId(savedUser.getId())
-                .email(savedUser.getEmail())
-                .name(savedUser.getName())
-                .role("student")
-                .identifier(studentId)
-                .onboardingStatus("INVITED")
-                .emailStatus(emailSent ? "SENT" : "FAILED")
-                .message(emailSent ? "Student onboarded successfully. Activation email sent." : "Student created, but activation email could not be sent.")
-                .ok(true)
-                .build();
-=======
         return buildResponse(savedUser, "student", studentId, mail, "Student onboarded successfully.");
->>>>>>> b72e728 (application updated)
     }
 
     /**
@@ -416,22 +420,7 @@ public class AdminOnboardingService {
         // Dispatch Welcome Email
         MailDispatchResult mail = emailService.sendWelcomeActivationEmail(savedUser, "Teacher", employeeId, token);
 
-<<<<<<< HEAD
-        return OnboardingResponse.builder()
-                .id(savedUser.getId())
-                .userId(savedUser.getId())
-                .email(savedUser.getEmail())
-                .name(savedUser.getName())
-                .role("teacher")
-                .identifier(employeeId)
-                .onboardingStatus("INVITED")
-                .emailStatus(emailSent ? "SENT" : "FAILED")
-                .message(emailSent ? "Teacher onboarded successfully. Activation email sent." : "Trainer created, but activation email could not be sent.")
-                .ok(true)
-                .build();
-=======
         return buildResponse(savedUser, "teacher", employeeId, mail, "Teacher onboarded successfully.");
->>>>>>> b72e728 (application updated)
     }
 
     /**
@@ -484,26 +473,9 @@ public class AdminOnboardingService {
                 .map(StudentProfile::getStudentId)
                 .orElse("N/A");
 
-<<<<<<< HEAD
-        boolean emailSent = emailService.sendWelcomeActivationEmail(user, "Student", identifier, token);
+        MailDispatchResult mail = emailService.sendWelcomeActivationEmail(user, "Student", identifier, token);
 
-        return OnboardingResponse.builder()
-                .id(user.getId())
-                .userId(user.getId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .role("student")
-                .identifier(identifier)
-                .onboardingStatus("INVITED")
-                .emailStatus(emailSent ? "SENT" : "FAILED")
-                .message(emailSent ? "Welcome activation email resent successfully." : "Failed to send activation email. Please check email server configuration.")
-                .ok(true)
-                .build();
-=======
-        MailDispatchResult mail = emailService.sendWelcomeActivationEmail(user, "Student", studentId, token);
-
-        return buildResponse(user, "student", studentId, mail, "Activation link regenerated.");
->>>>>>> b72e728 (application updated)
+        return buildResponse(user, "student", identifier, mail, "Activation link regenerated.");
     }
 
     /**
@@ -579,26 +551,29 @@ public class AdminOnboardingService {
                 .role(role)
                 .identifier(identifier)
                 .onboardingStatus("INVITED")
-<<<<<<< HEAD
-                .emailStatus(emailSent ? "SENT" : "FAILED")
-                .message(emailSent ? "Welcome activation email resent successfully." : "Failed to send activation email. Please check email server configuration.")
-=======
                 .emailStatus(mail.getStatusName())
                 .emailError(mail.getDetail())
                 .activationUrl(mail.getLink())
                 .message(message)
->>>>>>> b72e728 (application updated)
                 .ok(true)
                 .build();
     }
 
     /**
-     * Securely deactivates and terminates a student account.
-     * Prevents admin deletion, revokes tokens, updates enrollment states,
-     * and sets account status to INACTIVE.
+     * Permanently deletes a student account.
+     *
+     * <p>This is a hard delete: the users row is removed and every child row follows it
+     * through ON DELETE CASCADE - student_profiles, enrollments, batch_students,
+     * assignment_submissions, quiz_attempts, recording_watch_progress, notifications,
+     * refresh_tokens and account_activation_tokens. None of it is recoverable, which is
+     * the intended behaviour: an admin who clicks Delete expects the student to be gone,
+     * not hidden behind a status flag the list never filtered on.</p>
+     *
+     * <p>The guards below are unchanged from the previous soft-delete implementation -
+     * administrators, non-students and self-deletion are all still refused.</p>
      */
     @Transactional
-    public Map<String, Object> deleteOrDeactivateStudent(UUID studentId, org.springframework.security.core.Authentication authentication) {
+    public Map<String, Object> deleteStudentPermanently(UUID studentId, org.springframework.security.core.Authentication authentication) {
         if (studentId == null) {
             throw new IllegalArgumentException("Student ID is required");
         }
@@ -615,7 +590,7 @@ public class AdminOnboardingService {
 
         // Prevent deleting administrators
         if (user.getRoles().stream().anyMatch(r -> "ADMIN".equalsIgnoreCase(r.getName()) || "SUPER_ADMIN".equalsIgnoreCase(r.getName()))) {
-            throw new com.learntrix.edtech.common.exception.BusinessException("CANNOT_DELETE_ADMIN", "Cannot delete or deactivate an administrator account.", org.springframework.http.HttpStatus.FORBIDDEN);
+            throw new com.learntrix.edtech.common.exception.BusinessException("CANNOT_DELETE_ADMIN", "Cannot delete an administrator account.", org.springframework.http.HttpStatus.FORBIDDEN);
         }
 
         // Validate target role
@@ -623,45 +598,39 @@ public class AdminOnboardingService {
             throw new com.learntrix.edtech.common.exception.BusinessException("INVALID_ROLE", "Target user is not a student.", org.springframework.http.HttpStatus.BAD_REQUEST);
         }
 
-        // Prevent self-deactivation
+        // Prevent self-deletion
         if (authentication != null && authentication.getName() != null && (authentication.getName().equalsIgnoreCase(user.getEmail()) || authentication.getName().equalsIgnoreCase(user.getId().toString()))) {
             throw new com.learntrix.edtech.common.exception.BusinessException("CANNOT_DELETE_SELF", "You cannot delete your own account.", org.springframework.http.HttpStatus.BAD_REQUEST);
         }
 
-        // Invalidate unused activation tokens
-        activationTokenRepository.invalidateUnusedTokensForUser(user.getId(), Instant.now());
+        UUID userId = user.getId();
+        String email = user.getEmail();
 
-        // Clear sensitive tokens
-        user.setPasswordResetToken(null);
-        user.setPasswordResetTokenExpiry(null);
-        user.setEmailVerificationToken(null);
-        user.setEmailVerificationTokenExpiry(null);
-
-        // Mark user status as INACTIVE
-        user.setStatus("INACTIVE");
-        userRepository.save(user);
-
-        // Detach student from active batches
+        // Detach from batches first. batch_students cascades, but the Batch entity owns the
+        // in-memory collection, so leaving it stale would resurrect the link on a later save.
         List<Batch> batches = batchRepository.findByStudentsContaining(user);
         for (Batch batch : batches) {
             batch.getStudents().remove(user);
             batchRepository.save(batch);
         }
 
-        // Update active enrollments to INACTIVE
-        List<Enrollment> enrollments = enrollmentRepository.findByStudentId(user.getId());
-        for (Enrollment enrollment : enrollments) {
-            if ("ACTIVE".equalsIgnoreCase(enrollment.getStatus())) {
-                enrollment.setStatus("INACTIVE");
-                enrollmentRepository.save(enrollment);
-            }
-        }
+        // login_audit_logs is the one FK to users declared ON DELETE NO ACTION, so it would
+        // block the delete. Nothing writes to that table today, but clearing it here means
+        // this endpoint does not start returning 500s the day something does.
+        entityManager.createNativeQuery("DELETE FROM login_audit_logs WHERE user_id = :uid")
+                .setParameter("uid", userId)
+                .executeUpdate();
+
+        // Flush the detach above before the cascade delete runs.
+        entityManager.flush();
+
+        userRepository.delete(user);
 
         Map<String, Object> response = new HashMap<>();
         response.put("ok", true);
-        response.put("id", user.getId().toString());
-        response.put("status", "INACTIVE");
-        response.put("message", "Student account has been deactivated successfully.");
+        response.put("id", userId.toString());
+        response.put("status", "DELETED");
+        response.put("message", "Student " + email + " and all associated records were permanently deleted.");
         return response;
     }
 

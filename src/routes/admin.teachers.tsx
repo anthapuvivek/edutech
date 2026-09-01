@@ -33,7 +33,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { adminService } from "@/services/admin.service";
 import { useAuth } from "@/hooks/useAuth";
-import type { AdminTrainer } from "@/types";
+import type { AdminTrainer } from "@/types/admin";
 
 export const Route = createFileRoute("/admin/teachers")({
   head: () => ({
@@ -91,25 +91,7 @@ function AdminTeachers() {
     setSaving(true);
     try {
       const res = await adminService.createTeacher(payload);
-<<<<<<< HEAD
-      if (res?.emailStatus === "FAILED") {
-        toast.warning(
-          res.message ||
-            (res?.identifier
-              ? `Trainer ${res.identifier} created, but activation email could not be sent.`
-              : "Trainer created, but activation email could not be sent."),
-        );
-      } else {
-        toast.success(
-          res?.message ||
-            (res?.identifier
-              ? `Trainer ${res.identifier} onboarded! Welcome activation email sent.`
-              : "Trainer onboarded! Welcome activation email sent."),
-        );
-      }
-=======
       reportOnboardingOutcome(res, "Trainer");
->>>>>>> b72e728 (application updated)
       setOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["admin", "trainers"] });
       void trainers.refetch();
@@ -246,17 +228,7 @@ function AdminTeachers() {
                         onClick={() =>
                           void adminService
                             .resendTeacherWelcomeEmail(t.id)
-<<<<<<< HEAD
-                            .then((res) => {
-                              if (res?.emailStatus === "FAILED") {
-                                toast.warning(res.message || "Failed to send activation email.");
-                              } else {
-                                toast.success(res?.message || `Activation email resent to ${t.email}`);
-                              }
-                            })
-=======
                             .then((res) => reportResendOutcome(res, t.email))
->>>>>>> b72e728 (application updated)
                             .catch(() => toast.error("Could not resend email."))
                         }
                       >

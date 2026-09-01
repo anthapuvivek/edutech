@@ -1,0 +1,22 @@
+# Keep secrets and local state out of the Docker build context.
+# The Dockerfile only needs pom.xml and src/.
+.env
+.env.local
+.env.*.local
+
+# Build output - the image rebuilds this inside the build stage
+target/
+
+# Locally uploaded media; in a container this must be a mounted volume, not baked in
+uploads/
+
+# Local tooling / editor state
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Runner scripts are for local development only
+run.sh
+run.ps1

@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/table";
 import { adminService } from "@/services/admin.service";
 import { useAuth } from "@/hooks/useAuth";
-import type { AdminStudentRow } from "@/types";
+import type { AdminStudentRow } from "@/types/admin";
 
 export const Route = createFileRoute("/admin/students/")({
   head: () => ({
@@ -148,28 +148,27 @@ function AdminStudents() {
       batchId: selectedBatch && selectedBatch !== "none" ? selectedBatch : undefined,
     };
 
+    // A trainer is attached to a student only through a course enrolment - the link lives
+    // on the enrolment row, and StudentProfile has no teacher column. Without a course
+    // there is nowhere to store the selection, and the backend would silently drop it.
+    if (selectedTrainer !== "none" && selectedCourse === "none") {
+      toast.error("Choose a course as well.", {
+        description:
+          "A trainer is assigned through a course. Without one, the student will not appear in that trainer's list.",
+      });
+      return;
+    }
+    if (selectedBatch !== "none" && selectedCourse === "none") {
+      toast.error("Choose a course as well.", {
+        description: "Batch membership is recorded against a course enrolment.",
+      });
+      return;
+    }
+
     setSaving(true);
     try {
       const res = await adminService.createStudent(payload);
-<<<<<<< HEAD
-      if (res?.emailStatus === "FAILED") {
-        toast.warning(
-          res.message ||
-            (res?.identifier
-              ? `Student ${res.identifier} created, but activation email could not be sent.`
-              : "Student created, but activation email could not be sent."),
-        );
-      } else {
-        toast.success(
-          res?.message ||
-            (res?.identifier
-              ? `Student ${res.identifier} onboarded! Welcome activation email sent.`
-              : "Student onboarded! Welcome activation email sent."),
-        );
-      }
-=======
       reportOnboardingOutcome(res, "Student");
->>>>>>> b72e728 (application updated)
       setOpen(false);
       setSelectedCourse("none");
       setSelectedTrainer("none");
@@ -284,7 +283,12 @@ function AdminStudents() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="alloc-course">Initial Course</Label>
+                    <Label htmlFor="alloc-course">
+                      Initial Course{" "}
+                      <span className="font-normal text-muted-foreground">
+                        — required to assign a teacher or batch
+                      </span>
+                    </Label>
                     <Select value={selectedCourse} onValueChange={setSelectedCourse}>
                       <SelectTrigger id="alloc-course">
                         <SelectValue placeholder="Select Course (Optional)" />
@@ -487,17 +491,7 @@ function AdminStudents() {
                           onClick={() =>
                             void adminService
                               .resendStudentWelcomeEmail(s.id)
-<<<<<<< HEAD
-                              .then((res) => {
-                                if (res?.emailStatus === "FAILED") {
-                                  toast.warning(res.message || "Failed to send activation email.");
-                                } else {
-                                  toast.success(res?.message || `Activation email resent to ${s.email}`);
-                                }
-                              })
-=======
                               .then((res) => reportResendOutcome(res, s.email))
->>>>>>> b72e728 (application updated)
                               .catch(() => toast.error("Could not resend email."))
                           }
                         >
@@ -538,14 +532,17 @@ function AdminStudents() {
       <Dialog open={!!studentToDelete} onOpenChange={(open) => !open && setStudentToDelete(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Remove Student</DialogTitle>
+            <DialogTitle>Delete student permanently</DialogTitle>
             <DialogDescription>
-              Are you sure you want to remove this student?
+              This removes the student and their records from the database for good.
             </DialogDescription>
           </DialogHeader>
           <div className="py-2 text-sm text-muted-foreground">
             <p>
-              This will deactivate <strong>{studentToDelete?.name}</strong> ({studentToDelete?.email}), revoke their active login sessions, and remove them from active batches. Historical academic records will be safely retained.
+              This permanently deletes <strong>{studentToDelete?.name}</strong> ({studentToDelete?.email}) along with their profile, enrolments, batch membership, assignment submissions, quiz attempts and watch history.
+            </p>
+            <p className="mt-2 font-medium text-destructive">
+              This cannot be undone.
             </p>
           </div>
           <DialogFooter>
@@ -560,7 +557,7 @@ function AdminStudents() {
                 setDeleting(true);
                 try {
                   const res = await adminService.deleteStudent(studentToDelete.id);
-                  toast.success(res?.message || "Student account deactivated successfully.");
+                  toast.success(res?.message || "Student permanently deleted.");
                   setStudentToDelete(null);
                   void queryClient.invalidateQueries({ queryKey: ["admin", "students"] });
                 } catch (err: any) {
@@ -574,7 +571,7 @@ function AdminStudents() {
                 }
               }}
             >
-              {deleting ? "Removing..." : "Remove Student"}
+              {deleting ? "Deleting..." : "Delete permanently"}
             </Button>
           </DialogFooter>
         </DialogContent>

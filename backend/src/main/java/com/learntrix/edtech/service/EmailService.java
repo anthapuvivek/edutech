@@ -32,10 +32,6 @@ public class EmailService {
     @Value("${spring.mail.username:}")
     private String mailUsername;
 
-<<<<<<< HEAD
-    @Value("${spring.mail.from:${spring.mail.username:anthapuvivekananda@gmail.com}}")
-    private String fromAddress;
-=======
     @Value("${app.mail.from:}")
     private String configuredFrom;
 
@@ -82,25 +78,14 @@ public class EmailService {
     public String buildActivationUrl(String activationToken) {
         return clientUrl + "/reset-password?token=" + activationToken;
     }
->>>>>>> b72e728 (application updated)
 
     /**
      * Sends the welcome activation email to a newly onboarded student or teacher.
      * Contains the one-time secure activation token link for them to set their password.
      */
-<<<<<<< HEAD
-    public boolean sendWelcomeActivationEmail(User user, String roleName, String identifier, String activationToken) {
-        if (user == null || user.getEmail() == null || user.getEmail().trim().isEmpty()) {
-            LOGGER.warn("Cannot send activation email: User or email is null/empty");
-            return false;
-        }
-
-        String activationUrl = clientUrl + "/reset-password?token=" + activationToken;
-=======
     public MailDispatchResult sendWelcomeActivationEmail(User user, String roleName, String identifier,
                                                          String activationToken) {
         String activationUrl = buildActivationUrl(activationToken);
->>>>>>> b72e728 (application updated)
         String subject = "Welcome to LearntriX - Activate Your Account";
         String id = identifier != null ? identifier : "N/A";
 
@@ -137,85 +122,6 @@ public class EmailService {
                         + "</div>",
                 user.getEmail(), roleName, id, activationUrl, activationUrl, activationUrl);
 
-<<<<<<< HEAD
-        LOGGER.info("Attempting to send activation email to {}", user.getEmail());
-
-        if (mailSender == null || mailHost == null || mailHost.trim().isEmpty()) {
-            LOGGER.warn("JavaMailSender / SMTP host is not configured (MAIL_HOST unset). Failed to send activation email to {}", user.getEmail());
-            return false;
-        }
-
-        String sender = (fromAddress != null && !fromAddress.trim().isEmpty()) ? fromAddress.trim() : mailUsername;
-        if (sender == null || sender.trim().isEmpty()) {
-            sender = "anthapuvivekananda@gmail.com";
-        }
-
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(sender, "LearntriX Platform");
-            helper.setTo(user.getEmail());
-            helper.setSubject(subject);
-            helper.setText(textContent, htmlContent);
-            mailSender.send(message);
-            LOGGER.info("Activation email sent successfully to {} from {}", user.getEmail(), sender);
-            return true;
-        } catch (Exception e) {
-            LOGGER.error("Failed to send activation email to {} from {}. Error: {}", user.getEmail(), sender, e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
-     * Sends the password reset email to a user who requested a password reset.
-     * Contains the secure reset token link.
-     */
-    public boolean sendPasswordResetEmail(User user, String resetToken) {
-        if (user == null || user.getEmail() == null || user.getEmail().trim().isEmpty()) {
-            LOGGER.warn("Cannot send password reset email: User or email is null/empty");
-            return false;
-        }
-
-        String resetUrl = clientUrl + "/reset-password?token=" + resetToken;
-        String subject = "LearntriX - Password Reset Request";
-
-        String textContent = String.format(
-                "Hello %s,\n\n" +
-                "We received a request to reset your password for your LearntriX account.\n\n" +
-                "Please reset your password by visiting this link:\n" +
-                "%s\n\n" +
-                "Note: This password reset link expires in 1 hour. If you did not request this, please ignore this email.\n\n" +
-                "— The LearntriX Team",
-                user.getName() != null ? user.getName() : "LearntriX User", resetUrl
-        );
-
-        String htmlContent = String.format(
-                "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 8px;\">" +
-                "<h2 style=\"color: #0f172a;\">Reset Your LearntriX Password</h2>" +
-                "<p style=\"color: #475569;\">Hello %s,</p>" +
-                "<p style=\"color: #475569;\">We received a request to reset your password. Click the button below to choose a new password:</p>" +
-                "<div style=\"text-align: center; margin: 28px 0;\">" +
-                "<a href=\"%s\" style=\"background: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block;\">Reset Password</a>" +
-                "</div>" +
-                "<p style=\"color: #64748b; font-size: 13px;\">If the button does not work, copy and paste this link in your browser:<br>" +
-                "<a href=\"%s\" style=\"color: #2563eb;\">%s</a></p>" +
-                "<hr style=\"border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;\" />" +
-                "<p style=\"color: #94a3b8; font-size: 12px;\">This password reset link expires in 1 hour. If you did not make this request, you can safely ignore this email.</p>" +
-                "</div>",
-                user.getName() != null ? user.getName() : "LearntriX User", resetUrl, resetUrl, resetUrl
-        );
-
-        LOGGER.info("Attempting to send password reset email to {}", user.getEmail());
-
-        if (mailSender == null || mailHost == null || mailHost.trim().isEmpty()) {
-            LOGGER.warn("JavaMailSender / SMTP host is not configured (MAIL_HOST unset). Failed to send password reset email to {}", user.getEmail());
-            return false;
-        }
-
-        String sender = (fromAddress != null && !fromAddress.trim().isEmpty()) ? fromAddress.trim() : mailUsername;
-        if (sender == null || sender.trim().isEmpty()) {
-            sender = "anthapuvivekananda@gmail.com";
-=======
         return dispatch(user.getEmail(), subject, textContent, htmlContent, activationUrl, "activation");
     }
 
@@ -277,24 +183,10 @@ public class EmailService {
             LOGGER.error("SMTP is not configured (spring.mail.host is empty). The {} email to {} was NOT "
                     + "delivered. Set MAIL_HOST/MAIL_USERNAME/MAIL_PASSWORD in backend/.env.", kind, to);
             return MailDispatchResult.notConfigured(link);
->>>>>>> b72e728 (application updated)
         }
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
-<<<<<<< HEAD
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(sender, "LearntriX Platform");
-            helper.setTo(user.getEmail());
-            helper.setSubject(subject);
-            helper.setText(textContent, htmlContent);
-            mailSender.send(message);
-            LOGGER.info("Password reset email sent successfully to {} from {}", user.getEmail(), sender);
-            return true;
-        } catch (Exception e) {
-            LOGGER.error("Failed to send password reset email to {} from {}. Error: {}", user.getEmail(), sender, e.getMessage(), e);
-            return false;
-=======
             MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
             helper.setFrom(resolveFrom(), fromName);
             helper.setTo(to);
@@ -307,7 +199,6 @@ public class EmailService {
             String reason = rootMessage(e);
             LOGGER.error("SMTP dispatch of the {} email to {} FAILED: {}", kind, to, reason, e);
             return MailDispatchResult.failed(reason, link);
->>>>>>> b72e728 (application updated)
         }
     }
 

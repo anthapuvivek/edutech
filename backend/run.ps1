@@ -1,21 +1,3 @@
-<<<<<<< HEAD
-# LearntriX Backend Runner (PowerShell)
-# Loads environment variables from backend/.env and starts Spring Boot
-
-$envFile = Join-Path $PSScriptRoot ".env"
-if (Test-Path $envFile) {
-    Write-Host "Loading environment variables from $envFile"
-    Get-Content $envFile | Where-Object { $_ -match '^\s*[^#=\s]+\s*=' } | ForEach-Object {
-        $parts = $_ -split '=', 2
-        $key = $parts[0].Trim()
-        $val = $parts[1].Trim()
-        [System.Environment]::SetEnvironmentVariable($key, $val, [System.EnvironmentVariableTarget]::Process)
-    }
-} else {
-    Write-Warning ".env file not found at $envFile. Using default application.yml configurations."
-}
-
-=======
 # Starts the LearntriX backend with backend/.env loaded into the process environment.
 #
 # Spring Boot does not read .env files on its own, so without this launcher the
@@ -65,5 +47,4 @@ if ([string]::IsNullOrWhiteSpace($env:MAIL_USERNAME) -or [string]::IsNullOrWhite
 }
 
 Set-Location $root
->>>>>>> b72e728 (application updated)
 mvn spring-boot:run

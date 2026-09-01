@@ -403,14 +403,15 @@ public class AdminController {
     }
 
     /**
-     * Secure ADMIN-only endpoint to delete/deactivate a student account.
+     * Secure ADMIN-only endpoint that permanently deletes a student account and all
+     * of its associated records. Not recoverable.
      */
     @DeleteMapping("/students/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<Map<String, Object>> deleteStudent(
             @PathVariable("id") UUID id,
             org.springframework.security.core.Authentication authentication) {
-        Map<String, Object> result = adminOnboardingService.deleteOrDeactivateStudent(id, authentication);
+        Map<String, Object> result = adminOnboardingService.deleteStudentPermanently(id, authentication);
         return ApiResponse.success(result);
     }
 
