@@ -1,10 +1,12 @@
 package com.learntrix.edtech.controller;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,9 @@ public class TeacherController {
     private final UserRepository userRepository;
     private final StudentProfileRepository studentProfileRepository;
     private final BatchRepository batchRepository;
+    private final com.learntrix.edtech.repository.LiveClassRepository liveClassRepository;
+    private final com.learntrix.edtech.repository.QuizAttemptRepository quizAttemptRepository;
+    private final com.learntrix.edtech.repository.AssignmentSubmissionRepository assignmentSubmissionRepository;
     private final com.learntrix.edtech.service.CourseAccessService courseAccessService;
 
     public TeacherController(
@@ -60,6 +65,9 @@ public class TeacherController {
             UserRepository userRepository,
             StudentProfileRepository studentProfileRepository,
             BatchRepository batchRepository,
+            com.learntrix.edtech.repository.LiveClassRepository liveClassRepository,
+            com.learntrix.edtech.repository.QuizAttemptRepository quizAttemptRepository,
+            com.learntrix.edtech.repository.AssignmentSubmissionRepository assignmentSubmissionRepository,
             com.learntrix.edtech.service.CourseAccessService courseAccessService) {
         this.courseRepository = courseRepository;
         this.enrollmentRepository = enrollmentRepository;
@@ -69,6 +77,9 @@ public class TeacherController {
         this.userRepository = userRepository;
         this.studentProfileRepository = studentProfileRepository;
         this.batchRepository = batchRepository;
+        this.liveClassRepository = liveClassRepository;
+        this.quizAttemptRepository = quizAttemptRepository;
+        this.assignmentSubmissionRepository = assignmentSubmissionRepository;
         this.courseAccessService = courseAccessService;
     }
 
@@ -92,15 +103,48 @@ public class TeacherController {
             avgCompletion = totalProgress / totalStudents;
         }
 
+        // Real figures across this teacher's own students. Previously these were fixed
+        // literals (84.5 / 148 / 92.4 / 2) that never moved regardless of the data.
+        List<UUID> studentIds = enrollments.stream()
+                .map(e -> e.getStudent().getId())
+                .distinct()
+                .collect(Collectors.toList());
+
+        double averageQuizScore = studentIds.stream()
+                .flatMap(sid -> quizAttemptRepository.findByStudentId(sid).stream())
+                .filter(a -> a.getScore() != null)
+                .mapToInt(com.learntrix.edtech.entity.QuizAttempt::getScore)
+                .average()
+                .orElse(0d);
+
+        int submissionsGraded = (int) studentIds.stream()
+                .flatMap(sid -> assignmentSubmissionRepository.findByStudentId(sid).stream())
+                .count();
+
+        // Engagement: share of this teacher's students who have done anything at all.
+        long engagedStudents = studentIds.stream()
+                .filter(sid -> !quizAttemptRepository.findByStudentId(sid).isEmpty()
+                        || !assignmentSubmissionRepository.findByStudentId(sid).isEmpty()
+                        || progressRepository.findByStudentId(sid).stream()
+                                .anyMatch(RecordingWatchProgress::isCompleted))
+                .count();
+        double engagement = studentIds.isEmpty() ? 0d : (engagedStudents * 100.0) / studentIds.size();
+
+        java.time.LocalDate today = java.time.LocalDate.now();
+        int upcomingClasses = (int) liveClassRepository.findByTeacherOrBatchTeacher(teacherId).stream()
+                .filter(lc -> lc.getClassDate() != null && !lc.getClassDate().isBefore(today))
+                .filter(lc -> !"Cancelled".equalsIgnoreCase(String.valueOf(lc.getStatus())))
+                .count();
+
         return ApiResponse.success(TeacherStatsResponse.builder()
                 .totalStudents(totalStudents)
                 .activeStudents(activeStudents)
                 .courses(courseIds.size())
                 .averageCompletion(avgCompletion)
-                .averageQuizScore(84.5) // Stub average
-                .problemsSolved(148)    // Stub solved
-                .engagement(92.4)       // Stub engagement
-                .upcomingClasses(2)     // Stub classes
+                .averageQuizScore(averageQuizScore)
+                .problemsSolved(submissionsGraded)
+                .engagement(engagement)
+                .upcomingClasses(upcomingClasses)
                 .build());
     }
 
@@ -213,20 +257,64 @@ public class TeacherController {
         int points = profileOpt.map(p -> p.getPoints() != null ? p.getPoints() : 0).orElse(150);
         int rank = profileOpt.map(p -> p.getRankVal() != null ? p.getRankVal() : 1).orElse(12);
 
+        // Real performance, read from the records the student actually produced. These used
+        // to be fixed literals (quizScore 85, assignments "3/4", problemsSolved 24), which
+        // made every student look identical and hid the fact that nothing had been attempted.
+        List<com.learntrix.edtech.entity.QuizAttempt> attempts =
+                quizAttemptRepository.findByStudentId(studentId);
+        int quizScore = (int) Math.round(attempts.stream()
+                .filter(a -> a.getScore() != null)
+                .mapToInt(com.learntrix.edtech.entity.QuizAttempt::getScore)
+                .average()
+                .orElse(0d));
+
+        List<com.learntrix.edtech.entity.AssignmentSubmission> submissions =
+                assignmentSubmissionRepository.findByStudentId(studentId);
+        long graded = submissions.stream().filter(sub -> sub.getGrade() != null).count();
+        String assignments = submissions.isEmpty()
+                ? "0/0"
+                : graded + "/" + submissions.size();
+
+        // Lessons the student has actually finished watching, for this course only.
+        List<RecordingWatchProgress> watched = progressRepository.findByStudentId(studentId);
+        UUID courseId = enrollment.getCourse().getId();
+        int lessonsCompleted = (int) watched.stream()
+                .filter(RecordingWatchProgress::isCompleted)
+                .filter(wp -> wp.getRecording() != null
+                        && wp.getRecording().getCourse() != null
+                        && courseId.equals(wp.getRecording().getCourse().getId()))
+                .count();
+
+        // Last activity, derived from the most recent thing the student did.
+        Instant lastActivity = Stream.of(
+                        attempts.stream().map(com.learntrix.edtech.entity.QuizAttempt::getSubmittedAt),
+                        submissions.stream().map(com.learntrix.edtech.entity.AssignmentSubmission::getSubmittedAt),
+                        watched.stream().map(RecordingWatchProgress::getLastWatchedAt))
+                .flatMap(s -> s)
+                .filter(java.util.Objects::nonNull)
+                .max(Instant::compareTo)
+                .orElse(null);
+
+        Batch batch = enrollment.getBatch();
+
         return TeacherStudentResponse.builder()
                 .id(studentId)
+                .studentId(profileOpt.map(StudentProfile::getStudentId).orElse(null))
                 .name(enrollment.getStudent().getName())
                 .email(enrollment.getStudent().getEmail())
                 .courseTitle(enrollment.getCourse().getTitle())
+                .batchName(batch != null ? batch.getName() : null)
                 .progressPercent(progress)
-                .lessonsCompleted(progress / 10) // Approx
-                .quizScore(85)
-                .assignments("3/4")
-                .problemsSolved(24)
+                .lessonsCompleted(lessonsCompleted)
+                .quizzesAttempted(attempts.size())
+                .quizScore(quizScore)
+                .assignments(assignments)
+                .problemsSolved(submissions.size())
                 .points(points)
                 .rank(rank)
-                .lastActive("2 hours ago")
-                .status("active")
+                .lastActive(lastActivity != null ? lastActivity.toString() : null)
+                .enrolledAt(enrollment.getCreatedAt() != null ? enrollment.getCreatedAt().toString() : null)
+                .status(enrollment.getStatus() != null ? enrollment.getStatus() : "ACTIVE")
                 .build();
     }
 }

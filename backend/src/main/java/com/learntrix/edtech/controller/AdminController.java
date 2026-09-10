@@ -3,6 +3,7 @@ package com.learntrix.edtech.controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,7 @@ public class AdminController {
     private final StudentProfileRepository studentProfileRepository;
     private final com.learntrix.edtech.repository.TeacherProfileRepository teacherProfileRepository;
     private final BatchRepository batchRepository;
+    private final com.learntrix.edtech.repository.LiveClassRepository liveClassRepository;
     private final LiveClassService liveClassService;
     private final com.learntrix.edtech.service.AdminOnboardingService adminOnboardingService;
     private final CourseService courseService;
@@ -77,6 +79,7 @@ public class AdminController {
             StudentProfileRepository studentProfileRepository,
             com.learntrix.edtech.repository.TeacherProfileRepository teacherProfileRepository,
             BatchRepository batchRepository,
+            com.learntrix.edtech.repository.LiveClassRepository liveClassRepository,
             LiveClassService liveClassService,
             com.learntrix.edtech.service.AdminOnboardingService adminOnboardingService,
             CourseService courseService,
@@ -89,6 +92,7 @@ public class AdminController {
         this.studentProfileRepository = studentProfileRepository;
         this.teacherProfileRepository = teacherProfileRepository;
         this.batchRepository = batchRepository;
+        this.liveClassRepository = liveClassRepository;
         this.liveClassService = liveClassService;
         this.adminOnboardingService = adminOnboardingService;
         this.courseService = courseService;
@@ -286,17 +290,27 @@ public class AdminController {
                 .state("done")
                 .build();
 
-        AdminStudentDetailResponse.EnrollmentDetail ed = AdminStudentDetailResponse.EnrollmentDetail.builder()
-                .id("enr-1")
-                .courseTitle(row.getCourseTitle())
-                .batchName(row.getBatchName())
-                .trainerName(row.getTrainerName())
-                .startDate("2026-08-15")
-                .endDate("2026-12-15")
-                .courseStatus("in_progress")
-                .paymentStatus(row.getPaymentStatus())
-                .careerEligible(true)
-                .build();
+        // Every enrolment this student actually holds. A student can be enrolled in several
+        // courses at once (enrollments is UNIQUE on student_id + course_id, not student_id),
+        // so this must be a real list. It previously returned one synthetic row with a fixed
+        // id and invented dates, which made additional courses invisible to the admin.
+        List<AdminStudentDetailResponse.EnrollmentDetail> enrollmentDetails =
+                enrollmentRepository.findByStudentId(id).stream()
+                        .map(e -> AdminStudentDetailResponse.EnrollmentDetail.builder()
+                                .id(e.getId().toString())
+                                .courseId(e.getCourse() != null ? e.getCourse().getId().toString() : null)
+                                .courseTitle(e.getCourse() != null ? e.getCourse().getTitle() : null)
+                                .batchName(e.getBatch() != null ? e.getBatch().getName() : null)
+                                .trainerName(e.getTeacher() != null ? e.getTeacher().getName() : null)
+                                .startDate(e.getBatch() != null && e.getBatch().getStartDate() != null
+                                        ? e.getBatch().getStartDate().toString() : null)
+                                .endDate(e.getBatch() != null && e.getBatch().getEndDate() != null
+                                        ? e.getBatch().getEndDate().toString() : null)
+                                .courseStatus(e.getStatus())
+                                .paymentStatus(row.getPaymentStatus())
+                                .careerEligible(true)
+                                .build())
+                        .collect(Collectors.toList());
 
         List<String> skills = profileOpt.map(StudentProfile::getSkills)
                 .orElse(List.of("Java", "Spring Boot", "SQL", "Git"));
@@ -354,7 +368,7 @@ public class AdminController {
                 .links(links)
                 .documents(List.of(doc))
                 .timeline(List.of(tl))
-                .enrollments(List.of(ed))
+                .enrollments(enrollmentDetails)
                 .attendance(List.of())
                 .assessments(List.of())
                 .applications(List.of())
@@ -584,6 +598,138 @@ public class AdminController {
         }
         batchRepository.save(batch);
         return ApiResponse.success(Map.of("ok", true, "batchId", batchId, "studentCount", batch.getStudents().size()));
+    }
+
+    /**
+     * Deletes a batch without touching the people or the course it grouped.
+     *
+     * <p>A batch is a cohort, not an owner: students, their accounts and their course
+     * enrolments all outlive it. So every reference is detached first and only the batch
+     * row itself is removed:</p>
+     * <ul>
+     *   <li>batch_students - membership rows are dropped (the users are not)</li>
+     *   <li>enrollments.batch_id - set to null, the enrolment and its course survive</li>
+     *   <li>live_classes.batch_id - set to null, the class history survives</li>
+     * </ul>
+     *
+     * <p>PostgreSQL already declares SET NULL / CASCADE for these, but the mappings carry
+     * no {@code @OnDelete}, so a schema generated from the entities would restrict instead.
+     * Detaching explicitly makes the outcome identical on either schema.</p>
+     *
+     * <p>Authorization comes from the class-level
+     * {@code @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")} - a teacher or student
+     * calling this is rejected by Spring Security before the method runs.</p>
+     */
+    @Transactional
+    @DeleteMapping("/batches/{batchId}")
+    public ApiResponse<Map<String, Object>> deleteBatch(@PathVariable("batchId") UUID batchId) {
+        Batch batch = batchRepository.findById(batchId)
+                .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", batchId));
+
+        String name = batch.getName();
+        int studentCount = batch.getStudents() != null ? batch.getStudents().size() : 0;
+
+        // 1. Drop membership rows only. The User entities are untouched.
+        if (batch.getStudents() != null && !batch.getStudents().isEmpty()) {
+            batch.getStudents().clear();
+            batchRepository.save(batch);
+        }
+
+        // 2. Keep every enrolment; just forget which batch it belonged to. The student stays
+        //    enrolled in the course, and their enrolments in *other* courses are never read
+        //    here, so they cannot be affected.
+        List<Enrollment> affected = enrollmentRepository.findByBatchId(batchId);
+        for (Enrollment enrollment : affected) {
+            enrollment.setBatch(null);
+            enrollmentRepository.save(enrollment);
+        }
+
+        // 3. Same for scheduled classes: the class record survives, it just loses its cohort.
+        List<com.learntrix.edtech.entity.LiveClass> classes = liveClassRepository.findByBatchId(batchId);
+        for (com.learntrix.edtech.entity.LiveClass liveClass : classes) {
+            liveClass.setBatch(null);
+            liveClassRepository.save(liveClass);
+        }
+
+        try {
+            batchRepository.delete(batch);
+            batchRepository.flush();
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            // Something still references the batch that this method does not know about.
+            // Report it as a conflict rather than a 500 so the admin sees a real reason.
+            throw new com.learntrix.edtech.common.exception.ConflictException(
+                    "BATCH_IN_USE",
+                    "Batch '" + name + "' is still referenced by other records and could not be "
+                            + "deleted. Detach those records first.");
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("ok", true);
+        result.put("id", batchId.toString());
+        result.put("name", name);
+        result.put("studentsReleased", studentCount);
+        result.put("enrollmentsDetached", affected.size());
+        result.put("classesDetached", classes.size());
+        result.put("message", studentCount > 0
+                ? "Batch '" + name + "' deleted. " + studentCount + " student(s) kept their course "
+                        + "enrolment and were released from the batch."
+                : "Batch '" + name + "' deleted.");
+        return ApiResponse.success(result);
+    }
+
+    /**
+     * Students belonging to one batch, read from the batch_students relationship.
+     *
+     * <p>Each row is joined to that student's enrolment for the batch's course so the admin
+     * sees the course, the assigned teacher, the enrolment status and when it started -
+     * rather than a bare name list. Everything comes from the database; nothing is mocked.</p>
+     */
+    @Transactional(readOnly = true)
+    @GetMapping("/batches/{batchId}/students")
+    public ApiResponse<List<Map<String, Object>>> getBatchStudents(@PathVariable UUID batchId) {
+        Batch batch = batchRepository.findById(batchId)
+                .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", batchId));
+
+        UUID courseId = batch.getCourse() != null ? batch.getCourse().getId() : null;
+
+        List<Map<String, Object>> rows = batch.getStudents().stream()
+                .sorted(Comparator.comparing(u -> u.getName() == null ? "" : u.getName(),
+                        String.CASE_INSENSITIVE_ORDER))
+                .map(student -> {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("id", student.getId());
+                    row.put("name", student.getName());
+                    row.put("email", student.getEmail());
+                    row.put("accountStatus", student.getStatus());
+
+                    studentProfileRepository.findByUserId(student.getId()).ifPresent(p -> {
+                        row.put("studentId", p.getStudentId());
+                        row.put("phone", p.getPhone());
+                    });
+                    row.putIfAbsent("studentId", null);
+                    row.putIfAbsent("phone", null);
+
+                    row.put("courseTitle", batch.getCourse() != null ? batch.getCourse().getTitle() : null);
+                    row.put("teacherName", batch.getTeacher() != null ? batch.getTeacher().getName() : null);
+
+                    // Enrolment for this batch's course carries status and start date.
+                    if (courseId != null) {
+                        enrollmentRepository.findByStudentIdAndCourseId(student.getId(), courseId)
+                                .ifPresent(e -> {
+                                    row.put("enrollmentStatus", e.getStatus());
+                                    row.put("enrolledAt", e.getCreatedAt() != null ? e.getCreatedAt().toString() : null);
+                                    if (e.getTeacher() != null) {
+                                        row.put("teacherName", e.getTeacher().getName());
+                                    }
+                                });
+                    }
+                    row.putIfAbsent("enrollmentStatus", null);
+                    row.putIfAbsent("enrolledAt", null);
+                    return row;
+                })
+                .collect(Collectors.toList());
+
+        return ApiResponse.success(rows);
     }
 
     /**

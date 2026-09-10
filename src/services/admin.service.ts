@@ -72,6 +72,29 @@ export interface OnboardingResult {
   message?: string;
 }
 
+export interface DeleteBatchResult {
+  ok: boolean;
+  id?: string | undefined;
+  name?: string | undefined;
+  studentsReleased?: number | undefined;
+  enrollmentsDetached?: number | undefined;
+  classesDetached?: number | undefined;
+  message?: string | undefined;
+}
+
+export interface BatchStudentRow {
+  id: string;
+  studentId?: string | null | undefined;
+  name: string;
+  email: string;
+  phone?: string | null | undefined;
+  accountStatus?: string | null | undefined;
+  courseTitle?: string | null | undefined;
+  teacherName?: string | null | undefined;
+  enrollmentStatus?: string | null | undefined;
+  enrolledAt?: string | null | undefined;
+}
+
 export interface MailStatus {
   configured: boolean;
   host?: string | null;
@@ -176,6 +199,24 @@ const adminServiceRaw = {
   async batches(): Promise<AdminBatch[]> {
     if (!env.useMocks) return apiRequest<AdminBatch[]>("/admin/batches");
     return mockDelay(mockBatches);
+  },
+  /**
+   * Students actually attached to a batch, from the batch_students relationship.
+   * Each row is joined to that student's enrolment for the batch course, so the caller
+   * gets course, teacher, enrolment status and start date - not just a name.
+   */
+  async batchStudents(batchId: string): Promise<BatchStudentRow[]> {
+    if (!env.useMocks) return apiRequest<BatchStudentRow[]>(`/admin/batches/${batchId}/students`);
+    return mockDelay([]);
+  },
+  /**
+   * Deletes a batch. The backend detaches students, enrolments and classes first, so the
+   * students, their course enrolments and the course itself all survive.
+   */
+  async deleteBatch(batchId: string): Promise<DeleteBatchResult> {
+    if (!env.useMocks)
+      return apiRequest<DeleteBatchResult>(`/admin/batches/${batchId}`, { method: "DELETE" });
+    return mockDelay({ ok: true, id: batchId, message: "Batch deleted." });
   },
   async saveBatch(payload: Record<string, unknown>): Promise<{ ok: true }> {
     if (!env.useMocks) return apiRequest("/admin/batches", { method: "POST", body: payload });

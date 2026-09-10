@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { formatCurriculumPath } from "@/lib/format";
 import { PageHeader } from "@/components/portal/StatCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -155,8 +156,8 @@ function RecordingDetailsPage() {
               <div>
                 <h1 className="text-2xl font-bold text-foreground">{recording.title}</h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Mapped to <strong>{recording.courseTitle}</strong> · {recording.moduleTitle} ·{" "}
-                  {recording.lessonTitle}
+                  Mapped to <strong>{recording.courseTitle}</strong> ·{" "}
+                  {formatCurriculumPath(recording.moduleTitle, recording.lessonTitle)}
                 </p>
               </div>
               <div className="shrink-0">{getStatusBadge(recording.status)}</div>

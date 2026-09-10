@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -288,6 +289,110 @@ class AdminBatchWorkflowIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Duplicate\",\"email\":\"newstudent@test.com\",\"password\":\"Password123!\"}"))
                 .andExpect(status().isConflict());
+    }
+
+    /**
+     * Deleting a batch must remove only the cohort. The student, their account, the course
+     * and the enrolment in that course all survive; only the batch association is cleared.
+     */
+    @Test
+    void adminDeletesBatchWithStudentsWithoutLosingStudentsOrEnrollments() throws Exception {
+        String adminToken = loginToken("admin.flow@test.com", "Password123!");
+
+        MvcResult createStudentResult = mockMvc.perform(post("/api/admin/students")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"fullName\":\"Delete Case Student\",\"email\":\"delete.case@test.com\"}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String studentId = objectMapper.readTree(createStudentResult.getResponse().getContentAsString())
+                .path("data").path("userId").asText();
+        UUID studentUuid = UUID.fromString(studentId);
+
+        MvcResult batchResult = mockMvc.perform(post("/api/admin/batches")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Doomed Batch\",\"courseId\":\"" + course.getId()
+                                + "\",\"teacherId\":\"" + teacher.getId() + "\",\"capacity\":10}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        UUID batchId = UUID.fromString(objectMapper.readTree(batchResult.getResponse().getContentAsString())
+                .path("data").path("id").asText());
+
+        mockMvc.perform(post("/api/admin/batches/" + batchId + "/students")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"studentIds\":[\"" + studentId + "\"]}"))
+                .andExpect(status().isOk());
+
+        assertTrue(enrollmentRepository.existsByStudentIdAndCourseId(studentUuid, course.getId()),
+                "precondition: the student is enrolled in the course");
+
+        // --- delete the batch ---
+        mockMvc.perform(delete("/api/admin/batches/" + batchId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+
+        assertFalse(batchRepository.findById(batchId).isPresent(), "batch row must be gone");
+        assertTrue(userRepository.findById(studentUuid).isPresent(), "student account must survive");
+        assertTrue(courseRepository.findById(course.getId()).isPresent(), "course must survive");
+        assertTrue(enrollmentRepository.existsByStudentIdAndCourseId(studentUuid, course.getId()),
+                "course enrolment must survive the batch deletion");
+        assertTrue(enrollmentRepository.findByBatchId(batchId).isEmpty(),
+                "no enrolment may still point at the deleted batch");
+    }
+
+    @Test
+    void adminDeletesEmptyBatch() throws Exception {
+        String adminToken = loginToken("admin.flow@test.com", "Password123!");
+
+        MvcResult batchResult = mockMvc.perform(post("/api/admin/batches")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Empty Batch\",\"courseId\":\"" + course.getId()
+                                + "\",\"teacherId\":\"" + teacher.getId() + "\",\"capacity\":5}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        UUID batchId = UUID.fromString(objectMapper.readTree(batchResult.getResponse().getContentAsString())
+                .path("data").path("id").asText());
+
+        mockMvc.perform(delete("/api/admin/batches/" + batchId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+
+        assertFalse(batchRepository.findById(batchId).isPresent(), "empty batch must delete cleanly");
+    }
+
+    @Test
+    void teacherCannotDeleteBatch() throws Exception {
+        String adminToken = loginToken("admin.flow@test.com", "Password123!");
+        String teacherToken = loginToken("teacher.flow@test.com", "Password123!");
+
+        MvcResult batchResult = mockMvc.perform(post("/api/admin/batches")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Protected Batch\",\"courseId\":\"" + course.getId()
+                                + "\",\"teacherId\":\"" + teacher.getId() + "\",\"capacity\":5}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        UUID batchId = UUID.fromString(objectMapper.readTree(batchResult.getResponse().getContentAsString())
+                .path("data").path("id").asText());
+
+        mockMvc.perform(delete("/api/admin/batches/" + batchId)
+                        .header("Authorization", "Bearer " + teacherToken))
+                .andExpect(status().isForbidden());
+
+        assertTrue(batchRepository.findById(batchId).isPresent(),
+                "an unauthorised delete must leave the batch in place");
+    }
+
+    @Test
+    void deletingUnknownBatchReturnsNotFound() throws Exception {
+        String adminToken = loginToken("admin.flow@test.com", "Password123!");
+        mockMvc.perform(delete("/api/admin/batches/" + UUID.randomUUID())
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isNotFound());
     }
 
     private String loginToken(String email, String password) throws Exception {

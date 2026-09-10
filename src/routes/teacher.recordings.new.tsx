@@ -12,7 +12,6 @@ import {
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { env } from "@/lib/env";
 import { PageHeader } from "@/components/portal/StatCard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -23,6 +22,7 @@ import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { courseService } from "@/services/course.service";
 import { recordingService } from "@/services/recording.service";
+import { teacherService } from "@/services/teacher.service";
 import type { Recording } from "@/types/recording";
 
 export const Route = createFileRoute("/teacher/recordings/new")({
@@ -55,49 +55,65 @@ function CreateRecordedClassPage() {
   // Created recording details
   const [createdRecording, setCreatedRecording] = useState<Recording | null>(null);
 
-  // Fetch courses list
+  // Only the courses this trainer actually teaches - the ones they instruct, run a batch
+  // for, or have students allocated on. The public /courses list showed every published
+  // course, so picking one the trainer has no students on failed with a 403 on create.
   const coursesQuery = useQuery({
-    queryKey: ["courses", "list"],
-    queryFn: () => courseService.list({ pageSize: 50 }),
+    queryKey: ["teacher", "courses"],
+    queryFn: () => teacherService.courses(),
   });
 
-  // Mock sub-data for modules & lessons when in mock mode
-  const courses = coursesQuery.data?.items ?? [];
+  // Fallback for an installation that has not populated teacher allocations yet: better a
+  // wider list the backend will still authorise than a form the trainer cannot use at all.
+  const fallbackCoursesQuery = useQuery({
+    queryKey: ["courses", "list"],
+    queryFn: () => courseService.list({ pageSize: 50 }),
+    enabled: coursesQuery.isSuccess && (coursesQuery.data?.length ?? 0) === 0,
+  });
+
+  const courses: Array<{ id: string; title: string; slug: string }> =
+    (coursesQuery.data?.length ?? 0) > 0
+      ? (coursesQuery.data ?? [])
+      : (fallbackCoursesQuery.data?.items ?? []);
   const selectedCourse = courses.find((c) => c.id === courseId);
 
-  // Dynamic modules/lessons based on selection
-  const mockModules = selectedCourse
-    ? selectedCourse.skills.map((s, idx) => ({
-        id: `mod-${idx + 1}`,
-        title: `Module ${idx + 1} · ${s}`,
-      }))
-    : [];
+  // The list endpoint does not carry the curriculum, so fetch the course by slug - that is
+  // the only response that populates modules and their lessons. The mapping is optional
+  // (V29 dropped the NOT NULL on module_id / lesson_id), but any id that IS sent must be a
+  // real UUID - the API rejects placeholders like "mod-1" outright.
+  const courseDetailQuery = useQuery({
+    queryKey: ["course", "detail", selectedCourse?.slug],
+    queryFn: () => courseService.bySlug(selectedCourse!.slug),
+    enabled: !!selectedCourse?.slug,
+  });
 
-  const mockLessons = moduleId
-    ? [
-        { id: `les-1`, title: "Introduction to concepts" },
-        { id: `les-2`, title: "Advanced coding session" },
-        { id: `les-3`, title: "Review & recap" },
-      ]
-    : [];
+  const modules = courseDetailQuery.data?.modules ?? [];
+  const lessons = modules.find((m) => m.id === moduleId)?.lessons ?? [];
 
   const createRecordingMutation = useMutation({
     mutationFn: () =>
       recordingService.createRecording({
         courseId,
-        moduleId,
-        lessonId,
+        // Omitted entirely when unset - an empty string is not a UUID and would 400.
+        ...(moduleId ? { moduleId } : {}),
+        ...(lessonId ? { lessonId } : {}),
         title,
         description,
-        classDate: new Date(classDate).toISOString(),
+        ...(classDate ? { classDate: new Date(classDate).toISOString() } : {}),
       }),
     onSuccess: (data) => {
       setCreatedRecording(data);
       setStep("upload");
       toast.success("Draft recording created. Ready for video upload.");
     },
-    onError: () => {
-      toast.error("Failed to create recording details.");
+    onError: (err: unknown) => {
+      // Show what the backend actually said. The generic message hid real causes such as
+      // a module or lesson id that does not exist for the selected course.
+      toast.error(
+        err instanceof Error && err.message
+          ? err.message
+          : "Failed to create recording details.",
+      );
     },
   });
 
@@ -298,7 +314,10 @@ function CreateRecordedClassPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="module">Curriculum Module</Label>
+                  <Label htmlFor="module">
+                    Curriculum Module{" "}
+                    <span className="font-normal text-muted-foreground">(optional)</span>
+                  </Label>
                   <select
                     id="module"
                     value={moduleId}
@@ -309,30 +328,25 @@ function CreateRecordedClassPage() {
                     disabled={!courseId}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
                   >
-                    <option value="">Select Module</option>
-                    {/* If using real DB, we would load. For mock/dev, populate list */}
-                    {env.useMocks ? (
-                      mockModules.map((m) => (
-                        <option key={m.id} value={m.id}>
-                          {m.title}
-                        </option>
-                      ))
-                    ) : (
-                      // We will support simple fallback in rendering
-                      <>
-                        <option value="00000000-0000-0000-0000-000000000301">
-                          Introduction & Setup
-                        </option>
-                        <option value="00000000-0000-0000-0000-000000000302">
-                          JPA & Databases
-                        </option>
-                      </>
-                    )}
+                    <option value="">
+                      {courseDetailQuery.isLoading
+                        ? "Loading modules…"
+                        : modules.length === 0 && courseId
+                          ? "No modules yet — skip this"
+                          : "Not mapped to a module"}
+                    </option>
+                    {modules.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.title}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="lesson">Lesson Reference</Label>
+                  <Label htmlFor="lesson">
+                    Lesson <span className="font-normal text-muted-foreground">(optional)</span>
+                  </Label>
                   <select
                     id="lesson"
                     value={lessonId}
@@ -340,29 +354,25 @@ function CreateRecordedClassPage() {
                     disabled={!moduleId}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
                   >
-                    <option value="">Select Lesson</option>
-                    {env.useMocks ? (
-                      mockLessons.map((l) => (
-                        <option key={l.id} value={l.id}>
-                          {l.title}
-                        </option>
-                      ))
-                    ) : (
-                      <>
-                        <option value="00000000-0000-0000-0000-000000000401">
-                          Introduction to Java
-                        </option>
-                        <option value="00000000-0000-0000-0000-000000000402">
-                          Spring Boot Core Concepts
-                        </option>
-                        <option value="00000000-0000-0000-0000-000000000403">
-                          PostgreSQL Integration
-                        </option>
-                      </>
-                    )}
+                    <option value="">
+                      {moduleId && lessons.length === 0
+                        ? "No lessons yet — skip this"
+                        : "Not mapped to a lesson"}
+                    </option>
+                    {lessons.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.title}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
+
+              <p className="text-xs text-muted-foreground">
+                Mapping the recording to a module and lesson is optional. Leave them blank if the
+                curriculum isn't built yet — the class still uploads, publishes, and reaches the
+                students allocated to you.
+              </p>
 
               <div className="space-y-2">
                 <Label htmlFor="title">Class Title</Label>
@@ -391,13 +401,9 @@ function CreateRecordedClassPage() {
                 </Button>
                 <Button
                   onClick={() => createRecordingMutation.mutate()}
-                  disabled={
-                    !courseId ||
-                    !moduleId ||
-                    !lessonId ||
-                    !title.trim() ||
-                    createRecordingMutation.isPending
-                  }
+                  // Course and title are all the backend requires. The curriculum mapping
+                  // is optional so a trainer is never blocked by an unbuilt curriculum.
+                  disabled={!courseId || !title.trim() || createRecordingMutation.isPending}
                 >
                   {createRecordingMutation.isPending ? (
                     <Loader2 className="mr-2 size-4 animate-spin" />

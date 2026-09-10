@@ -64,6 +64,26 @@ export interface Course {
   instructor: Instructor | null;
   badges?: Array<"Bestseller" | "New" | "Career Track"> | undefined;
   updatedAt: string;
+  /**
+   * Curriculum. Only GET /api/courses/{slug} populates this - the list endpoint leaves it
+   * undefined. Recording creation needs the real module and lesson UUIDs from here, because
+   * ClassRecording.module_id and lesson_id are NOT NULL foreign keys.
+   */
+  modules?: CourseModule[] | undefined;
+}
+
+export interface CourseModule {
+  id: string;
+  title: string;
+  sequenceNumber: number;
+  lessons: CourseLesson[];
+}
+
+export interface CourseLesson {
+  id: string;
+  title: string;
+  sequenceNumber?: number | undefined;
+  durationMinutes?: number | undefined;
 }
 
 export interface Category {

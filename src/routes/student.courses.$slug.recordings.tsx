@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, Calendar, CheckCircle2, Clock, PlayCircle, Video } from "lucide-react";
 
+import { formatCurriculumPath } from "@/lib/format";
 import { PageHeader } from "@/components/portal/StatCard";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -157,7 +158,7 @@ function CourseRecordingsPage() {
                       </Link>
                     </h2>
                     <p className="text-xs text-muted-foreground">
-                      {r.moduleTitle} · {r.lessonTitle}
+                      {formatCurriculumPath(r.moduleTitle, r.lessonTitle)}
                     </p>
                   </div>
 

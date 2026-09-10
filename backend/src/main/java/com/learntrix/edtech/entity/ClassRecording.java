@@ -22,12 +22,17 @@ public class ClassRecording extends AuditableEntity {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
+    /**
+     * Optional curriculum mapping. A trainer can upload a recording before the course
+     * has modules or lessons defined; see V29__make_recording_module_lesson_optional.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "module_id", nullable = false)
+    @JoinColumn(name = "module_id")
     private Module module;
 
+    /** Optional curriculum mapping - see {@link #module}. */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "lesson_id", nullable = false)
+    @JoinColumn(name = "lesson_id")
     private Lesson lesson;
 
     @ManyToOne(fetch = FetchType.LAZY)

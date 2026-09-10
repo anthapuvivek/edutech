@@ -13,10 +13,14 @@ public class CreateRecordingRequest {
     @NotNull(message = "Course ID is required")
     private UUID courseId;
 
-    @NotNull(message = "Module ID is required")
+    /**
+     * Optional curriculum mapping. Left null when the course has no modules yet, or when
+     * the trainer simply wants the recording filed against the course as a whole. When it
+     * IS supplied the service still verifies it belongs to the selected course.
+     */
     private UUID moduleId;
 
-    @NotNull(message = "Lesson ID is required")
+    /** Optional curriculum mapping - see {@link #moduleId}. */
     private UUID lessonId;
 
     @NotBlank(message = "Title is required")
@@ -24,6 +28,6 @@ public class CreateRecordingRequest {
 
     private String description;
 
-    @NotNull(message = "Class date is required")
+    /** Optional; defaults to the time the recording is created. */
     private Instant classDate;
 }

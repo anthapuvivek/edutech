@@ -101,6 +101,7 @@ const PLATFORMS: MeetingPlatform[] = ["Google Meet", "Zoom", "Microsoft Teams", 
 interface ClassFormData {
   title: string;
   courseTitle: string;
+  batchId: string;
   customCourse: string;
   date: string;
   startTime: string;
@@ -117,7 +118,10 @@ interface ClassFormData {
 
 const defaultFormData: ClassFormData = {
   title: "",
-  courseTitle: "Generative AI & LLM Systems",
+  // No default course: the list is loaded from the database, and pre-selecting a title that
+  // may not exist would silently mislabel the class.
+  courseTitle: "",
+  batchId: "",
   customCourse: "",
   date: new Date().toISOString().substring(0, 10),
   startTime: "10:00",
@@ -179,20 +183,22 @@ function TeacherLiveClassesPage() {
     queryFn: () => courseService.list({ pageSize: 50 }),
   });
 
+  // The teacher's own batches. GET /teacher/batches resolves them from the JWT, so a
+  // teacher can only ever schedule against a batch they actually run.
+  const { data: myBatches = [] } = useQuery({
+    queryKey: ["teacher", "batches"],
+    queryFn: () => teacherService.batches(),
+  });
+
+  // Built only from what the database returns - the course catalogue, the teacher's own
+  // batches, and courses already used by their classes. Nothing is hard-coded, so adding a
+  // course or a teacher anywhere in the system needs no change here.
   const availableCourses = useMemo(() => {
     const fromApi = coursesData?.items.map((c) => c.title) ?? [];
+    const fromBatches = (myBatches as any[]).map((b) => b.courseTitle);
     const fromClasses = classes.map((c) => c.courseTitle);
-    return Array.from(
-      new Set([
-        ...fromApi,
-        ...fromClasses,
-        "Generative AI & LLM Systems",
-        "Full Stack Engineering Program",
-        "Applied Machine Learning",
-        "Data Science & Analytics",
-      ]),
-    ).filter(Boolean);
-  }, [coursesData, classes]);
+    return Array.from(new Set([...fromApi, ...fromBatches, ...fromClasses])).filter(Boolean);
+  }, [coursesData, myBatches, classes]);
 
   // Mutations
   const createMutation = useMutation({
@@ -332,6 +338,7 @@ function TeacherLiveClassesPage() {
     setFormData({
       title: item.title,
       courseTitle: isCustom ? "Custom" : item.courseTitle,
+      batchId: (item as { batchId?: string }).batchId ?? "",
       customCourse: isCustom ? item.courseTitle : "",
       date: item.date,
       startTime: item.startTime,
@@ -379,10 +386,23 @@ function TeacherLiveClassesPage() {
         },
       });
     } else {
+      // The batch decides who can see this class, and it also supplies the course. The
+      // backend reads `classDate`, not `date` - sending `date` silently fell back to
+      // "tomorrow" and left course_id/batch_id null, which no student query can match.
+      const batch = (myBatches as any[]).find((b) => b.id === formData.batchId);
+      if (!batch) {
+        toast.error("Select a batch for this class.", {
+          description: "Students see a class through their batch, so one has to be chosen.",
+        });
+        return;
+      }
+
       createMutation.mutate({
         title: formData.title.trim(),
+        courseId: batch.courseId,
+        batchId: batch.id,
         courseTitle: finalCourseTitle,
-        trainerName: "Durga Prasad",
+        classDate: formData.date,
         date: formData.date,
         startTime: formData.startTime,
         endTime: formData.endTime,
@@ -864,6 +884,39 @@ function TeacherLiveClassesPage() {
                     <SelectItem value="Custom">+ Custom Subject Name</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* A class must target a batch. The student portal only returns classes whose
+                  batch contains the student, or (when there is no batch) whose course they
+                  are enrolled in. A class saved with neither is invisible to everyone. */}
+              <div className="space-y-1.5">
+                <Label htmlFor="class-batch" className="text-sm font-medium">
+                  Batch <span className="text-destructive">*</span>
+                </Label>
+                <Select
+                  value={formData.batchId}
+                  onValueChange={(val) => setFormData((p) => ({ ...p, batchId: val }))}
+                >
+                  <SelectTrigger id="class-batch">
+                    <SelectValue placeholder="Select the batch attending this class" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {myBatches.length === 0 ? (
+                      <SelectItem value="none" disabled>
+                        No batches assigned to you yet
+                      </SelectItem>
+                    ) : (
+                      myBatches.map((b: any) => (
+                        <SelectItem key={b.id} value={b.id}>
+                          {b.name} · {b.courseTitle} ({b.studentCount} students)
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Only students in this batch will see the class.
+                </p>
               </div>
 
               <div className="space-y-1.5">

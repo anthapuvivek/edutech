@@ -30,6 +30,9 @@ public interface LiveClassRepository extends JpaRepository<LiveClass, UUID> {
 
     List<LiveClass> findByTeacherIdOrderByClassDateAscStartTimeAsc(UUID teacherId);
 
+    /** Classes pinned to a batch. Used to detach them before the batch is deleted. */
+    List<LiveClass> findByBatchId(UUID batchId);
+
     @Query("SELECT DISTINCT lc FROM LiveClass lc LEFT JOIN FETCH lc.course c LEFT JOIN FETCH lc.batch b LEFT JOIN FETCH b.students s " +
            "WHERE lc.teacher.id = :teacherId OR b.teacher.id = :teacherId " +
            "ORDER BY lc.classDate ASC, lc.startTime ASC")

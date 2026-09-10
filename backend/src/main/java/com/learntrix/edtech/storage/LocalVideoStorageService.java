@@ -5,11 +5,12 @@ import com.learntrix.edtech.service.VideoStorageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -88,13 +89,29 @@ public class LocalVideoStorageService implements VideoStorageService {
     }
 
     public void storeFile(String storageKey, byte[] bytes) throws IOException {
+        Path targetPath = resolveWithinUploadDir(storageKey);
+        Files.createDirectories(targetPath.getParent());
+        Files.write(targetPath, bytes);
+    }
+
+    /**
+     * Streams the upload straight to disk. A class recording can be gigabytes, so the
+     * byte[] overload above must not be used for the video payload - it would need the
+     * whole file resident in heap.
+     */
+    public void storeFile(String storageKey, InputStream in) throws IOException {
+        Path targetPath = resolveWithinUploadDir(storageKey);
+        Files.createDirectories(targetPath.getParent());
+        Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    /** Guards against path traversal: the resolved path must stay inside uploadDir. */
+    private Path resolveWithinUploadDir(String storageKey) {
         Path uploadDirAbsolute = Paths.get(uploadDir).toAbsolutePath().normalize();
         Path targetPath = uploadDirAbsolute.resolve(storageKey).normalize();
-        // Guard against path traversal: resolved path must be inside uploadDir
         if (!targetPath.startsWith(uploadDirAbsolute)) {
             throw new IllegalArgumentException("Invalid storage key — path traversal detected: " + storageKey);
         }
-        Files.createDirectories(targetPath.getParent());
-        Files.write(targetPath, bytes);
+        return targetPath;
     }
 }

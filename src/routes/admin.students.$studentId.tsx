@@ -383,9 +383,11 @@ function StudentDetail() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Allocate Student to Course & Teacher</DialogTitle>
+                    <DialogTitle>Add a course for this student</DialogTitle>
                     <DialogDescription>
-                      Associate {s.name} with a Course and Teacher. Content and class access will be granted immediately.
+                      Enrols {s.name} in another course. Existing enrolments are kept &mdash; a
+                      student can hold several at once. Choosing a course they are already in
+                      updates that enrolment instead of creating a second one.
                     </DialogDescription>
                   </DialogHeader>
                   <form id="alloc-form" onSubmit={handleAllocate} className="space-y-4">
@@ -396,11 +398,15 @@ function StudentDetail() {
                           <SelectValue placeholder="Select Course" />
                         </SelectTrigger>
                         <SelectContent>
-                          {(coursesQuery.data ?? []).map((c: any) => (
-                            <SelectItem key={c.id} value={c.id}>
-                              {c.title}
-                            </SelectItem>
-                          ))}
+                          {(coursesQuery.data ?? []).map((c: any) => {
+                            const already = enrollments.some((e: any) => e.courseId === c.id);
+                            return (
+                              <SelectItem key={c.id} value={c.id}>
+                                {c.title}
+                                {already ? " · already enrolled" : ""}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                     </div>
@@ -423,16 +429,34 @@ function StudentDetail() {
 
                     <div className="space-y-1.5">
                       <Label htmlFor="alloc-batch">Batch</Label>
-                      <Select value={selectedBatch} onValueChange={setSelectedBatch}>
+                      <Select
+                        value={selectedBatch}
+                        onValueChange={(v) => {
+                          setSelectedBatch(v);
+                          // The batch already knows its trainer; deriving it keeps course,
+                          // batch and teacher consistent and puts the student in
+                          // batch_students, which is what batch-scoped classes match on.
+                          const b = (batchesQuery.data ?? []).find((x: any) => x.id === v);
+                          if (b?.teacherId) setSelectedTrainer(b.teacherId);
+                        }}
+                        disabled={!selectedCourse}
+                      >
                         <SelectTrigger id="alloc-batch">
-                          <SelectValue placeholder="Select Batch (Optional)" />
+                          <SelectValue
+                            placeholder={
+                              selectedCourse ? "Select Batch (Optional)" : "Select a course first"
+                            }
+                          />
                         </SelectTrigger>
                         <SelectContent>
-                          {(batchesQuery.data ?? []).map((b: any) => (
-                            <SelectItem key={b.id} value={b.id}>
-                              {b.name}
-                            </SelectItem>
-                          ))}
+                          {(batchesQuery.data ?? [])
+                            .filter((b: any) => !selectedCourse || b.courseId === selectedCourse)
+                            .map((b: any) => (
+                              <SelectItem key={b.id} value={b.id}>
+                                {b.name}
+                                {b.teacherName ? ` · ${b.teacherName}` : ""}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                     </div>

@@ -14,6 +14,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { formatCurriculumPath } from "@/lib/format";
 import { PageHeader } from "@/components/portal/StatCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -233,7 +234,7 @@ function AdminRecordingsPage() {
                   <TableCell>
                     <div className="text-sm font-medium text-foreground">{r.courseTitle}</div>
                     <div className="text-xs text-muted-foreground mt-0.5">
-                      {r.moduleTitle} · {r.lessonTitle}
+                      {formatCurriculumPath(r.moduleTitle, r.lessonTitle)}
                     </div>
                   </TableCell>
                   <TableCell>

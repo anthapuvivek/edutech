@@ -72,6 +72,8 @@ export interface AdminStudentDetail extends AdminStudentRow {
   timeline: StudentTimelineEntry[];
   enrollments: Array<{
     id: string;
+    /** Real course id; lets the UI flag courses the student already holds. */
+    courseId?: string | null | undefined;
     courseTitle: string;
     batchName: string;
     trainerName: string;
@@ -115,7 +117,14 @@ export interface AdminStudentDetail extends AdminStudentRow {
 export interface AdminBatch {
   id: string;
   name: string;
+  /**
+   * Returned by GET /admin/batches; used to filter batches by the selected course and to
+   * derive the trainer. Optional because the mock fixtures predate these fields.
+   */
+  courseId?: string | undefined;
   courseTitle: string;
+  teacherId?: string | undefined;
+  teacherName?: string | undefined;
   trainerName: string;
   startDate: string;
   endDate: string;

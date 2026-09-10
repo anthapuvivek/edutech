@@ -6,6 +6,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -151,6 +152,57 @@ public class ClassRecordingServiceTest {
         assertEquals("Introduction to JPA", response.getTitle());
         assertEquals("DRAFT", response.getStatus());
         assertFalse(response.isPublished());
+    }
+
+    /**
+     * A trainer must be able to record a class before the curriculum exists. This also
+     * proves V29 dropped the NOT NULL on module_id / lesson_id - without the migration the
+     * insert fails at the database, not at validation.
+     */
+    @Test
+    public void testCreateRecordingWithoutCurriculumMapping() {
+        CreateRecordingRequest request = new CreateRecordingRequest();
+        request.setCourseId(course.getId());
+        request.setTitle("Ad-hoc doubt clearing session");
+
+        RecordingResponse response = recordingService.createRecording(request, teacher.getId());
+
+        assertNotNull(response);
+        assertNull(response.getModuleId());
+        assertNull(response.getLessonId());
+        assertEquals("DRAFT", response.getStatus());
+        // classDate is optional too and falls back to "now" rather than rejecting the create.
+        assertNotNull(response.getClassDate());
+    }
+
+    /** A lesson supplied on its own adopts its own module, so the mapping stays consistent. */
+    @Test
+    public void testCreateRecordingWithLessonOnlyResolvesItsModule() {
+        CreateRecordingRequest request = new CreateRecordingRequest();
+        request.setCourseId(course.getId());
+        request.setLessonId(lesson.getId());
+        request.setTitle("Lesson recap");
+        request.setClassDate(Instant.now());
+
+        RecordingResponse response = recordingService.createRecording(request, teacher.getId());
+
+        assertEquals(module.getId(), response.getModuleId());
+        assertEquals(lesson.getId(), response.getLessonId());
+    }
+
+    /** The uploader owns the recording, so every later ownership check passes for them. */
+    @Test
+    public void testRecordingIsOwnedByTheUploadingTrainer() {
+        CreateRecordingRequest request = new CreateRecordingRequest();
+        request.setCourseId(course.getId());
+        request.setTitle("Ownership check");
+
+        RecordingResponse response = recordingService.createRecording(request, teacher.getId());
+
+        assertEquals(teacher.getId(), response.getTeacherId());
+        // Reaching the upload step at all requires that ownership check to pass.
+        assertNotNull(recordingService.generateUploadUrl(
+                response.getId(), "class.mp4", teacher.getId()));
     }
 
     @Test

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 @RestController
@@ -117,7 +118,9 @@ public class ClassRecordingController {
     public ApiResponse<String> uploadLocalMultipart(
             @RequestParam("key") String key,
             @RequestParam("file") MultipartFile file) throws IOException {
-        localVideoStorageService.storeFile(key, file.getBytes());
+        try (InputStream in = file.getInputStream()) {
+            localVideoStorageService.storeFile(key, in);
+        }
         return ApiResponse.success("File uploaded successfully");
     }
 
@@ -126,8 +129,9 @@ public class ClassRecordingController {
     public ApiResponse<String> uploadLocalPut(
             @RequestParam("key") String key,
             HttpServletRequest request) throws IOException {
-        byte[] bytes = request.getInputStream().readAllBytes();
-        localVideoStorageService.storeFile(key, bytes);
+        try (InputStream in = request.getInputStream()) {
+            localVideoStorageService.storeFile(key, in);
+        }
         return ApiResponse.success("File uploaded successfully");
     }
 }

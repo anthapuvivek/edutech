@@ -98,6 +98,8 @@ public class AdminStudentDetailResponse {
     @Builder
     public static class EnrollmentDetail {
         private String id;
+        /** Real course id, so the UI can tell which courses a student already holds. */
+        private String courseId;
         private String courseTitle;
         private String batchName;
         private String trainerName;

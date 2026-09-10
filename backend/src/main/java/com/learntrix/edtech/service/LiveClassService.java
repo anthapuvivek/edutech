@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.learntrix.edtech.common.exception.CourseAccessDeniedException;
+import com.learntrix.edtech.common.util.SecurityUtil;
 import com.learntrix.edtech.common.exception.ResourceNotFoundException;
 import com.learntrix.edtech.dto.live.LiveClassResponse;
 import com.learntrix.edtech.entity.Batch;
@@ -180,10 +182,44 @@ public class LiveClassService {
         return mapToResponse(saved);
     }
 
+    /**
+     * Authorises a teacher to act on one class.
+     *
+     * <p>Every path is resolved from the database, so adding courses, teachers or
+     * assignments never requires a code change. A teacher qualifies when they own the
+     * class, when they run its batch, or when they are otherwise assigned to its course
+     * (instructor, batch teacher, or allocated on an enrolment - see
+     * {@link CourseAccessService#verifyTeacherCanManageCourse}).</p>
+     *
+     * <p>Admins keep full reach because these endpoints are also exposed to them.</p>
+     */
+    private void verifyTeacherCanManageClass(LiveClass lc, UUID actorId) {
+        if (SecurityUtil.hasRole("ADMIN") || SecurityUtil.hasRole("SUPER_ADMIN")) {
+            return;
+        }
+        if (actorId == null) {
+            throw new CourseAccessDeniedException("You are not authorized to manage this class");
+        }
+        if (lc.getTeacher() != null && actorId.equals(lc.getTeacher().getId())) {
+            return;
+        }
+        if (lc.getBatch() != null && lc.getBatch().getTeacher() != null
+                && actorId.equals(lc.getBatch().getTeacher().getId())) {
+            return;
+        }
+        if (lc.getCourse() != null) {
+            // Throws CourseAccessDeniedException when the teacher is not assigned.
+            courseAccessService.verifyTeacherCanManageCourse(actorId, lc.getCourse().getId());
+            return;
+        }
+        throw new CourseAccessDeniedException("You are not authorized to manage this class");
+    }
+
     @Transactional(readOnly = true)
     public LiveClassResponse getLiveClassById(UUID id, UUID teacherId) {
         LiveClass lc = liveClassRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LiveClass", "id", id));
+        verifyTeacherCanManageClass(lc, teacherId);
         return mapToResponse(lc);
     }
 
@@ -202,6 +238,7 @@ public class LiveClassService {
     public LiveClassResponse updateLiveClass(UUID id, Map<String, Object> body, UUID teacherId) {
         LiveClass liveClass = liveClassRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LiveClass", "id", id));
+        verifyTeacherCanManageClass(liveClass, teacherId);
 
         if (body.containsKey("title") && body.get("title") != null) {
             liveClass.setTitle((String) body.get("title"));
@@ -211,6 +248,9 @@ public class LiveClassService {
             Object cid = body.get("courseId");
             if (cid != null && !cid.toString().isBlank()) {
                 UUID courseId = UUID.fromString(cid.toString());
+                // Same check create performs. Without it a teacher could move a class into
+                // a course they are not assigned to and gain control of its content.
+                courseAccessService.verifyTeacherCanManageCourse(teacherId, courseId);
                 Course course = courseRepository.findById(courseId)
                         .orElseThrow(() -> new ResourceNotFoundException("Course", "id", courseId));
                 liveClass.setCourse(course);
@@ -282,6 +322,7 @@ public class LiveClassService {
     public LiveClassResponse cancelLiveClass(UUID id, UUID teacherId) {
         LiveClass liveClass = liveClassRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LiveClass", "id", id));
+        verifyTeacherCanManageClass(liveClass, teacherId);
         liveClass.setStatus("Cancelled");
         LiveClass saved = liveClassRepository.save(liveClass);
         return mapToResponse(saved);
@@ -290,6 +331,7 @@ public class LiveClassService {
     public void deleteLiveClass(UUID id, UUID teacherId) {
         LiveClass liveClass = liveClassRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LiveClass", "id", id));
+        verifyTeacherCanManageClass(liveClass, teacherId);
         liveClassRepository.delete(liveClass);
     }
 

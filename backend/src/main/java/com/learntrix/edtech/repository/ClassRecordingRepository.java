@@ -28,7 +28,10 @@ public interface ClassRecordingRepository extends JpaRepository<ClassRecording, 
     @Query("SELECT r FROM ClassRecording r WHERE r.course.id = :courseId AND r.published = true ORDER BY r.classDate DESC")
     List<ClassRecording> findPublishedByCourseId(@Param("courseId") UUID courseId);
 
-    @Query("SELECT r FROM ClassRecording r JOIN Enrollment e ON r.course.id = e.course.id WHERE e.student.id = :studentId AND r.published = true ORDER BY r.classDate DESC")
+    @Query("SELECT r FROM ClassRecording r JOIN Enrollment e ON r.course.id = e.course.id " +
+           "WHERE e.student.id = :studentId AND r.published = true " +
+           "AND (e.status = 'ACTIVE' OR e.status = 'ENROLLED') " +
+           "ORDER BY r.classDate DESC")
     List<ClassRecording> findPublishedByStudentEnrollment(@Param("studentId") UUID studentId);
 
     Page<ClassRecording> findByStatus(RecordingStatus status, Pageable pageable);

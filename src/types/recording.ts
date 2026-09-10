@@ -5,10 +5,13 @@ export interface Recording {
   id: string;
   courseId: string;
   courseTitle: string;
-  moduleId: string;
-  moduleTitle: string;
-  lessonId: string;
-  lessonTitle: string;
+  // Optional: a recording can be filed against the course without a curriculum mapping.
+  // Spelled `| undefined` because exactOptionalPropertyTypes is on and the API really
+  // does send these back absent.
+  moduleId?: string | undefined;
+  moduleTitle?: string | undefined;
+  lessonId?: string | undefined;
+  lessonTitle?: string | undefined;
   teacherId: string;
   teacherName: string;
   title: string;
@@ -29,11 +32,12 @@ export interface Recording {
 
 export interface CreateRecordingRequest {
   courseId: string;
-  moduleId: string;
-  lessonId: string;
+  /** Optional. Send undefined when the course has no modules, or to skip the mapping. */
+  moduleId?: string;
+  lessonId?: string;
   title: string;
   description?: string;
-  classDate: string;
+  classDate?: string;
 }
 
 export interface UpdateRecordingRequest {

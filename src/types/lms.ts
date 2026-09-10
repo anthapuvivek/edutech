@@ -135,6 +135,8 @@ export interface CreateLiveClassPayload {
   trainerName?: string | undefined;
   description?: string | undefined;
   date: string;
+  /** Backend field name. LiveClassService reads `classDate`; `date` is only used by the mock layer. */
+  classDate?: string | undefined;
   startTime: string;
   endTime: string;
   platform: MeetingPlatform;
@@ -160,9 +162,15 @@ export interface TeacherStats {
 
 export interface TeacherStudentRow {
   id: string;
+  /** Human-readable id from StudentProfile (LTX-...); null if the profile has none. */
+  studentId?: string | null | undefined;
   name: string;
   email: string;
   courseTitle: string;
+  /** Batch the enrolment is pinned to; null when enrolled course-wide. */
+  batchName?: string | null | undefined;
+  quizzesAttempted?: number | undefined;
+  enrolledAt?: string | null | undefined;
   progressPercent: number;
   lessonsCompleted: number;
   quizScore: number;

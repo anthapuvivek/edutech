@@ -560,6 +560,32 @@ public class AdminOnboardingService {
     }
 
     /**
+     * True when the optional login_audit_logs table is present in the current schema.
+     * Checked through JDBC metadata so a missing table is a boolean, not an exception that
+     * would mark the surrounding transaction rollback-only.
+     */
+    private boolean loginAuditLogsTableExists() {
+        try {
+            return Boolean.TRUE.equals(entityManager.unwrap(org.hibernate.Session.class)
+                    .doReturningWork(connection -> {
+                        try (java.sql.ResultSet rs = connection.getMetaData()
+                                .getTables(null, null, "%", new String[] {"TABLE"})) {
+                            while (rs.next()) {
+                                if ("login_audit_logs".equalsIgnoreCase(rs.getString("TABLE_NAME"))) {
+                                    return Boolean.TRUE;
+                                }
+                            }
+                        }
+                        return Boolean.FALSE;
+                    }));
+        } catch (Exception e) {
+            // Best effort: if metadata is unavailable, skip the cleanup rather than failing
+            // the delete. The FK only matters once something writes to that table.
+            return false;
+        }
+    }
+
+    /**
      * Permanently deletes a student account.
      *
      * <p>This is a hard delete: the users row is removed and every child row follows it
@@ -614,12 +640,16 @@ public class AdminOnboardingService {
             batchRepository.save(batch);
         }
 
-        // login_audit_logs is the one FK to users declared ON DELETE NO ACTION, so it would
-        // block the delete. Nothing writes to that table today, but clearing it here means
-        // this endpoint does not start returning 500s the day something does.
-        entityManager.createNativeQuery("DELETE FROM login_audit_logs WHERE user_id = :uid")
-                .setParameter("uid", userId)
-                .executeUpdate();
+        // login_audit_logs is the one FK to users declared ON DELETE NO ACTION, so rows there
+        // would block the delete. The table is created by a Flyway migration and is absent in
+        // schemas built directly from the JPA entities (it is mapped by no entity), so probe
+        // for it first: issuing the DELETE blindly threw and turned the whole request into a
+        // 500 wherever the table does not exist.
+        if (loginAuditLogsTableExists()) {
+            entityManager.createNativeQuery("DELETE FROM login_audit_logs WHERE user_id = :uid")
+                    .setParameter("uid", userId)
+                    .executeUpdate();
+        }
 
         // Flush the detach above before the cascade delete runs.
         entityManager.flush();

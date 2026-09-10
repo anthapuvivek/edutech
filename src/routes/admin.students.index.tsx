@@ -323,19 +323,46 @@ function AdminStudents() {
 
                   <div className="space-y-1.5 sm:col-span-2">
                     <Label htmlFor="alloc-batch">Batch</Label>
-                    <Select value={selectedBatch} onValueChange={setSelectedBatch}>
+                    <Select
+                      value={selectedBatch}
+                      onValueChange={(v) => {
+                        setSelectedBatch(v);
+                        // The batch already knows its trainer. Deriving it here keeps
+                        // course, batch and teacher consistent, and puts the student into
+                        // batch_students - which is what the student's live-class query
+                        // matches on.
+                        const b = (batchesQuery.data ?? []).find((x: any) => x.id === v);
+                        if (b?.teacherId) setSelectedTrainer(b.teacherId);
+                      }}
+                      disabled={selectedCourse === "none"}
+                    >
                       <SelectTrigger id="alloc-batch">
-                        <SelectValue placeholder="Select Batch (Optional)" />
+                        <SelectValue
+                          placeholder={
+                            selectedCourse === "none"
+                              ? "Select a course first"
+                              : "Select Batch (Optional)"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
-                        {(batchesQuery.data ?? []).map((b: any) => (
-                          <SelectItem key={b.id} value={b.id}>
-                            {b.name}
-                          </SelectItem>
-                        ))}
+                        {(batchesQuery.data ?? [])
+                          .filter(
+                            (b: any) => selectedCourse === "none" || b.courseId === selectedCourse,
+                          )
+                          .map((b: any) => (
+                            <SelectItem key={b.id} value={b.id}>
+                              {b.name}
+                              {b.teacherName ? ` · ${b.teacherName}` : ""}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Choosing a batch also sets the teacher and is what lets the student see
+                      that batch&rsquo;s live classes.
+                    </p>
                   </div>
 
                   <div className="space-y-1.5 sm:col-span-2">

@@ -85,6 +85,7 @@ function TeacherStudents() {
               <TableRow>
                 <TableHead>Student</TableHead>
                 <TableHead>Course</TableHead>
+                <TableHead>Batch</TableHead>
                 <TableHead className="w-40">Progress</TableHead>
                 <TableHead className="text-right">Quiz</TableHead>
                 <TableHead className="text-right">Assignments</TableHead>
@@ -101,21 +102,35 @@ function TeacherStudents() {
                 <TableRow key={s.id}>
                   <TableCell>
                     <div className="font-medium">{s.name}</div>
-                    <div className="text-xs text-muted-foreground">{s.email}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {s.studentId ? `${s.studentId} · ` : ""}
+                      {s.email}
+                    </div>
                   </TableCell>
                   <TableCell className="max-w-52 truncate">{s.courseTitle}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {s.batchName ?? "—"}
+                  </TableCell>
                   <TableCell>
                     <Progress value={s.progressPercent} />
                     <span className="mt-1 block text-xs text-muted-foreground">
                       {s.progressPercent}% · {s.lessonsCompleted} lessons
                     </span>
                   </TableCell>
-                  <TableCell className="text-right">{s.quizScore}%</TableCell>
+                  <TableCell className="text-right">
+                    {s.quizzesAttempted ? (
+                      `${s.quizScore}%`
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">{s.assignments}</TableCell>
                   <TableCell className="text-right">{s.problemsSolved}</TableCell>
                   <TableCell className="text-right">{s.points.toLocaleString()}</TableCell>
                   <TableCell className="text-right">#{s.rank}</TableCell>
-                  <TableCell className="text-muted-foreground">{s.lastActive}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {s.lastActive ? new Date(s.lastActive).toLocaleDateString() : "No activity yet"}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={statusVariant[s.status]}>{s.status.replace("_", " ")}</Badge>
                   </TableCell>

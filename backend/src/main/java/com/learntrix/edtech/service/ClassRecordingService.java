@@ -19,9 +19,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+// Statuses that constitute an active enrolment for access-control purposes.
+// Kept as a package-private constant so it is easy to extend (e.g. "TRIAL")
+// without hunting for every literal List.of("ACTIVE","ENROLLED") in the class.
+
 @Service
 @Transactional
 public class ClassRecordingService {
+
+    private static final List<String> ACTIVE_STATUSES = List.of("ACTIVE", "ENROLLED");
 
     private final ClassRecordingRepository recordingRepository;
     private final RecordingWatchProgressRepository progressRepository;
@@ -33,6 +39,7 @@ public class ClassRecordingService {
     private final UserRepository userRepository;
     private final VideoStorageService videoStorageService;
     private final VideoProcessingService videoProcessingService;
+    private final CourseAccessService courseAccessService;
 
     @Value("${video.completion-threshold:90}")
     private int completionThresholdPercent;
@@ -47,7 +54,8 @@ public class ClassRecordingService {
             NotificationRepository notificationRepository,
             UserRepository userRepository,
             VideoStorageService videoStorageService,
-            VideoProcessingService videoProcessingService) {
+            VideoProcessingService videoProcessingService,
+            CourseAccessService courseAccessService) {
         this.recordingRepository = recordingRepository;
         this.progressRepository = progressRepository;
         this.courseRepository = courseRepository;
@@ -58,37 +66,30 @@ public class ClassRecordingService {
         this.userRepository = userRepository;
         this.videoStorageService = videoStorageService;
         this.videoProcessingService = videoProcessingService;
+        this.courseAccessService = courseAccessService;
     }
 
     public RecordingResponse createRecording(CreateRecordingRequest request, UUID teacherId) {
         Course course = courseRepository.findById(request.getCourseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Course", "id", request.getCourseId()));
-                
-        // Verify teacher course ownership
-        if (course.getInstructor() == null || !course.getInstructor().getId().equals(teacherId)) {
-            throw new CourseAccessDeniedException("You are not authorized to manage recordings for this course");
-        }
 
-        Module module = moduleRepository.findById(request.getModuleId())
-                .orElseThrow(() -> new ResourceNotFoundException("Module", "id", request.getModuleId()));
-        if (!module.getCourse().getId().equals(course.getId())) {
-            throw new BusinessException("INVALID_RELATIONSHIP", "Module does not belong to the selected course", HttpStatus.BAD_REQUEST);
-        }
+        // A trainer may reach a course as its instructor, through a batch they teach, or
+        // through students allocated to them - CourseAccessService is the single authority
+        // on that. The old instructor-only check locked allocated trainers out of uploading.
+        courseAccessService.verifyTeacherCanManageCourse(teacherId, course.getId());
 
-        Lesson lesson = lessonRepository.findById(request.getLessonId())
-                .orElseThrow(() -> new ResourceNotFoundException("Lesson", "id", request.getLessonId()));
-        if (!lesson.getModule().getId().equals(module.getId())) {
-            throw new BusinessException("INVALID_RELATIONSHIP", "Lesson does not belong to the selected module", HttpStatus.BAD_REQUEST);
-        }
+        // The uploader owns the recording. Attributing it to course.getInstructor() meant an
+        // allocated trainer failed every later ownership check on their own upload.
+        User uploader = userRepository.findById(teacherId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", teacherId));
 
         ClassRecording recording = new ClassRecording();
         recording.setCourse(course);
-        recording.setModule(module);
-        recording.setLesson(lesson);
-        recording.setTeacher(course.getInstructor()); // Use managed instructor user
+        recording.setTeacher(uploader);
+        applyCurriculumMapping(recording, request.getModuleId(), request.getLessonId());
         recording.setTitle(request.getTitle());
         recording.setDescription(request.getDescription());
-        recording.setClassDate(request.getClassDate());
+        recording.setClassDate(request.getClassDate() != null ? request.getClassDate() : Instant.now());
         recording.setStatus(RecordingStatus.DRAFT);
         recording.setPublished(false);
 
@@ -109,6 +110,13 @@ public class ClassRecordingService {
         if (request.getClassDate() != null) {
             recording.setClassDate(request.getClassDate());
         }
+
+        // Only touch the curriculum mapping when the caller explicitly asked to, so an
+        // ordinary title edit cannot wipe a mapping it never sent.
+        if (request.isRemapCurriculum()) {
+            applyCurriculumMapping(recording, request.getModuleId(), request.getLessonId());
+        }
+
         recording.setUpdatedAt(Instant.now());
 
         ClassRecording saved = recordingRepository.save(recording);
@@ -130,7 +138,8 @@ public class ClassRecordingService {
                 if (!recording.isPublished()) {
                     throw new CourseAccessDeniedException("Recording is not published yet");
                 }
-                boolean enrolled = enrollmentRepository.existsByStudentIdAndCourseId(userId, recording.getCourse().getId());
+                boolean enrolled = enrollmentRepository.existsByStudentIdAndCourseIdAndStatusIn(
+                        userId, recording.getCourse().getId(), ACTIVE_STATUSES);
                 if (!enrolled) {
                     throw new CourseAccessDeniedException("You must be enrolled in the course to view this recording");
                 }
@@ -156,7 +165,8 @@ public class ClassRecordingService {
 
     @Transactional(readOnly = true)
     public List<RecordingResponse> getPublishedRecordingsForCourse(UUID courseId, UUID studentId) {
-        boolean enrolled = enrollmentRepository.existsByStudentIdAndCourseId(studentId, courseId);
+        boolean enrolled = enrollmentRepository.existsByStudentIdAndCourseIdAndStatusIn(
+                studentId, courseId, ACTIVE_STATUSES);
         if (!enrolled) {
             throw new CourseAccessDeniedException("You must be enrolled in the course to view recordings");
         }
@@ -185,9 +195,13 @@ public class ClassRecordingService {
 
         ClassRecording saved = recordingRepository.save(recording);
 
-        // Generate in-app notifications for enrolled students
+        // Notify only the students who sit under this trainer for the course - their own
+        // allocation, a batch they teach, or the course they instruct. On a course with
+        // several trainers this stops one trainer's upload paging another's students.
         List<Enrollment> enrollments = enrollmentRepository.findAll().stream()
                 .filter(e -> e.getCourse().getId().equals(recording.getCourse().getId()) && "ACTIVE".equalsIgnoreCase(e.getStatus()))
+                .filter(e -> courseAccessService.isStudentAllocatedToTeacherCourse(
+                        e.getStudent().getId(), teacherId, recording.getCourse().getId()))
                 .toList();
 
         for (Enrollment enrollment : enrollments) {
@@ -290,7 +304,8 @@ public class ClassRecordingService {
         ClassRecording recording = recordingRepository.findById(recordingId)
                 .orElseThrow(() -> new ResourceNotFoundException("ClassRecording", "id", recordingId));
 
-        boolean enrolled = enrollmentRepository.existsByStudentIdAndCourseId(studentId, recording.getCourse().getId());
+        boolean enrolled = enrollmentRepository.existsByStudentIdAndCourseIdAndStatusIn(
+                studentId, recording.getCourse().getId(), ACTIVE_STATUSES);
         if (!enrolled) {
             throw new CourseAccessDeniedException("You must be enrolled in the course to track progress");
         }
@@ -334,7 +349,8 @@ public class ClassRecordingService {
         ClassRecording recording = recordingRepository.findById(recordingId)
                 .orElseThrow(() -> new ResourceNotFoundException("ClassRecording", "id", recordingId));
 
-        boolean enrolled = enrollmentRepository.existsByStudentIdAndCourseId(studentId, recording.getCourse().getId());
+        boolean enrolled = enrollmentRepository.existsByStudentIdAndCourseIdAndStatusIn(
+                studentId, recording.getCourse().getId(), ACTIVE_STATUSES);
         if (!enrolled) {
             throw new CourseAccessDeniedException("You must be enrolled in the course to view progress");
         }
@@ -411,15 +427,52 @@ public class ClassRecordingService {
         return recordingRepository.findAll(pageable).map(this::mapToResponse);
     }
 
+    /**
+     * Resolves the optional module/lesson mapping onto a recording.
+     *
+     * <p>Both ids may be null: a trainer can upload a class before the course curriculum
+     * has been built, and the recording is then filed against the course alone. Whatever
+     * IS supplied is still verified - the module must belong to the recording's course and
+     * the lesson to that module - and a lesson supplied on its own adopts its own module.
+     */
+    private void applyCurriculumMapping(ClassRecording recording, UUID moduleId, UUID lessonId) {
+        Lesson lesson = lessonId == null ? null
+                : lessonRepository.findById(lessonId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Lesson", "id", lessonId));
+
+        Module module = moduleId == null ? null
+                : moduleRepository.findById(moduleId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Module", "id", moduleId));
+
+        if (module == null && lesson != null) {
+            module = lesson.getModule();
+        }
+
+        if (module != null && !module.getCourse().getId().equals(recording.getCourse().getId())) {
+            throw new BusinessException("INVALID_RELATIONSHIP",
+                    "Module does not belong to the selected course", HttpStatus.BAD_REQUEST);
+        }
+
+        if (lesson != null && module != null && !lesson.getModule().getId().equals(module.getId())) {
+            throw new BusinessException("INVALID_RELATIONSHIP",
+                    "Lesson does not belong to the selected module", HttpStatus.BAD_REQUEST);
+        }
+
+        recording.setModule(module);
+        recording.setLesson(lesson);
+    }
+
     private RecordingResponse mapToResponse(ClassRecording recording) {
         return RecordingResponse.builder()
                 .id(recording.getId())
                 .courseId(recording.getCourse().getId())
                 .courseTitle(recording.getCourse().getTitle())
-                .moduleId(recording.getModule().getId())
-                .moduleTitle(recording.getModule().getTitle())
-                .lessonId(recording.getLesson().getId())
-                .lessonTitle(recording.getLesson().getTitle())
+                // Null whenever the trainer uploaded without mapping the recording to the
+                // curriculum. Clients render a fallback label rather than assuming a mapping.
+                .moduleId(recording.getModule() != null ? recording.getModule().getId() : null)
+                .moduleTitle(recording.getModule() != null ? recording.getModule().getTitle() : null)
+                .lessonId(recording.getLesson() != null ? recording.getLesson().getId() : null)
+                .lessonTitle(recording.getLesson() != null ? recording.getLesson().getTitle() : null)
                 .teacherId(recording.getTeacher().getId())
                 .teacherName(recording.getTeacher().getName())
                 .title(recording.getTitle())
