@@ -15,6 +15,10 @@ public class QuizResponse {
     private String courseTitle;
     private UUID teacherId;
     private String teacherName;
+    /** Null when the quiz is course-wide. */
+    private UUID batchId;
+    private String batchName;
+    private Integer questionCount;
     private String title;
     private String description;
     private Integer timeLimitMinutes;

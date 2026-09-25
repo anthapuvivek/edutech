@@ -9,6 +9,7 @@ import {
   CalendarCheck,
   CalendarDays,
   ClipboardList,
+  Code2,
   FileText,
   GraduationCap,
   Handshake,
@@ -39,6 +40,7 @@ const nav: PortalNavItem[] = [
   { label: "Teachers", to: "/admin/teachers", icon: GraduationCap },
   { label: "Courses", to: "/admin/courses", icon: BookOpen },
   { label: "Batches", to: "/admin/batches", icon: CalendarDays },
+  { label: "Coding Practice", to: "/admin/coding-problems", icon: Code2 },
   { label: "Attendance", to: "/admin/attendance", icon: CalendarCheck },
   { label: "Learning & Performance", to: "/admin/performance", icon: TrendingUp },
 

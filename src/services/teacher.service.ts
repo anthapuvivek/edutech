@@ -4,6 +4,7 @@ import { apiRequest, mockDelay } from "@/services/api-client";
 import type {
   CreateLiveClassPayload,
   PlatformEvent,
+  TeacherBatchRow,
   TeacherStats,
   TeacherStudentRow,
   UpdateLiveClassPayload,
@@ -175,8 +176,8 @@ export const teacherService = {
     return mockDelay([]);
   },
 
-  async batches(): Promise<any[]> {
-    if (!env.useMocks) return apiRequest<any[]>("/teacher/batches");
+  async batches(): Promise<TeacherBatchRow[]> {
+    if (!env.useMocks) return apiRequest<TeacherBatchRow[]>("/teacher/batches");
     return mockDelay([]);
   },
 

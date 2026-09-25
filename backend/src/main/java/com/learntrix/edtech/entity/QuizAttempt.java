@@ -28,6 +28,15 @@ public class QuizAttempt {
 
     private Integer score;
 
+    /** Marked by the backend, never accepted from the client. */
+    @Column(name = "total_questions", nullable = false)
+    @Builder.Default
+    private Integer totalQuestions = 0;
+
+    @Column(name = "correct_answers", nullable = false)
+    @Builder.Default
+    private Integer correctAnswers = 0;
+
     @Column(name = "passed")
     @Builder.Default
     private Boolean passed = false;

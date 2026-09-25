@@ -11,6 +11,7 @@ import {
   User,
   Users,
   Video,
+  Sparkles,
 } from "lucide-react";
 
 import { PortalLayout, type PortalNavItem } from "@/layouts/PortalLayout";
@@ -19,12 +20,13 @@ const nav: PortalNavItem[] = [
   { label: "Dashboard", to: "/teacher/dashboard", icon: LayoutDashboard },
   { label: "Students", to: "/teacher/students", icon: Users },
   { label: "My Courses", icon: BookOpen },
-  { label: "Batches", icon: Users },
+  { label: "Batches", to: "/teacher/batches", icon: Users },
   { label: "Live Classes", to: "/teacher/live-classes", icon: Video },
   { label: "Recorded Classes", to: "/teacher/recordings", icon: Video },
   { label: "Assignments", icon: FileCheck2 },
-  { label: "Quizzes", icon: ListChecks },
-  { label: "Coding Problems", icon: Code2 },
+  { label: "Quizzes", to: "/teacher/quizzes", icon: ListChecks },
+  { label: "Coding Problems", to: "/teacher/coding-problems", icon: Code2 },
+  { label: "AI Assistant", to: "/teacher/ai-assistant", icon: Sparkles },
   { label: "Progress", icon: TrendingUp },
   { label: "Analytics", icon: BarChart3 },
   { label: "Announcements", icon: Megaphone },

@@ -373,6 +373,9 @@ function TeacherLiveClassesPage() {
         payload: {
           title: formData.title.trim(),
           courseTitle: finalCourseTitle,
+          // The backend reads `classDate`; sending only `date` meant an edited date was
+          // silently discarded. `date` stays for the mock layer, which still reads it.
+          classDate: formData.date,
           date: formData.date,
           startTime: formData.startTime,
           endTime: formData.endTime,

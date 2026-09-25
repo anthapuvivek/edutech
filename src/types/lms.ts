@@ -160,6 +160,21 @@ export interface TeacherStats {
   upcomingClasses: number;
 }
 
+/** Mirrors TeacherBatchResponse. GET /teacher/batches resolves the teacher from the JWT. */
+export interface TeacherBatchRow {
+  id: string;
+  name: string;
+  courseId: string;
+  courseTitle: string;
+  teacherId: string;
+  teacherName: string;
+  capacity: number;
+  status: string;
+  startDate?: string | null | undefined;
+  endDate?: string | null | undefined;
+  studentCount: number;
+}
+
 export interface TeacherStudentRow {
   id: string;
   /** Human-readable id from StudentProfile (LTX-...); null if the profile has none. */

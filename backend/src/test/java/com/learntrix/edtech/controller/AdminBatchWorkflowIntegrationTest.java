@@ -18,12 +18,14 @@ import org.springframework.test.web.servlet.MvcResult;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learntrix.edtech.entity.Course;
+import com.learntrix.edtech.entity.LiveClass;
 import com.learntrix.edtech.entity.Role;
 import com.learntrix.edtech.entity.User;
 import com.learntrix.edtech.repository.BatchRepository;
@@ -393,6 +395,91 @@ class AdminBatchWorkflowIntegrationTest {
         mockMvc.perform(delete("/api/admin/batches/" + UUID.randomUUID())
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNotFound());
+    }
+
+    /**
+     * SCENARIO C - a teacher must not be able to move one of their own classes into another
+     * teacher's batch, which would expose it to that teacher's cohort.
+     */
+    @Test
+    void teacherCannotMoveOwnClassIntoAnotherTeachersBatch() throws Exception {
+        String adminToken = loginToken("admin.flow@test.com", "Password123!");
+        String teacherToken = loginToken("teacher.flow@test.com", "Password123!");
+
+        // A batch for each teacher, on the same course.
+        UUID myBatchId = createBatch(adminToken, "Mine", teacher.getId());
+        UUID theirBatchId = createBatch(adminToken, "Theirs", otherTeacher.getId());
+
+        // Teacher schedules a class against their own batch - allowed.
+        MvcResult created = mockMvc.perform(post("/api/teacher/live-classes")
+                        .header("Authorization", "Bearer " + teacherToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Spring Security\",\"batchId\":\"" + myBatchId
+                                + "\",\"classDate\":\"2026-10-01\",\"startTime\":\"09:00\","
+                                + "\"endTime\":\"10:30\"}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String classId = objectMapper.readTree(created.getResponse().getContentAsString())
+                .path("data").path("id").asText();
+
+        // Moving it into the other teacher's batch must be refused.
+        mockMvc.perform(put("/api/teacher/live-classes/" + classId)
+                        .header("Authorization", "Bearer " + teacherToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"batchId\":\"" + theirBatchId + "\"}"))
+                .andExpect(status().isForbidden());
+
+        LiveClass unchanged = liveClassRepository.findById(UUID.fromString(classId)).orElseThrow();
+        assertTrue(unchanged.getBatch() != null && unchanged.getBatch().getId().equals(myBatchId),
+                "the class must still belong to the original batch");
+    }
+
+    /**
+     * Deleting a batch detaches its classes. Clearing batch_id alone would make them
+     * course-wide, so they must also be unpublished rather than shown to every student
+     * on the course.
+     */
+    @Test
+    void deletingBatchUnpublishesItsClassesInsteadOfWideningVisibility() throws Exception {
+        String adminToken = loginToken("admin.flow@test.com", "Password123!");
+        String teacherToken = loginToken("teacher.flow@test.com", "Password123!");
+
+        UUID batchId = createBatch(adminToken, "Doomed Cohort", teacher.getId());
+
+        MvcResult created = mockMvc.perform(post("/api/teacher/live-classes")
+                        .header("Authorization", "Bearer " + teacherToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Cohort Only\",\"batchId\":\"" + batchId
+                                + "\",\"classDate\":\"2026-10-02\",\"startTime\":\"09:00\","
+                                + "\"endTime\":\"10:30\",\"published\":true}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        UUID classId = UUID.fromString(objectMapper.readTree(created.getResponse().getContentAsString())
+                .path("data").path("id").asText());
+
+        assertTrue(Boolean.TRUE.equals(liveClassRepository.findById(classId).orElseThrow().getPublished()),
+                "precondition: the class is published to its batch");
+
+        mockMvc.perform(delete("/api/admin/batches/" + batchId)
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+
+        LiveClass detached = liveClassRepository.findById(classId).orElseThrow();
+        assertTrue(detached.getBatch() == null, "the class is detached from the deleted batch");
+        assertFalse(Boolean.TRUE.equals(detached.getPublished()),
+                "a detached class must be unpublished, not silently made course-wide");
+    }
+
+    private UUID createBatch(String adminToken, String name, UUID teacherId) throws Exception {
+        MvcResult r = mockMvc.perform(post("/api/admin/batches")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"" + name + "\",\"courseId\":\"" + course.getId()
+                                + "\",\"teacherId\":\"" + teacherId + "\",\"capacity\":10}"))
+                .andExpect(status().isOk())
+                .andReturn();
+        return UUID.fromString(objectMapper.readTree(r.getResponse().getContentAsString())
+                .path("data").path("id").asText());
     }
 
     private String loginToken(String email, String password) throws Exception {

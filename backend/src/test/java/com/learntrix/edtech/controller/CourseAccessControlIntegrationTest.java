@@ -39,6 +39,9 @@ import com.learntrix.edtech.entity.Module;
 import com.learntrix.edtech.entity.RecordingStatus;
 import com.learntrix.edtech.entity.Role;
 import com.learntrix.edtech.entity.User;
+import com.learntrix.edtech.repository.CodingProblemRepository;
+import com.learntrix.edtech.repository.CodingSubmissionRepository;
+import com.learntrix.edtech.repository.CodingTestCaseRepository;
 import com.learntrix.edtech.repository.AccountActivationTokenRepository;
 import com.learntrix.edtech.repository.BatchRepository;
 import com.learntrix.edtech.repository.ClassRecordingRepository;
@@ -57,6 +60,13 @@ import com.learntrix.edtech.repository.UserRepository;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class CourseAccessControlIntegrationTest {
+
+    @Autowired
+    private CodingSubmissionRepository codingSubmissionRepository;
+    @Autowired
+    private CodingTestCaseRepository codingTestCaseRepository;
+    @Autowired
+    private CodingProblemRepository codingProblemRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -129,8 +139,15 @@ class CourseAccessControlIntegrationTest {
         progressRepository.deleteAll();
         classRecordingRepository.deleteAll();
         liveClassRepository.deleteAll();
-        batchRepository.deleteAll();
+        // coding_problems.batch_id blocks batch deletion in the JPA-generated test
+        // schema; production Postgres has ON DELETE SET NULL (V31). Children first.
+        codingSubmissionRepository.deleteAll();
+        codingTestCaseRepository.deleteAll();
+        codingProblemRepository.deleteAll();
+        // enrollments.batch_id references batches - children first, or H2 rejects
+        // the batch delete (production Postgres cascades this itself).
         enrollmentRepository.deleteAll();
+        batchRepository.deleteAll();
         studentProfileRepository.deleteAll();
         teacherProfileRepository.deleteAll();
         activationTokenRepository.deleteAll();

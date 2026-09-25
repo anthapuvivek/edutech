@@ -30,6 +30,7 @@ import { Route as AdminAttendanceRouteImport } from './routes/admin.attendance'
 import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
 import { Route as AdminBatchesRouteImport } from './routes/admin.batches'
 import { Route as AdminCmsRouteImport } from './routes/admin.cms'
+import { Route as AdminCodingProblemsRouteImport } from './routes/admin.coding-problems'
 import { Route as AdminCommunicationRouteImport } from './routes/admin.communication'
 import { Route as AdminCoursesRouteImport } from './routes/admin.courses'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
@@ -48,8 +49,12 @@ import { Route as StudentDashboardRouteImport } from './routes/student.dashboard
 import { Route as StudentLeaderboardRouteImport } from './routes/student.leaderboard'
 import { Route as StudentLiveClassesRouteImport } from './routes/student.live-classes'
 import { Route as StudentRecordingsRouteImport } from './routes/student.recordings'
+import { Route as TeacherAiAssistantRouteImport } from './routes/teacher.ai-assistant'
+import { Route as TeacherBatchesRouteImport } from './routes/teacher.batches'
+import { Route as TeacherCodingProblemsRouteImport } from './routes/teacher.coding-problems'
 import { Route as TeacherDashboardRouteImport } from './routes/teacher.dashboard'
 import { Route as TeacherLiveClassesRouteImport } from './routes/teacher.live-classes'
+import { Route as TeacherQuizzesRouteImport } from './routes/teacher.quizzes'
 import { Route as TeacherStudentsRouteImport } from './routes/teacher.students'
 import { Route as AdminCareerApplicationsRouteImport } from './routes/admin.career.applications'
 import { Route as AdminCareerCompaniesRouteImport } from './routes/admin.career.companies'
@@ -69,6 +74,10 @@ import { Route as StudentCareerApplicationsRouteImport } from './routes/student.
 import { Route as StudentCareerJobsRouteImport } from './routes/student.career.jobs'
 import { Route as StudentCareerOnboardingRouteImport } from './routes/student.career.onboarding'
 import { Route as StudentCareerProfileRouteImport } from './routes/student.career.profile'
+import { Route as StudentCodingPracticeIndexRouteImport } from './routes/student.coding-practice.index'
+import { Route as StudentCodingPracticeProblemIdRouteImport } from './routes/student.coding-practice.$problemId'
+import { Route as StudentQuizzesIndexRouteImport } from './routes/student.quizzes.index'
+import { Route as StudentQuizzesQuizIdRouteImport } from './routes/student.quizzes.$quizId'
 import { Route as StudentRecordingsIdRouteImport } from './routes/student.recordings.$id'
 import { Route as TeacherRecordingsIndexRouteImport } from './routes/teacher.recordings.index'
 import { Route as TeacherRecordingsIdRouteImport } from './routes/teacher.recordings.$id'
@@ -180,6 +189,11 @@ const AdminCmsRoute = AdminCmsRouteImport.update({
   path: '/cms',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCodingProblemsRoute = AdminCodingProblemsRouteImport.update({
+  id: '/coding-problems',
+  path: '/coding-problems',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCommunicationRoute = AdminCommunicationRouteImport.update({
   id: '/communication',
   path: '/communication',
@@ -270,6 +284,21 @@ const StudentRecordingsRoute = StudentRecordingsRouteImport.update({
   path: '/recordings',
   getParentRoute: () => StudentRoute,
 } as any)
+const TeacherAiAssistantRoute = TeacherAiAssistantRouteImport.update({
+  id: '/ai-assistant',
+  path: '/ai-assistant',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherBatchesRoute = TeacherBatchesRouteImport.update({
+  id: '/batches',
+  path: '/batches',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherCodingProblemsRoute = TeacherCodingProblemsRouteImport.update({
+  id: '/coding-problems',
+  path: '/coding-problems',
+  getParentRoute: () => TeacherRoute,
+} as any)
 const TeacherDashboardRoute = TeacherDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -278,6 +307,11 @@ const TeacherDashboardRoute = TeacherDashboardRouteImport.update({
 const TeacherLiveClassesRoute = TeacherLiveClassesRouteImport.update({
   id: '/live-classes',
   path: '/live-classes',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherQuizzesRoute = TeacherQuizzesRouteImport.update({
+  id: '/quizzes',
+  path: '/quizzes',
   getParentRoute: () => TeacherRoute,
 } as any)
 const TeacherStudentsRoute = TeacherStudentsRouteImport.update({
@@ -377,6 +411,28 @@ const StudentCareerProfileRoute = StudentCareerProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => StudentCareerRoute,
 } as any)
+const StudentCodingPracticeIndexRoute =
+  StudentCodingPracticeIndexRouteImport.update({
+    id: '/coding-practice/',
+    path: '/coding-practice/',
+    getParentRoute: () => StudentRoute,
+  } as any)
+const StudentCodingPracticeProblemIdRoute =
+  StudentCodingPracticeProblemIdRouteImport.update({
+    id: '/coding-practice/$problemId',
+    path: '/coding-practice/$problemId',
+    getParentRoute: () => StudentRoute,
+  } as any)
+const StudentQuizzesIndexRoute = StudentQuizzesIndexRouteImport.update({
+  id: '/quizzes/',
+  path: '/quizzes/',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentQuizzesQuizIdRoute = StudentQuizzesQuizIdRouteImport.update({
+  id: '/quizzes/$quizId',
+  path: '/quizzes/$quizId',
+  getParentRoute: () => StudentRoute,
+} as any)
 const StudentRecordingsIdRoute = StudentRecordingsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -426,6 +482,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/batches': typeof AdminBatchesRoute
   '/admin/cms': typeof AdminCmsRoute
+  '/admin/coding-problems': typeof AdminCodingProblemsRoute
   '/admin/communication': typeof AdminCommunicationRoute
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -443,8 +500,12 @@ export interface FileRoutesByFullPath {
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
   '/student/recordings': typeof StudentRecordingsRouteWithChildren
+  '/teacher/ai-assistant': typeof TeacherAiAssistantRoute
+  '/teacher/batches': typeof TeacherBatchesRoute
+  '/teacher/coding-problems': typeof TeacherCodingProblemsRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/live-classes': typeof TeacherLiveClassesRoute
+  '/teacher/quizzes': typeof TeacherQuizzesRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
   '/admin/career/applications': typeof AdminCareerApplicationsRoute
@@ -462,12 +523,16 @@ export interface FileRoutesByFullPath {
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/student/coding-practice/$problemId': typeof StudentCodingPracticeProblemIdRoute
+  '/student/quizzes/$quizId': typeof StudentQuizzesQuizIdRoute
   '/student/recordings/$id': typeof StudentRecordingsIdRoute
   '/teacher/recordings/$id': typeof TeacherRecordingsIdRoute
   '/teacher/recordings/new': typeof TeacherRecordingsNewRoute
   '/admin/crm/': typeof AdminCrmIndexRoute
   '/admin/students/': typeof AdminStudentsIndexRoute
   '/student/career/': typeof StudentCareerIndexRoute
+  '/student/coding-practice/': typeof StudentCodingPracticeIndexRoute
+  '/student/quizzes/': typeof StudentQuizzesIndexRoute
   '/teacher/recordings/': typeof TeacherRecordingsIndexRoute
   '/student/courses/$slug/recordings': typeof StudentCoursesSlugRecordingsRoute
 }
@@ -493,6 +558,7 @@ export interface FileRoutesByTo {
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/batches': typeof AdminBatchesRoute
   '/admin/cms': typeof AdminCmsRoute
+  '/admin/coding-problems': typeof AdminCodingProblemsRoute
   '/admin/communication': typeof AdminCommunicationRoute
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -509,8 +575,12 @@ export interface FileRoutesByTo {
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
   '/student/recordings': typeof StudentRecordingsRouteWithChildren
+  '/teacher/ai-assistant': typeof TeacherAiAssistantRoute
+  '/teacher/batches': typeof TeacherBatchesRoute
+  '/teacher/coding-problems': typeof TeacherCodingProblemsRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/live-classes': typeof TeacherLiveClassesRoute
+  '/teacher/quizzes': typeof TeacherQuizzesRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses': typeof CoursesIndexRoute
   '/admin/career/applications': typeof AdminCareerApplicationsRoute
@@ -528,12 +598,16 @@ export interface FileRoutesByTo {
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/student/coding-practice/$problemId': typeof StudentCodingPracticeProblemIdRoute
+  '/student/quizzes/$quizId': typeof StudentQuizzesQuizIdRoute
   '/student/recordings/$id': typeof StudentRecordingsIdRoute
   '/teacher/recordings/$id': typeof TeacherRecordingsIdRoute
   '/teacher/recordings/new': typeof TeacherRecordingsNewRoute
   '/admin/crm': typeof AdminCrmIndexRoute
   '/admin/students': typeof AdminStudentsIndexRoute
   '/student/career': typeof StudentCareerIndexRoute
+  '/student/coding-practice': typeof StudentCodingPracticeIndexRoute
+  '/student/quizzes': typeof StudentQuizzesIndexRoute
   '/teacher/recordings': typeof TeacherRecordingsIndexRoute
   '/student/courses/$slug/recordings': typeof StudentCoursesSlugRecordingsRoute
 }
@@ -560,6 +634,7 @@ export interface FileRoutesById {
   '/admin/audit-logs': typeof AdminAuditLogsRoute
   '/admin/batches': typeof AdminBatchesRoute
   '/admin/cms': typeof AdminCmsRoute
+  '/admin/coding-problems': typeof AdminCodingProblemsRoute
   '/admin/communication': typeof AdminCommunicationRoute
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -577,8 +652,12 @@ export interface FileRoutesById {
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
   '/student/recordings': typeof StudentRecordingsRouteWithChildren
+  '/teacher/ai-assistant': typeof TeacherAiAssistantRoute
+  '/teacher/batches': typeof TeacherBatchesRoute
+  '/teacher/coding-problems': typeof TeacherCodingProblemsRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/live-classes': typeof TeacherLiveClassesRoute
+  '/teacher/quizzes': typeof TeacherQuizzesRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
   '/admin/career/applications': typeof AdminCareerApplicationsRoute
@@ -596,12 +675,16 @@ export interface FileRoutesById {
   '/student/career/jobs': typeof StudentCareerJobsRoute
   '/student/career/onboarding': typeof StudentCareerOnboardingRoute
   '/student/career/profile': typeof StudentCareerProfileRoute
+  '/student/coding-practice/$problemId': typeof StudentCodingPracticeProblemIdRoute
+  '/student/quizzes/$quizId': typeof StudentQuizzesQuizIdRoute
   '/student/recordings/$id': typeof StudentRecordingsIdRoute
   '/teacher/recordings/$id': typeof TeacherRecordingsIdRoute
   '/teacher/recordings/new': typeof TeacherRecordingsNewRoute
   '/admin/crm/': typeof AdminCrmIndexRoute
   '/admin/students/': typeof AdminStudentsIndexRoute
   '/student/career/': typeof StudentCareerIndexRoute
+  '/student/coding-practice/': typeof StudentCodingPracticeIndexRoute
+  '/student/quizzes/': typeof StudentQuizzesIndexRoute
   '/teacher/recordings/': typeof TeacherRecordingsIndexRoute
   '/student/courses/$slug/recordings': typeof StudentCoursesSlugRecordingsRoute
 }
@@ -629,6 +712,7 @@ export interface FileRouteTypes {
     | '/admin/audit-logs'
     | '/admin/batches'
     | '/admin/cms'
+    | '/admin/coding-problems'
     | '/admin/communication'
     | '/admin/courses'
     | '/admin/dashboard'
@@ -646,8 +730,12 @@ export interface FileRouteTypes {
     | '/student/leaderboard'
     | '/student/live-classes'
     | '/student/recordings'
+    | '/teacher/ai-assistant'
+    | '/teacher/batches'
+    | '/teacher/coding-problems'
     | '/teacher/dashboard'
     | '/teacher/live-classes'
+    | '/teacher/quizzes'
     | '/teacher/students'
     | '/courses/'
     | '/admin/career/applications'
@@ -665,12 +753,16 @@ export interface FileRouteTypes {
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/student/coding-practice/$problemId'
+    | '/student/quizzes/$quizId'
     | '/student/recordings/$id'
     | '/teacher/recordings/$id'
     | '/teacher/recordings/new'
     | '/admin/crm/'
     | '/admin/students/'
     | '/student/career/'
+    | '/student/coding-practice/'
+    | '/student/quizzes/'
     | '/teacher/recordings/'
     | '/student/courses/$slug/recordings'
   fileRoutesByTo: FileRoutesByTo
@@ -696,6 +788,7 @@ export interface FileRouteTypes {
     | '/admin/audit-logs'
     | '/admin/batches'
     | '/admin/cms'
+    | '/admin/coding-problems'
     | '/admin/communication'
     | '/admin/courses'
     | '/admin/dashboard'
@@ -712,8 +805,12 @@ export interface FileRouteTypes {
     | '/student/leaderboard'
     | '/student/live-classes'
     | '/student/recordings'
+    | '/teacher/ai-assistant'
+    | '/teacher/batches'
+    | '/teacher/coding-problems'
     | '/teacher/dashboard'
     | '/teacher/live-classes'
+    | '/teacher/quizzes'
     | '/teacher/students'
     | '/courses'
     | '/admin/career/applications'
@@ -731,12 +828,16 @@ export interface FileRouteTypes {
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/student/coding-practice/$problemId'
+    | '/student/quizzes/$quizId'
     | '/student/recordings/$id'
     | '/teacher/recordings/$id'
     | '/teacher/recordings/new'
     | '/admin/crm'
     | '/admin/students'
     | '/student/career'
+    | '/student/coding-practice'
+    | '/student/quizzes'
     | '/teacher/recordings'
     | '/student/courses/$slug/recordings'
   id:
@@ -762,6 +863,7 @@ export interface FileRouteTypes {
     | '/admin/audit-logs'
     | '/admin/batches'
     | '/admin/cms'
+    | '/admin/coding-problems'
     | '/admin/communication'
     | '/admin/courses'
     | '/admin/dashboard'
@@ -779,8 +881,12 @@ export interface FileRouteTypes {
     | '/student/leaderboard'
     | '/student/live-classes'
     | '/student/recordings'
+    | '/teacher/ai-assistant'
+    | '/teacher/batches'
+    | '/teacher/coding-problems'
     | '/teacher/dashboard'
     | '/teacher/live-classes'
+    | '/teacher/quizzes'
     | '/teacher/students'
     | '/courses/'
     | '/admin/career/applications'
@@ -798,12 +904,16 @@ export interface FileRouteTypes {
     | '/student/career/jobs'
     | '/student/career/onboarding'
     | '/student/career/profile'
+    | '/student/coding-practice/$problemId'
+    | '/student/quizzes/$quizId'
     | '/student/recordings/$id'
     | '/teacher/recordings/$id'
     | '/teacher/recordings/new'
     | '/admin/crm/'
     | '/admin/students/'
     | '/student/career/'
+    | '/student/coding-practice/'
+    | '/student/quizzes/'
     | '/teacher/recordings/'
     | '/student/courses/$slug/recordings'
   fileRoutesById: FileRoutesById
@@ -977,6 +1087,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCmsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/coding-problems': {
+      id: '/admin/coding-problems'
+      path: '/coding-problems'
+      fullPath: '/admin/coding-problems'
+      preLoaderRoute: typeof AdminCodingProblemsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/communication': {
       id: '/admin/communication'
       path: '/communication'
@@ -1103,6 +1220,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentRecordingsRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/teacher/ai-assistant': {
+      id: '/teacher/ai-assistant'
+      path: '/ai-assistant'
+      fullPath: '/teacher/ai-assistant'
+      preLoaderRoute: typeof TeacherAiAssistantRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/batches': {
+      id: '/teacher/batches'
+      path: '/batches'
+      fullPath: '/teacher/batches'
+      preLoaderRoute: typeof TeacherBatchesRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/coding-problems': {
+      id: '/teacher/coding-problems'
+      path: '/coding-problems'
+      fullPath: '/teacher/coding-problems'
+      preLoaderRoute: typeof TeacherCodingProblemsRouteImport
+      parentRoute: typeof TeacherRoute
+    }
     '/teacher/dashboard': {
       id: '/teacher/dashboard'
       path: '/dashboard'
@@ -1115,6 +1253,13 @@ declare module '@tanstack/react-router' {
       path: '/live-classes'
       fullPath: '/teacher/live-classes'
       preLoaderRoute: typeof TeacherLiveClassesRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/quizzes': {
+      id: '/teacher/quizzes'
+      path: '/quizzes'
+      fullPath: '/teacher/quizzes'
+      preLoaderRoute: typeof TeacherQuizzesRouteImport
       parentRoute: typeof TeacherRoute
     }
     '/teacher/students': {
@@ -1250,6 +1395,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentCareerProfileRouteImport
       parentRoute: typeof StudentCareerRoute
     }
+    '/student/coding-practice/': {
+      id: '/student/coding-practice/'
+      path: '/coding-practice'
+      fullPath: '/student/coding-practice/'
+      preLoaderRoute: typeof StudentCodingPracticeIndexRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/coding-practice/$problemId': {
+      id: '/student/coding-practice/$problemId'
+      path: '/coding-practice/$problemId'
+      fullPath: '/student/coding-practice/$problemId'
+      preLoaderRoute: typeof StudentCodingPracticeProblemIdRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/quizzes/': {
+      id: '/student/quizzes/'
+      path: '/quizzes'
+      fullPath: '/student/quizzes/'
+      preLoaderRoute: typeof StudentQuizzesIndexRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/quizzes/$quizId': {
+      id: '/student/quizzes/$quizId'
+      path: '/quizzes/$quizId'
+      fullPath: '/student/quizzes/$quizId'
+      preLoaderRoute: typeof StudentQuizzesQuizIdRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/student/recordings/$id': {
       id: '/student/recordings/$id'
       path: '/$id'
@@ -1295,6 +1468,7 @@ interface AdminRouteChildren {
   AdminAuditLogsRoute: typeof AdminAuditLogsRoute
   AdminBatchesRoute: typeof AdminBatchesRoute
   AdminCmsRoute: typeof AdminCmsRoute
+  AdminCodingProblemsRoute: typeof AdminCodingProblemsRoute
   AdminCommunicationRoute: typeof AdminCommunicationRoute
   AdminCoursesRoute: typeof AdminCoursesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
@@ -1327,6 +1501,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditLogsRoute: AdminAuditLogsRoute,
   AdminBatchesRoute: AdminBatchesRoute,
   AdminCmsRoute: AdminCmsRoute,
+  AdminCodingProblemsRoute: AdminCodingProblemsRoute,
   AdminCommunicationRoute: AdminCommunicationRoute,
   AdminCoursesRoute: AdminCoursesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
@@ -1404,6 +1579,10 @@ interface StudentRouteChildren {
   StudentLeaderboardRoute: typeof StudentLeaderboardRoute
   StudentLiveClassesRoute: typeof StudentLiveClassesRoute
   StudentRecordingsRoute: typeof StudentRecordingsRouteWithChildren
+  StudentCodingPracticeProblemIdRoute: typeof StudentCodingPracticeProblemIdRoute
+  StudentQuizzesQuizIdRoute: typeof StudentQuizzesQuizIdRoute
+  StudentCodingPracticeIndexRoute: typeof StudentCodingPracticeIndexRoute
+  StudentQuizzesIndexRoute: typeof StudentQuizzesIndexRoute
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
@@ -1413,14 +1592,22 @@ const StudentRouteChildren: StudentRouteChildren = {
   StudentLeaderboardRoute: StudentLeaderboardRoute,
   StudentLiveClassesRoute: StudentLiveClassesRoute,
   StudentRecordingsRoute: StudentRecordingsRouteWithChildren,
+  StudentCodingPracticeProblemIdRoute: StudentCodingPracticeProblemIdRoute,
+  StudentQuizzesQuizIdRoute: StudentQuizzesQuizIdRoute,
+  StudentCodingPracticeIndexRoute: StudentCodingPracticeIndexRoute,
+  StudentQuizzesIndexRoute: StudentQuizzesIndexRoute,
 }
 
 const StudentRouteWithChildren =
   StudentRoute._addFileChildren(StudentRouteChildren)
 
 interface TeacherRouteChildren {
+  TeacherAiAssistantRoute: typeof TeacherAiAssistantRoute
+  TeacherBatchesRoute: typeof TeacherBatchesRoute
+  TeacherCodingProblemsRoute: typeof TeacherCodingProblemsRoute
   TeacherDashboardRoute: typeof TeacherDashboardRoute
   TeacherLiveClassesRoute: typeof TeacherLiveClassesRoute
+  TeacherQuizzesRoute: typeof TeacherQuizzesRoute
   TeacherStudentsRoute: typeof TeacherStudentsRoute
   TeacherRecordingsIdRoute: typeof TeacherRecordingsIdRoute
   TeacherRecordingsNewRoute: typeof TeacherRecordingsNewRoute
@@ -1428,8 +1615,12 @@ interface TeacherRouteChildren {
 }
 
 const TeacherRouteChildren: TeacherRouteChildren = {
+  TeacherAiAssistantRoute: TeacherAiAssistantRoute,
+  TeacherBatchesRoute: TeacherBatchesRoute,
+  TeacherCodingProblemsRoute: TeacherCodingProblemsRoute,
   TeacherDashboardRoute: TeacherDashboardRoute,
   TeacherLiveClassesRoute: TeacherLiveClassesRoute,
+  TeacherQuizzesRoute: TeacherQuizzesRoute,
   TeacherStudentsRoute: TeacherStudentsRoute,
   TeacherRecordingsIdRoute: TeacherRecordingsIdRoute,
   TeacherRecordingsNewRoute: TeacherRecordingsNewRoute,

@@ -16,7 +16,18 @@ export const authService = {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (!raw) return null;
       const session = JSON.parse(raw) as AuthSession;
-      if (Date.parse(session.expiresAt) < Date.now()) return null;
+      if (Date.parse(session.expiresAt) < Date.now()) {
+        window.localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+      // A session cached before roles were added to the JWT can still be cryptographically
+      // valid while every role-guarded API returns 403. Refuse that stale shell up front and
+      // require a fresh login. The backend remains the authorization authority; this is only
+      // a consistency check between the cached UI user and the signed token claims.
+      if (!env.useMocks && !tokenContainsRole(session.accessToken, session.user.role)) {
+        window.localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
       return session;
     } catch {
       return null;
@@ -114,13 +125,7 @@ export const authService = {
    */
   async profile(): Promise<AuthUser> {
     if (!env.useMocks) {
-      try {
-        return await apiRequest<AuthUser>("/auth/profile");
-      } catch {
-        const session = this.readSession();
-        if (session?.user) return session.user;
-        throw new Error("No active session.");
-      }
+      return apiRequest<AuthUser>("/auth/profile");
     }
     const session = this.readSession();
     if (!session) throw new Error("No active session.");
@@ -138,6 +143,21 @@ export const authService = {
     }
   },
 };
+
+function tokenContainsRole(token: string, role: Role): boolean {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return false;
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const claims = JSON.parse(atob(padded)) as { roles?: unknown };
+    if (!Array.isArray(claims.roles)) return false;
+    const expected = `ROLE_${role.toUpperCase()}`;
+    return claims.roles.some((value) => typeof value === "string" && value.toUpperCase() === expected);
+  } catch {
+    return false;
+  }
+}
 
 function buildSession(user: AuthUser, days: number): AuthSession {
   return {

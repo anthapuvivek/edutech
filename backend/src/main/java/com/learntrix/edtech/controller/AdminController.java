@@ -644,10 +644,21 @@ public class AdminController {
             enrollmentRepository.save(enrollment);
         }
 
-        // 3. Same for scheduled classes: the class record survives, it just loses its cohort.
+        // 3. Scheduled classes keep their record but lose their cohort.
+        //
+        // Clearing batch_id alone would WIDEN visibility: the student query treats a class
+        // with no batch as course-wide, so every student on the course - including cohorts
+        // that were never in this batch - would suddenly gain access. Unpublishing the
+        // detached classes keeps the history intact while holding visibility closed until
+        // an admin deliberately reassigns and republishes them.
         List<com.learntrix.edtech.entity.LiveClass> classes = liveClassRepository.findByBatchId(batchId);
+        int unpublished = 0;
         for (com.learntrix.edtech.entity.LiveClass liveClass : classes) {
             liveClass.setBatch(null);
+            if (Boolean.TRUE.equals(liveClass.getPublished())) {
+                liveClass.setPublished(false);
+                unpublished++;
+            }
             liveClassRepository.save(liveClass);
         }
 
@@ -670,10 +681,16 @@ public class AdminController {
         result.put("studentsReleased", studentCount);
         result.put("enrollmentsDetached", affected.size());
         result.put("classesDetached", classes.size());
-        result.put("message", studentCount > 0
+        result.put("classesUnpublished", unpublished);
+        String message = studentCount > 0
                 ? "Batch '" + name + "' deleted. " + studentCount + " student(s) kept their course "
                         + "enrolment and were released from the batch."
-                : "Batch '" + name + "' deleted.");
+                : "Batch '" + name + "' deleted.";
+        if (unpublished > 0) {
+            message += " " + unpublished + " scheduled class(es) were unpublished so they do not "
+                    + "become visible to the whole course.";
+        }
+        result.put("message", message);
         return ApiResponse.success(result);
     }
 

@@ -15,6 +15,9 @@ import com.learntrix.edtech.dto.quiz.CreateQuizRequest;
 import com.learntrix.edtech.dto.quiz.QuizAttemptRequest;
 import com.learntrix.edtech.dto.recording.CreateRecordingRequest;
 import com.learntrix.edtech.entity.*;
+import com.learntrix.edtech.repository.CodingProblemRepository;
+import com.learntrix.edtech.repository.CodingSubmissionRepository;
+import com.learntrix.edtech.repository.CodingTestCaseRepository;
 import com.learntrix.edtech.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +45,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class LearntrixCompleteAccessControlIntegrationTest {
+
+    @Autowired
+    private CodingSubmissionRepository codingSubmissionRepository;
+    @Autowired
+    private CodingTestCaseRepository codingTestCaseRepository;
+    @Autowired
+    private CodingProblemRepository codingProblemRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -81,6 +91,15 @@ class LearntrixCompleteAccessControlIntegrationTest {
 
     @Autowired
     private QuizAttemptRepository quizAttemptRepository;
+
+    @Autowired
+    private com.learntrix.edtech.repository.QuizAttemptAnswerRepository quizAttemptAnswerRepository;
+
+    @Autowired
+    private com.learntrix.edtech.repository.QuizOptionRepository quizOptionRepository;
+
+    @Autowired
+    private com.learntrix.edtech.repository.QuizQuestionRepository quizQuestionRepository;
 
     @Autowired
     private CourseMaterialRepository courseMaterialRepository;
@@ -140,14 +159,25 @@ class LearntrixCompleteAccessControlIntegrationTest {
         progressRepository.deleteAll();
         courseAnnouncementRepository.deleteAll();
         courseMaterialRepository.deleteAll();
+        // Children first: quiz_attempt_answers and quiz_options reference these rows.
+        quizAttemptAnswerRepository.deleteAll();
         quizAttemptRepository.deleteAll();
+        quizOptionRepository.deleteAll();
+        quizQuestionRepository.deleteAll();
         quizRepository.deleteAll();
         assignmentSubmissionRepository.deleteAll();
         assignmentRepository.deleteAll();
+        // coding_problems.batch_id blocks batch deletion in the JPA-generated test
+        // schema; production Postgres has ON DELETE SET NULL (V31). Children first.
+        codingSubmissionRepository.deleteAll();
+        codingTestCaseRepository.deleteAll();
+        codingProblemRepository.deleteAll();
         classRecordingRepository.deleteAll();
         liveClassRepository.deleteAll();
-        batchRepository.deleteAll();
+        // enrollments.batch_id references batches - children first, or H2 rejects
+        // the batch delete (production Postgres cascades this itself).
         enrollmentRepository.deleteAll();
+        batchRepository.deleteAll();
         studentProfileRepository.deleteAll();
         teacherProfileRepository.deleteAll();
         activationTokenRepository.deleteAll();
@@ -591,7 +621,26 @@ class LearntrixCompleteAccessControlIntegrationTest {
         String quizId = objectMapper.readTree(createResult.getResponse().getContentAsString())
                 .path("data").path("id").asText();
 
-        // Student 1 attempts Quiz -> 200 OK
+        // A quiz is now created as DRAFT and needs at least one question before it can be
+        // published, so a student never meets an empty or half-built quiz. Complete that
+        // lifecycle before attempting - this is the real workflow, not a test workaround.
+        mockMvc.perform(post("/api/teacher/quizzes/" + quizId + "/questions")
+                        .header("Authorization", "Bearer " + teacherAToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"questionText\":\"Which interface backs ArrayList?\",\"options\":["
+                                + "{\"optionText\":\"List\",\"correct\":true},"
+                                + "{\"optionText\":\"Map\",\"correct\":false}]}"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/teacher/quizzes/" + quizId + "/publish")
+                        .header("Authorization", "Bearer " + teacherAToken))
+                .andExpect(status().isOk());
+
+        // Student 1 attempts the quiz -> 200 OK.
+        //
+        // This previously posted score=85 and asserted the response echoed 85/passed=true,
+        // which is exactly the hole that has now been closed: the score is computed from the
+        // server-side answer key, so an unanswered attempt scores 0 no matter what is posted.
         QuizAttemptRequest attemptReq = QuizAttemptRequest.builder()
                 .score(85)
                 .build();
@@ -601,8 +650,8 @@ class LearntrixCompleteAccessControlIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(attemptReq)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.score").value(85))
-                .andExpect(jsonPath("$.data.passed").value(true));
+                .andExpect(jsonPath("$.data.score").value(0))
+                .andExpect(jsonPath("$.data.passed").value(false));
 
         // Student 3 attempts IDOR access to Java quiz -> 403 Forbidden
         mockMvc.perform(get("/api/student/quizzes/" + quizId)
@@ -818,8 +867,8 @@ class LearntrixCompleteAccessControlIntegrationTest {
                 .andExpect(jsonPath("$.data.email").value("ananya.roy@test.com"))
                 .andExpect(jsonPath("$.data.role").value("teacher"))
                 .andExpect(jsonPath("$.data.onboardingStatus").value("INVITED"))
-                .andExpect(jsonPath("$.data.emailStatus").value("FAILED"))
-                .andExpect(jsonPath("$.data.message").value("Trainer created, but activation email could not be sent."))
+                .andExpect(jsonPath("$.data.emailStatus").value("NOT_CONFIGURED"))
+                .andExpect(jsonPath("$.data.message").value("Teacher onboarded successfully. The activation email could NOT be delivered - share the activation link manually."))
                 .andReturn();
 
         JsonNode data = objectMapper.readTree(result.getResponse().getContentAsString()).path("data");
@@ -904,8 +953,8 @@ class LearntrixCompleteAccessControlIntegrationTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.emailStatus").value("FAILED"))
-                .andExpect(jsonPath("$.data.message").value("Failed to send activation email. Please check email server configuration."));
+                .andExpect(jsonPath("$.data.emailStatus").value("NOT_CONFIGURED"))
+                .andExpect(jsonPath("$.data.message").value("Activation link regenerated. The activation email could NOT be delivered - share the activation link manually."));
 
         // Prior token must be marked used/invalidated in account_activation_tokens
         AccountActivationToken oldActToken = activationTokenRepository.findByToken(initialToken).orElseThrow();

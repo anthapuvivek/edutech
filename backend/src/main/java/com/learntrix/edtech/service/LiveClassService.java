@@ -265,7 +265,19 @@ public class LiveClassService {
                 UUID batchId = UUID.fromString(bid.toString());
                 Batch batch = batchRepository.findById(batchId)
                         .orElseThrow(() -> new ResourceNotFoundException("Batch", "id", batchId));
+                // Same ownership rule create enforces. Without it a teacher could move one of
+                // their own classes into another teacher's batch and expose it to that cohort.
+                // Admins keep the wider reach these endpoints already grant them.
+                if (!SecurityUtil.hasRole("ADMIN") && !SecurityUtil.hasRole("SUPER_ADMIN")
+                        && (batch.getTeacher() == null || !batch.getTeacher().getId().equals(teacherId))) {
+                    throw new CourseAccessDeniedException(
+                            "You are not authorized to move this class into that batch");
+                }
                 liveClass.setBatch(batch);
+                // Keep the course consistent with the batch, exactly as create does.
+                if (batch.getCourse() != null) {
+                    liveClass.setCourse(batch.getCourse());
+                }
             } else {
                 liveClass.setBatch(null);
             }

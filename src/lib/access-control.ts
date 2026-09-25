@@ -16,7 +16,13 @@ export const routePermissions: Record<string, Permission[]> = {
   "/student/dashboard": ["learning.own"],
   "/student/courses": ["learning.own"],
   "/student/live-classes": ["learning.own"],
+  "/student/recordings": ["learning.own"],
   "/student/leaderboard": ["learning.own"],
+  // Assessment surfaces. The backend decides which quizzes and problems this
+  // student actually sees (enrolment + batch + PUBLISHED); this only decides
+  // whether the page may be opened at all.
+  "/student/quizzes": ["learning.own"],
+  "/student/coding-practice": ["learning.own"],
   "/student/career": ["career.own"],
   "/student/career/jobs": ["career.own"],
   "/student/career/applications": ["career.own"],
@@ -26,15 +32,24 @@ export const routePermissions: Record<string, Permission[]> = {
   // Teaching / mentoring views. Mentors reuse the existing student-progress
   // screens read-only; they never get the teaching management surface.
   "/teacher/dashboard": ["teaching.manage"],
+  "/teacher/batches": ["teaching.manage"],
   "/teacher/live-classes": ["teaching.manage"],
   "/teacher/recordings": ["teaching.manage"],
   "/teacher/students": ["teaching.manage", "mentor.students"],
+  // Authoring surfaces. CourseAccessService still re-checks course and batch
+  // ownership on every call, so this gate is about the page, not the data.
+  "/teacher/quizzes": ["teaching.manage"],
+  "/teacher/coding-problems": ["teaching.manage"],
+  // AI Question Assistant. Teacher-only: the backend rejects a student with 403
+  // regardless of this entry, which only governs whether the page may be opened.
+  "/teacher/ai-assistant": ["teaching.manage"],
 
   // Platform administration.
   "/admin/dashboard": ["platform.manage"],
   "/admin/students": ["platform.manage"],
   "/admin/teachers": ["platform.manage"],
   "/admin/batches": ["platform.manage"],
+  "/admin/coding-problems": ["platform.manage"],
   "/admin/attendance": ["platform.manage"],
   "/admin/performance": ["platform.manage"],
   "/admin/events": ["platform.manage"],

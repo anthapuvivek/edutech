@@ -25,6 +25,14 @@ public class Quiz {
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
+    /**
+     * Cohort scope, mirroring LiveClass.batch. Null means the quiz is course-wide; a batch
+     * means only that cohort may see it, which is what keeps Morning and Evening separate.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "batch_id")
+    private Batch batch;
+
     @Column(nullable = false)
     private String title;
 

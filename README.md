@@ -39,7 +39,8 @@ the backend through the launcher scripts, which load it into the process environ
 
 ```powershell
 cd backend
-.un.ps1
+.
+un.ps1
 ```
 
 **bash / Git Bash**
@@ -148,6 +149,7 @@ Seeded by the Flyway migrations. Password for all accounts: **`password`**
 | `npm run build`                  | Production frontend build       |
 | `npm run lint`                   | ESLint                          |
 | `npx tsc --noEmit`               | Typecheck the frontend          |
-| `.un.ps1` / `./run.sh` (backend/) | Run the API with `.env` loaded (port 8081) |
+| `.
+un.ps1` / `./run.sh` (backend/) | Run the API with `.env` loaded (port 8081) |
 | `mvn spring-boot:run` (backend/) | Run the API without `.env` (port 8081) |
 | `mvn test` (backend/)            | Backend tests                   |

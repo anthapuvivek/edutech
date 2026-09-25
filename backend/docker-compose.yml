@@ -94,9 +94,76 @@ services:
     networks:
       - edtech-network
 
+  # ---------------------------------------------------------------------------
+  # Judge0 - sandboxed execution of student code
+  # ---------------------------------------------------------------------------
+  # Student code is NEVER run inside the Spring Boot JVM. It is forwarded here and
+  # executed in an isolated container under its own CPU and memory limits.
+  #
+  # Judge0 needs its own Postgres and Redis; it does not share the app's, because a
+  # sandbox escape must not reach application data.
+  #
+  # To use: docker compose up -d judge0-server judge0-workers
+  # then set JUDGE0_URL=http://localhost:2358 in backend/.env (no API key needed).
+  judge0-db:
+    image: postgres:16-alpine
+    container_name: edtech-judge0-db
+    environment:
+      POSTGRES_DB: judge0
+      POSTGRES_USER: judge0
+      POSTGRES_PASSWORD: judge0
+    volumes:
+      - judge0-db-data:/var/lib/postgresql/data
+    networks:
+      - edtech-network
+
+  judge0-redis:
+    image: redis:7-alpine
+    container_name: edtech-judge0-redis
+    command: ["redis-server", "--appendonly", "no"]
+    networks:
+      - edtech-network
+
+  judge0-server:
+    image: judge0/judge0:1.13.1
+    container_name: edtech-judge0-server
+    # privileged is required: Judge0 uses cgroups and namespaces to isolate each
+    # submission. This is why it runs in its own container rather than in the app.
+    privileged: true
+    ports:
+      - "2358:2358"
+    environment: &judge0-env
+      POSTGRES_HOST: judge0-db
+      POSTGRES_DB: judge0
+      POSTGRES_USER: judge0
+      POSTGRES_PASSWORD: judge0
+      REDIS_HOST: judge0-redis
+      # Ceilings applied to every submission, so one program cannot starve the judge.
+      MAX_CPU_TIME_LIMIT: 10
+      MAX_WALL_TIME_LIMIT: 20
+      MAX_MEMORY_LIMIT: 512000
+      ENABLE_WAIT_RESULT: "true"
+    depends_on:
+      - judge0-db
+      - judge0-redis
+    networks:
+      - edtech-network
+
+  judge0-workers:
+    image: judge0/judge0:1.13.1
+    container_name: edtech-judge0-workers
+    command: ["./scripts/workers"]
+    privileged: true
+    environment: *judge0-env
+    depends_on:
+      - judge0-server
+    networks:
+      - edtech-network
+
 networks:
   edtech-network:
     driver: bridge
 
 volumes:
   postgres-data:
+  judge0-db-data:

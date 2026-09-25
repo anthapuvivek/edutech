@@ -126,6 +126,66 @@ app:
     # listed or the browser fails preflight and the app looks like a backend outage.
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8080,http://127.0.0.1:8080,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000,http://localhost:4173,http://127.0.0.1:4173}
 
+# ---------------------------------------------------------------------------
+# Judge0 - sandboxed execution of student code
+# ---------------------------------------------------------------------------
+# Student code is NEVER run inside this JVM. It is forwarded to Judge0, which
+# executes it in an isolated container under its own CPU and memory limits.
+#
+# The API key stays server-side: React talks to LearntriX, LearntriX talks to
+# Judge0. Leaving url blank is a supported state - Run and Submit then return a
+# clear "not configured" message instead of failing obscurely.
+judge0:
+  url: ${JUDGE0_URL:}
+  api-key: ${JUDGE0_API_KEY:}
+  api-host: ${JUDGE0_API_HOST:judge0-ce.p.rapidapi.com}
+
+# ---------------------------------------------------------------------------
+# Google Gemini - AI Question Assistant (teacher-only)
+# ---------------------------------------------------------------------------
+# The key is read from the environment and stays server-side: it is never sent
+# to the browser, never logged, and never included in an API response.
+#
+# Leaving api-key blank is a supported state - the app still starts, and the
+# assistant returns a clear "not configured" error instead of failing obscurely.
+#
+# model: verify against the live ListModels endpoint before changing. Newly
+# released models are frequently overloaded (HTTP 503) even when they exist.
+gemini:
+  api-key: ${GEMINI_API_KEY:}
+  model: ${GEMINI_MODEL:gemini-3-flash-preview}
+  base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
+  timeout-seconds: ${GEMINI_TIMEOUT_SECONDS:90}
+
+# ---------------------------------------------------------------------------
+# Code execution provider for Coding Practice
+# ---------------------------------------------------------------------------
+# Which sandbox runs student code: judge0 (default) or jdoodle. Exactly one
+# CodeExecutionClient bean is created, so switching is a one-line change and
+# nothing above the execution package is aware of the difference.
+#
+# Student code is NEVER executed inside this JVM under either provider.
+execution:
+  provider: ${EXECUTION_PROVIDER:judge0}
+
+# JDoodle. Credentials go in the request body (their API takes no auth header),
+# so they stay server-side and are never sent to the browser.
+#
+# versionIndex is a POSITION in JDoodle's version list, not a version number, and
+# positions shift as they add releases. 0 is the safe floor; raise it if you need a
+# newer compiler - check their languages page for the current position.
+jdoodle:
+  client-id: ${JDOODLE_CLIENT_ID:}
+  client-secret: ${JDOODLE_CLIENT_SECRET:}
+  url: ${JDOODLE_URL:https://api.jdoodle.com/v1/execute}
+  # Optional per-language overrides. Each language has its OWN valid range
+  # (java [0..6], cpp17 [0..3], typescript [0..1]), so there is no single global
+  # index. Sensible newest-version defaults live in JDoodleExecutionClient;
+  # uncomment and pin one here only if a default stops working.
+  # version-index:
+  #   java: "6"
+  #   cpp: "3"
+
 logging:
   level:
     root: INFO
