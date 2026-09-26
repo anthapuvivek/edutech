@@ -34,6 +34,10 @@ import com.learntrix.edtech.entity.Role;
 import com.learntrix.edtech.entity.User;
 import com.learntrix.edtech.execution.CodeExecutionClient;
 import com.learntrix.edtech.execution.ExecutionResult;
+import com.learntrix.edtech.repository.AnnouncementReadRepository;
+import com.learntrix.edtech.repository.CourseAnnouncementRepository;
+import com.learntrix.edtech.repository.AssignmentRepository;
+import com.learntrix.edtech.repository.AssignmentSubmissionRepository;
 import com.learntrix.edtech.repository.BatchRepository;
 import com.learntrix.edtech.repository.CodingProblemRepository;
 import com.learntrix.edtech.repository.CodingSubmissionRepository;
@@ -62,6 +66,16 @@ import com.learntrix.edtech.repository.UserRepository;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class CodingSecurityIntegrationTest {
+
+    @Autowired
+    private AnnouncementReadRepository announcementReadRepositoryCleanup;
+    @Autowired
+    private CourseAnnouncementRepository courseAnnouncementRepositoryCleanup;
+
+    @Autowired
+    private AssignmentSubmissionRepository assignmentSubmissionRepository;
+    @Autowired
+    private AssignmentRepository assignmentRepository;
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
@@ -150,9 +164,17 @@ class CodingSecurityIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        // course_announcements.batch_id references batches; clear announcements (and their
+        // read rows) before the batch delete below, or H2 rejects it.
+        announcementReadRepositoryCleanup.deleteAll();
+        courseAnnouncementRepositoryCleanup.deleteAll();
         submissionRepository.deleteAll();
         testCaseRepository.deleteAll();
         problemRepository.deleteAll();
+        // assignments.batch_id blocks batch deletion in the JPA-generated test schema
+        // (production Postgres has ON DELETE SET NULL, see V34). Children first.
+        assignmentSubmissionRepository.deleteAll();
+        assignmentRepository.deleteAll();
         enrollmentRepository.deleteAll();
         batchRepository.deleteAll();
 

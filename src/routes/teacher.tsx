@@ -23,13 +23,13 @@ const nav: PortalNavItem[] = [
   { label: "Batches", to: "/teacher/batches", icon: Users },
   { label: "Live Classes", to: "/teacher/live-classes", icon: Video },
   { label: "Recorded Classes", to: "/teacher/recordings", icon: Video },
-  { label: "Assignments", icon: FileCheck2 },
+  { label: "Assignments", to: "/teacher/assignments", icon: FileCheck2 },
   { label: "Quizzes", to: "/teacher/quizzes", icon: ListChecks },
   { label: "Coding Problems", to: "/teacher/coding-problems", icon: Code2 },
   { label: "AI Assistant", to: "/teacher/ai-assistant", icon: Sparkles },
-  { label: "Progress", icon: TrendingUp },
-  { label: "Analytics", icon: BarChart3 },
-  { label: "Announcements", icon: Megaphone },
+  { label: "Progress", to: "/teacher/progress", icon: TrendingUp },
+  { label: "Analytics", to: "/teacher/analytics", icon: BarChart3 },
+  { label: "Announcements", to: "/teacher/announcements", icon: Megaphone },
   { label: "Profile", icon: User },
 ];
 

@@ -24,6 +24,7 @@ public class AiGenerationResponse {
 
     private List<AiQuizQuestionDraft> questions;
     private List<AiCodingProblemDraft> problems;
+    private List<AiAssignmentDraft> assignments;
 
     /** Non-fatal notes, e.g. that fewer items came back than were asked for. */
     private List<String> warnings;

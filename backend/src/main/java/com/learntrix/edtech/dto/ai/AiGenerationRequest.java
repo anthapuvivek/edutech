@@ -48,5 +48,6 @@ public class AiGenerationRequest {
      */
     private List<AiQuizQuestionDraft> existingQuestions;
     private List<AiCodingProblemDraft> existingProblems;
+    private List<AiAssignmentDraft> existingAssignments;
     private String regenerateInstruction;
 }

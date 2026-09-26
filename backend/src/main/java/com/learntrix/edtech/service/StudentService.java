@@ -19,6 +19,7 @@ import java.util.UUID;
 public class StudentService {
 
     private final StudentProfileRepository studentProfileRepository;
+    private final LearningProgressService progressService;
     private final UserRepository userRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final RecordingWatchProgressRepository progressRepository;
@@ -27,7 +28,9 @@ public class StudentService {
             StudentProfileRepository studentProfileRepository,
             UserRepository userRepository,
             EnrollmentRepository enrollmentRepository,
-            RecordingWatchProgressRepository progressRepository) {
+            RecordingWatchProgressRepository progressRepository,
+            LearningProgressService progressService) {
+        this.progressService = progressService;
         this.studentProfileRepository = studentProfileRepository;
         this.userRepository = userRepository;
         this.enrollmentRepository = enrollmentRepository;
@@ -143,6 +146,8 @@ public class StudentService {
     public List<com.learntrix.edtech.dto.student.LeaderboardEntryResponse> getLeaderboard(UUID currentUserId, String scope) {
         List<StudentProfile> profiles = studentProfileRepository.findAll();
         List<com.learntrix.edtech.dto.student.LeaderboardEntryResponse> entries = new ArrayList<>();
+        // Rank is assigned after sorting below - incrementing here ranked students by
+        // whatever order the table happened to return.
         int rank = 1;
         for (StudentProfile profile : profiles) {
             User user = userRepository.findById(profile.getUserId()).orElse(null);
@@ -152,15 +157,35 @@ public class StudentService {
                         .studentId(profile.getStudentId())
                         .name(user.getName())
                         .points(profile.getPoints() != null ? profile.getPoints() : 0)
-                        .problemsSolved(24)
-                        .quizScore(85)
-                        .attendance(92)
+                        // Computed from stored activity. These were previously the literals
+                        // 24 / 85 / 92, so every student showed the same fabricated figures.
+                        .problemsSolved(progressService.countCodingSolved(profile.getUserId()))
+                        .quizScore(nullToZero(progressService.averageQuizScore(profile.getUserId())))
+                        // Attendance has no table in this system; 0 marks it unknown rather
+                        // than asserting a number nobody recorded.
+                        .attendance(0)
                         .streak(profile.getStreakDays() != null ? profile.getStreakDays() : 0)
                         .level(profile.getLevelName() != null ? profile.getLevelName() : "Beginner")
                         .isCurrentUser(currentUserId != null && currentUserId.equals(profile.getUserId()))
                         .build());
             }
         }
+
+        // Order by real achievement, then re-number so rank matches the visible order.
+        entries.sort((a, b) -> {
+            int byPoints = Integer.compare(b.getPoints(), a.getPoints());
+            if (byPoints != 0) return byPoints;
+            int bySolved = Integer.compare(b.getProblemsSolved(), a.getProblemsSolved());
+            if (bySolved != 0) return bySolved;
+            return Integer.compare(b.getQuizScore(), a.getQuizScore());
+        });
+        for (int i = 0; i < entries.size(); i++) {
+            entries.get(i).setRank(i + 1);
+        }
         return entries;
+    }
+
+    private int nullToZero(Integer value) {
+        return value == null ? 0 : value;
     }
 }

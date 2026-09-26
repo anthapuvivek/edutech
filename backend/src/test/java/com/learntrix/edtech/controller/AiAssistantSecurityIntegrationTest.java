@@ -33,6 +33,8 @@ import com.learntrix.edtech.entity.Course;
 import com.learntrix.edtech.entity.Enrollment;
 import com.learntrix.edtech.entity.Role;
 import com.learntrix.edtech.entity.User;
+import com.learntrix.edtech.repository.AnnouncementReadRepository;
+import com.learntrix.edtech.repository.CourseAnnouncementRepository;
 import com.learntrix.edtech.repository.BatchRepository;
 import com.learntrix.edtech.repository.CodingProblemRepository;
 import com.learntrix.edtech.repository.CodingSubmissionRepository;
@@ -59,6 +61,11 @@ import com.learntrix.edtech.repository.UserRepository;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class AiAssistantSecurityIntegrationTest {
+
+    @Autowired
+    private AnnouncementReadRepository announcementReadRepositoryCleanup;
+    @Autowired
+    private CourseAnnouncementRepository courseAnnouncementRepositoryCleanup;
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
@@ -167,6 +174,10 @@ class AiAssistantSecurityIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        // course_announcements.batch_id references batches; clear announcements (and their
+        // read rows) before the batch delete below, or H2 rejects it.
+        announcementReadRepositoryCleanup.deleteAll();
+        courseAnnouncementRepositoryCleanup.deleteAll();
         codingSubmissionRepository.deleteAll();
         codingTestCaseRepository.deleteAll();
         codingProblemRepository.deleteAll();

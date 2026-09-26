@@ -16,6 +16,12 @@ public class CreateAssignmentRequest {
     @NotNull(message = "Course ID is required")
     private UUID courseId;
 
+    /** Null = course-wide; set = that cohort only. Verified against the caller. */
+    private UUID batchId;
+
+    /** DRAFT or PUBLISHED. Defaults to DRAFT so nothing goes live by accident. */
+    private String status;
+
     @NotBlank(message = "Title is required")
     private String title;
 

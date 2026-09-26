@@ -48,6 +48,35 @@ public class AssignmentController {
         return ApiResponse.success(response);
     }
 
+    @PutMapping("/teacher/assignments/{id}")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<AssignmentResponse> updateAssignment(
+            @PathVariable UUID id, @RequestBody CreateAssignmentRequest request) {
+        return ApiResponse.success(
+                assignmentService.updateAssignment(id, request, SecurityUtil.getCurrentUserId()));
+    }
+
+    @PutMapping("/teacher/assignments/{id}/publish")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<AssignmentResponse> publish(@PathVariable UUID id) {
+        return ApiResponse.success(
+                assignmentService.setPublished(id, true, SecurityUtil.getCurrentUserId()));
+    }
+
+    @PutMapping("/teacher/assignments/{id}/unpublish")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<AssignmentResponse> unpublish(@PathVariable UUID id) {
+        return ApiResponse.success(
+                assignmentService.setPublished(id, false, SecurityUtil.getCurrentUserId()));
+    }
+
+    @DeleteMapping("/teacher/assignments/{id}")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<Void> deleteAssignment(@PathVariable UUID id) {
+        assignmentService.deleteAssignment(id, SecurityUtil.getCurrentUserId());
+        return ApiResponse.success(null);
+    }
+
     @GetMapping("/teacher/assignments/{id}/submissions")
     @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<AssignmentSubmissionResponse>> getAssignmentSubmissions(

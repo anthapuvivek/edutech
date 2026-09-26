@@ -9,7 +9,7 @@
  * would be an impersonation vector.
  */
 
-export type AiContentType = "QUIZ" | "CODING";
+export type AiContentType = "QUIZ" | "CODING" | "ASSIGNMENT";
 
 export type AiDifficulty = "EASY" | "MEDIUM" | "HARD";
 
@@ -41,6 +41,16 @@ export interface AiCodingProblemDraft {
   testCases: AiCodingTestCaseDraft[];
 }
 
+/** One generated assignment brief, before any teacher has approved it. */
+export interface AiAssignmentDraft {
+  title: string;
+  description: string;
+  points: number;
+  difficulty: AiDifficulty | string;
+  /** Suggested days from today; the teacher still picks the real date. */
+  suggestedDueInDays?: number | null | undefined;
+}
+
 export interface AiGenerationPayload {
   courseId: string;
   batchId?: string | undefined;
@@ -53,6 +63,7 @@ export interface AiGenerationPayload {
   /** Regeneration context — sent from the browser rather than stored server-side. */
   existingQuestions?: AiQuizQuestionDraft[] | undefined;
   existingProblems?: AiCodingProblemDraft[] | undefined;
+  existingAssignments?: AiAssignmentDraft[] | undefined;
   regenerateInstruction?: string | undefined;
 }
 
@@ -64,6 +75,7 @@ export interface AiGenerationResult {
   batchName?: string | null | undefined;
   questions?: AiQuizQuestionDraft[] | null | undefined;
   problems?: AiCodingProblemDraft[] | null | undefined;
+  assignments?: AiAssignmentDraft[] | null | undefined;
   /** Non-fatal notes, e.g. a question the backend discarded as invalid. */
   warnings?: string[] | null | undefined;
 }

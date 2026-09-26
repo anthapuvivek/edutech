@@ -15,8 +15,15 @@ public class CourseAnnouncementResponse {
     private String courseTitle;
     private UUID teacherId;
     private String teacherName;
+    private UUID batchId;
+    private String batchName;
     private String title;
     private String content;
     private String priority;
     private Instant createdAt;
+
+    /** Student view: whether this student has opened it. Null in teacher listings. */
+    private Boolean read;
+    /** Teacher view: how many students have opened it. */
+    private Integer readCount;
 }

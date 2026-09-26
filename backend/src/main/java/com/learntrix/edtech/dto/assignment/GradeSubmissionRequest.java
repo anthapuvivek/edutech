@@ -12,8 +12,9 @@ import lombok.*;
 public class GradeSubmissionRequest {
 
     @NotNull(message = "Grade is required")
+    // Upper bound is the assignment's own points value, checked in the service - a
+    // hardcoded 100 here silently accepted 100 on an assignment worth 50.
     @Min(0)
-    @Max(100)
     private Integer grade;
 
     private String feedback;

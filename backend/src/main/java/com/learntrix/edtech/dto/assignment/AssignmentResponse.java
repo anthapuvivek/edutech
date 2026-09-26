@@ -15,6 +15,8 @@ public class AssignmentResponse {
     private String courseTitle;
     private UUID teacherId;
     private String teacherName;
+    private UUID batchId;
+    private String batchName;
     private String title;
     private String description;
     private Instant dueDate;
@@ -25,4 +27,11 @@ public class AssignmentResponse {
     private String submissionStatus;
     private Integer grade;
     private String feedback;
+
+    /** Teacher listings only - counts of DISTINCT students, computed server-side. */
+    private Integer totalStudents;
+    private Integer submittedCount;
+    private Integer pendingCount;
+    private Integer lateCount;
+    private Integer gradedCount;
 }

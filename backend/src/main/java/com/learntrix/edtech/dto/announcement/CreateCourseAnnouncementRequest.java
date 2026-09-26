@@ -15,6 +15,9 @@ public class CreateCourseAnnouncementRequest {
     @NotNull(message = "Course ID is required")
     private UUID courseId;
 
+    /** Null = whole course; set = that cohort only. Verified against the caller. */
+    private UUID batchId;
+
     @NotBlank(message = "Title is required")
     private String title;
 

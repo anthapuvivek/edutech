@@ -20,10 +20,12 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { aiService } from "@/services/ai.service";
+import { assignmentService } from "@/services/assignment.service";
 import { codingService } from "@/services/coding.service";
 import { quizService } from "@/services/quiz.service";
 import { teacherService } from "@/services/teacher.service";
 import type {
+  AiAssignmentDraft,
   AiCodingProblemDraft,
   AiContentType,
   AiDifficulty,
@@ -56,6 +58,7 @@ function AiAssistantPage() {
   // ---------- review state ----------
   const [questions, setQuestions] = useState<AiQuizQuestionDraft[]>([]);
   const [problems, setProblems] = useState<AiCodingProblemDraft[]>([]);
+  const [assignments, setAssignments] = useState<AiAssignmentDraft[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [warnings, setWarnings] = useState<string[]>([]);
   const [refineText, setRefineText] = useState("");
@@ -80,6 +83,7 @@ function AiAssistantPage() {
   function resetDrafts() {
     setQuestions([]);
     setProblems([]);
+    setAssignments([]);
     setSelected(new Set());
     setWarnings([]);
   }
@@ -102,14 +106,16 @@ function AiAssistantPage() {
               regenerateInstruction: refine,
               existingQuestions: type === "QUIZ" ? questions : undefined,
               existingProblems: type === "CODING" ? problems : undefined,
+              existingAssignments: type === "ASSIGNMENT" ? assignments : undefined,
             }
           : {}),
       }),
     onSuccess: (res) => {
       setQuestions(res.questions ?? []);
       setProblems(res.problems ?? []);
+      setAssignments(res.assignments ?? []);
       // Everything comes back selected: the common case is keeping most of it.
-      const n = (res.questions ?? res.problems ?? []).length;
+      const n = (res.questions ?? res.problems ?? res.assignments ?? []).length;
       setSelected(new Set(Array.from({ length: n }, (_, i) => i)));
       setWarnings(res.warnings ?? []);
       setRefineText("");
@@ -191,9 +197,38 @@ function AiAssistantPage() {
     },
   });
 
+  /** Creates DRAFT assignments through the existing assignment API. Never publishes. */
+  const addAssignmentsMutation = useMutation({
+    mutationFn: async () => {
+      const chosen = assignments.filter((_, i) => selected.has(i));
+      for (const a of chosen) {
+        await assignmentService.createAssignment({
+          courseId,
+          batchId: batchId || undefined,
+          title: a.title,
+          description: a.description,
+          points: a.points,
+          dueDate: a.suggestedDueInDays
+            ? new Date(Date.now() + a.suggestedDueInDays * 86400000).toISOString()
+            : undefined,
+          status: "DRAFT",
+        });
+      }
+      return chosen.length;
+    },
+    onSuccess: (added) => {
+      toast.success(`Added ${added} assignment${added === 1 ? "" : "s"} as drafts`);
+      resetDrafts();
+    },
+    onError: (err: unknown) => {
+      toast.error(err instanceof Error ? err.message : "Could not add the assignments.");
+    },
+  });
+
   const busy = generateMutation.isPending;
-  const saving = addQuizMutation.isPending || addCodingMutation.isPending;
-  const hasDrafts = questions.length > 0 || problems.length > 0;
+  const saving =
+    addQuizMutation.isPending || addCodingMutation.isPending || addAssignmentsMutation.isPending;
+  const hasDrafts = questions.length > 0 || problems.length > 0 || assignments.length > 0;
   const canGenerate = Boolean(courseId && topic.trim()) && !busy;
 
   function toggle(i: number) {
@@ -207,7 +242,8 @@ function AiAssistantPage() {
 
   function removeAt(i: number) {
     if (type === "QUIZ") setQuestions((qs) => qs.filter((_, idx) => idx !== i));
-    else setProblems((ps) => ps.filter((_, idx) => idx !== i));
+    else if (type === "CODING") setProblems((ps) => ps.filter((_, idx) => idx !== i));
+    else setAssignments((as) => as.filter((_, idx) => idx !== i));
     setSelected((prev) => {
       // Indices shift left after a removal, so rebuild rather than delete.
       const next = new Set<number>();
@@ -273,7 +309,7 @@ function AiAssistantPage() {
           <div className="space-y-1.5">
             <Label>Type</Label>
             <div className="flex gap-2">
-              {(["QUIZ", "CODING"] as AiContentType[]).map((t) => (
+              {(["QUIZ", "CODING", "ASSIGNMENT"] as AiContentType[]).map((t) => (
                 <Button
                   key={t}
                   type="button"
@@ -284,7 +320,7 @@ function AiAssistantPage() {
                     resetDrafts();
                   }}
                 >
-                  {t === "QUIZ" ? "Quiz" : "Coding"}
+                  {t === "QUIZ" ? "Quiz" : t === "CODING" ? "Coding" : "Assignment"}
                 </Button>
               ))}
             </div>
@@ -405,7 +441,15 @@ function AiAssistantPage() {
             </Button>
           </div>
 
-          {type === "QUIZ" ? (
+          {type === "ASSIGNMENT" ? (
+            <AssignmentDrafts
+              assignments={assignments}
+              selected={selected}
+              onToggle={toggle}
+              onRemove={removeAt}
+              onChange={setAssignments}
+            />
+          ) : type === "QUIZ" ? (
             <QuizDrafts
               questions={questions}
               selected={selected}
@@ -424,14 +468,22 @@ function AiAssistantPage() {
 
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
             <p className="text-sm text-muted-foreground">
-              {selected.size} of {type === "QUIZ" ? questions.length : problems.length} selected.
+              {selected.size} of{" "}
+              {type === "QUIZ"
+                ? questions.length
+                : type === "CODING"
+                  ? problems.length
+                  : assignments.length}{" "}
+              selected.
               Added as a <strong>draft</strong> — you publish from the existing page.
             </p>
             <Button
               disabled={selected.size === 0 || saving}
-              onClick={() =>
-                type === "QUIZ" ? addQuizMutation.mutate() : addCodingMutation.mutate()
-              }
+              onClick={() => {
+                if (type === "QUIZ") addQuizMutation.mutate();
+                else if (type === "CODING") addCodingMutation.mutate();
+                else addAssignmentsMutation.mutate();
+              }}
             >
               {saving ? (
                 <>
@@ -440,7 +492,11 @@ function AiAssistantPage() {
               ) : (
                 <>
                   <Check className="mr-1.5 size-4" aria-hidden />
-                  {type === "QUIZ" ? "Add selected questions" : "Add selected problems"}
+                  {type === "QUIZ"
+                    ? "Add selected questions"
+                    : type === "CODING"
+                      ? "Add selected problems"
+                      : "Add selected assignments"}
                 </>
               )}
             </Button>
@@ -649,6 +705,82 @@ function CodingDrafts({
                 </div>
               ))}
             </div>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/** Editable assignment briefs. Added as DRAFT through the existing assignment API. */
+function AssignmentDrafts({
+  assignments,
+  selected,
+  onToggle,
+  onRemove,
+  onChange,
+}: {
+  assignments: AiAssignmentDraft[];
+  selected: Set<number>;
+  onToggle: (i: number) => void;
+  onRemove: (i: number) => void;
+  onChange: (next: AiAssignmentDraft[]) => void;
+}) {
+  function update(i: number, patch: Partial<AiAssignmentDraft>) {
+    onChange(assignments.map((a, idx) => (idx === i ? { ...a, ...patch } : a)));
+  }
+
+  return (
+    <ol className="flex flex-col gap-4">
+      {assignments.map((a, i) => (
+        <li key={i} className={`rounded-md border p-3 ${selected.has(i) ? "" : "opacity-55"}`}>
+          <div className="mb-2 flex items-start justify-between gap-3">
+            <Input
+              value={a.title}
+              onChange={(e) => update(i, { title: e.target.value })}
+              className="font-medium"
+            />
+            <div className="flex shrink-0 gap-1">
+              <Button
+                size="sm"
+                variant={selected.has(i) ? "default" : "outline"}
+                onClick={() => onToggle(i)}
+              >
+                {selected.has(i) ? "Selected" : "Select"}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => onRemove(i)} aria-label="Delete">
+                <Trash2 className="size-4" aria-hidden />
+              </Button>
+            </div>
+          </div>
+
+          <Textarea
+            rows={4}
+            value={a.description}
+            onChange={(e) => update(i, { description: e.target.value })}
+            className="text-sm"
+          />
+
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <Badge variant="secondary">{a.difficulty}</Badge>
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor={`ai-points-${i}`} className="text-xs">
+                Marks
+              </Label>
+              <Input
+                id={`ai-points-${i}`}
+                type="number"
+                min={1}
+                value={a.points}
+                onChange={(e) => update(i, { points: Math.max(1, Number(e.target.value) || 1) })}
+                className="h-8 w-24"
+              />
+            </div>
+            {a.suggestedDueInDays ? (
+              <span className="text-xs text-muted-foreground">
+                Suggested due in {a.suggestedDueInDays} days
+              </span>
+            ) : null}
           </div>
         </li>
       ))}

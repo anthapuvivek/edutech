@@ -27,6 +27,11 @@ public class CourseAnnouncement extends AuditableEntity {
     @JoinColumn(name = "teacher_id", nullable = false)
     private User teacher;
 
+    /** Null means course-wide; set means that cohort only. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "batch_id")
+    private Batch batch;
+
     @Column(nullable = false)
     private String title;
 

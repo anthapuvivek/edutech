@@ -15,6 +15,7 @@ import com.learntrix.edtech.dto.quiz.CreateQuizRequest;
 import com.learntrix.edtech.dto.quiz.QuizAttemptRequest;
 import com.learntrix.edtech.dto.recording.CreateRecordingRequest;
 import com.learntrix.edtech.entity.*;
+import com.learntrix.edtech.repository.CodingProblemCompletionRepository;
 import com.learntrix.edtech.repository.CodingProblemRepository;
 import com.learntrix.edtech.repository.CodingSubmissionRepository;
 import com.learntrix.edtech.repository.CodingTestCaseRepository;
@@ -45,6 +46,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class LearntrixCompleteAccessControlIntegrationTest {
+
+    @Autowired
+    private CodingProblemCompletionRepository codingProblemCompletionRepository;
 
     @Autowired
     private CodingSubmissionRepository codingSubmissionRepository;
@@ -169,6 +173,9 @@ class LearntrixCompleteAccessControlIntegrationTest {
         assignmentRepository.deleteAll();
         // coding_problems.batch_id blocks batch deletion in the JPA-generated test
         // schema; production Postgres has ON DELETE SET NULL (V31). Children first.
+        // coding_problem_completions references coding_problems; clear it first or
+        // the problem delete below is rejected.
+        codingProblemCompletionRepository.deleteAll();
         codingSubmissionRepository.deleteAll();
         codingTestCaseRepository.deleteAll();
         codingProblemRepository.deleteAll();
@@ -541,6 +548,12 @@ class LearntrixCompleteAccessControlIntegrationTest {
 
         String assignmentId = objectMapper.readTree(createResult.getResponse().getContentAsString())
                 .path("data").path("id").asText();
+
+        // Assignments are now created as DRAFT and must be published before students see
+        // them, so the teacher publishes before the student lists.
+        mockMvc.perform(put("/api/teacher/assignments/" + assignmentId + "/publish")
+                        .header("Authorization", "Bearer " + teacherAToken))
+                .andExpect(status().isOk());
 
         // Student 1 lists assignments -> sees 1 assignment
         mockMvc.perform(get("/api/student/assignments")

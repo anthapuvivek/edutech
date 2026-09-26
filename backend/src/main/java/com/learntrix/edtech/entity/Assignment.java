@@ -26,6 +26,16 @@ public class Assignment {
     @JoinColumn(name = "teacher_id")
     private User teacher;
 
+    /**
+     * Null means course-wide; set means that cohort only.
+     *
+     * <p>Same rule as quizzes, live classes and coding problems - the student visibility
+     * query enforces it, so a caller cannot forget it.</p>
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "batch_id")
+    private Batch batch;
+
     @Column(nullable = false)
     private String title;
 

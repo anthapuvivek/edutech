@@ -19,6 +19,8 @@ import {
   Trophy,
   User,
   Video,
+  TrendingUp,
+  Megaphone,
 } from "lucide-react";
 
 import { PortalLayout, type PortalNavItem } from "@/layouts/PortalLayout";
@@ -31,7 +33,9 @@ const nav: PortalNavItem[] = [
   { label: "Leaderboard", to: "/student/leaderboard", icon: Trophy },
   { label: "Coding Practice", to: "/student/coding-practice", icon: Code2 },
   { label: "Quizzes", to: "/student/quizzes", icon: ListChecks },
-  { label: "Assignments", icon: FileCheck2 },
+  { label: "Assignments", to: "/student/assignments", icon: FileCheck2 },
+  { label: "Progress", to: "/student/progress", icon: TrendingUp },
+  { label: "Announcements", to: "/student/announcements", icon: Megaphone },
   { label: "Achievements", icon: Award },
   { label: "Career", to: "/student/career", icon: Briefcase },
   { label: "Jobs", to: "/student/career/jobs", icon: Building2 },
@@ -41,7 +45,7 @@ const nav: PortalNavItem[] = [
   { label: "Referrals", icon: Handshake },
   { label: "AI Tutor", icon: Bot },
   { label: "Certificates", icon: GraduationCap },
-  { label: "Analytics", icon: BarChart3 },
+  { label: "Analytics", to: "/student/analytics", icon: BarChart3 },
   { label: "Profile", icon: User },
   { label: "Settings", icon: Settings },
 ];

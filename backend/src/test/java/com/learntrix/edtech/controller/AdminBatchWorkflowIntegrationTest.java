@@ -28,6 +28,8 @@ import com.learntrix.edtech.entity.Course;
 import com.learntrix.edtech.entity.LiveClass;
 import com.learntrix.edtech.entity.Role;
 import com.learntrix.edtech.entity.User;
+import com.learntrix.edtech.repository.AnnouncementReadRepository;
+import com.learntrix.edtech.repository.CourseAnnouncementRepository;
 import com.learntrix.edtech.repository.BatchRepository;
 import com.learntrix.edtech.repository.CourseRepository;
 import com.learntrix.edtech.repository.EnrollmentRepository;
@@ -39,6 +41,11 @@ import com.learntrix.edtech.repository.UserRepository;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class AdminBatchWorkflowIntegrationTest {
+
+    @Autowired
+    private AnnouncementReadRepository announcementReadRepositoryCleanup;
+    @Autowired
+    private CourseAnnouncementRepository courseAnnouncementRepositoryCleanup;
 
     @Autowired
     private MockMvc mockMvc;
@@ -79,6 +86,10 @@ class AdminBatchWorkflowIntegrationTest {
     @BeforeEach
     void setUp() {
         // Clean state — order matters to avoid FK violations
+        // course_announcements.batch_id references batches; clear announcements (and their
+        // read rows) before the batch delete below, or H2 rejects it.
+        announcementReadRepositoryCleanup.deleteAll();
+        courseAnnouncementRepositoryCleanup.deleteAll();
         liveClassRepository.deleteAll();
         batchRepository.deleteAll();
         enrollmentRepository.deleteAll();

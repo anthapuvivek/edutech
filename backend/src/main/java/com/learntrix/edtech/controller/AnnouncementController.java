@@ -43,6 +43,36 @@ public class AnnouncementController {
 
     // --- Student Endpoints ---
 
+    @PutMapping("/teacher/announcements/{id}")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<CourseAnnouncementResponse> updateAnnouncement(
+            @PathVariable UUID id, @RequestBody CreateCourseAnnouncementRequest request) {
+        return ApiResponse.success(announcementService.updateAnnouncement(
+                id, request, SecurityUtil.getCurrentUserId()));
+    }
+
+    @DeleteMapping("/teacher/announcements/{id}")
+    @PreAuthorize("hasAnyRole('TEACHER', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<Void> deleteAnnouncement(@PathVariable UUID id) {
+        announcementService.deleteAnnouncement(id, SecurityUtil.getCurrentUserId());
+        return ApiResponse.success(null);
+    }
+
+    /** Drives the "2 unread" badge. Scoped to the authenticated student. */
+    @GetMapping("/student/announcements/unread-count")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<java.util.Map<String, Long>> unreadCount() {
+        return ApiResponse.success(java.util.Map.of("unread",
+                announcementService.getUnreadCount(SecurityUtil.getCurrentUserId())));
+    }
+
+    @PutMapping("/student/announcements/{id}/read")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN', 'SUPER_ADMIN')")
+    public ApiResponse<CourseAnnouncementResponse> markRead(@PathVariable UUID id) {
+        return ApiResponse.success(
+                announcementService.markRead(id, SecurityUtil.getCurrentUserId()));
+    }
+
     @GetMapping("/student/announcements")
     @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN', 'SUPER_ADMIN')")
     public ApiResponse<List<CourseAnnouncementResponse>> getStudentAnnouncements() {

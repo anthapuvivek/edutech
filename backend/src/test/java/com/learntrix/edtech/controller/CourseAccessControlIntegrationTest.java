@@ -39,6 +39,10 @@ import com.learntrix.edtech.entity.Module;
 import com.learntrix.edtech.entity.RecordingStatus;
 import com.learntrix.edtech.entity.Role;
 import com.learntrix.edtech.entity.User;
+import com.learntrix.edtech.repository.AnnouncementReadRepository;
+import com.learntrix.edtech.repository.CourseAnnouncementRepository;
+import com.learntrix.edtech.repository.AssignmentRepository;
+import com.learntrix.edtech.repository.AssignmentSubmissionRepository;
 import com.learntrix.edtech.repository.CodingProblemRepository;
 import com.learntrix.edtech.repository.CodingSubmissionRepository;
 import com.learntrix.edtech.repository.CodingTestCaseRepository;
@@ -60,6 +64,16 @@ import com.learntrix.edtech.repository.UserRepository;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class CourseAccessControlIntegrationTest {
+
+    @Autowired
+    private AnnouncementReadRepository announcementReadRepositoryCleanup;
+    @Autowired
+    private CourseAnnouncementRepository courseAnnouncementRepositoryCleanup;
+
+    @Autowired
+    private AssignmentSubmissionRepository assignmentSubmissionRepository;
+    @Autowired
+    private AssignmentRepository assignmentRepository;
 
     @Autowired
     private CodingSubmissionRepository codingSubmissionRepository;
@@ -136,6 +150,10 @@ class CourseAccessControlIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        // course_announcements.batch_id references batches; clear announcements (and their
+        // read rows) before the batch delete below, or H2 rejects it.
+        announcementReadRepositoryCleanup.deleteAll();
+        courseAnnouncementRepositoryCleanup.deleteAll();
         progressRepository.deleteAll();
         classRecordingRepository.deleteAll();
         liveClassRepository.deleteAll();
@@ -146,6 +164,10 @@ class CourseAccessControlIntegrationTest {
         codingProblemRepository.deleteAll();
         // enrollments.batch_id references batches - children first, or H2 rejects
         // the batch delete (production Postgres cascades this itself).
+        // assignments.batch_id blocks batch deletion in the JPA-generated test schema
+        // (production Postgres has ON DELETE SET NULL, see V34). Children first.
+        assignmentSubmissionRepository.deleteAll();
+        assignmentRepository.deleteAll();
         enrollmentRepository.deleteAll();
         batchRepository.deleteAll();
         studentProfileRepository.deleteAll();

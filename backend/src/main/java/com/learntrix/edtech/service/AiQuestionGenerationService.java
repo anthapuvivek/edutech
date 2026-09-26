@@ -92,8 +92,9 @@ public class AiQuestionGenerationService {
         return switch (type) {
             case "QUIZ" -> generateQuiz(request, difficulty, count, response);
             case "CODING" -> generateCoding(request, difficulty, count, response);
+            case "ASSIGNMENT" -> generateAssignments(request, difficulty, count, response);
             default -> throw new BusinessException("INVALID_CONTENT_TYPE",
-                    "Content type must be QUIZ or CODING.", HttpStatus.BAD_REQUEST);
+                    "Content type must be QUIZ, CODING or ASSIGNMENT.", HttpStatus.BAD_REQUEST);
         };
     }
 
@@ -447,6 +448,126 @@ public class AiQuestionGenerationService {
                 "type", "OBJECT",
                 "properties", Map.of("problems", Map.of("type", "ARRAY", "items", problem)),
                 "required", List.of("problems"));
+    }
+
+
+    // ==================================================================
+    // Assignment generation
+    // ==================================================================
+
+    private AiGenerationResponse generateAssignments(
+            AiGenerationRequest request, String difficulty, int count,
+            AiGenerationResponse.AiGenerationResponseBuilder response) {
+
+        String raw = aiProvider.generateJson(
+                assignmentSystemInstruction(), assignmentPrompt(request, difficulty, count),
+                assignmentSchema());
+
+        List<AiAssignmentDraft> drafts = parseAssignmentDrafts(raw);
+
+        List<String> warnings = new ArrayList<>();
+        List<AiAssignmentDraft> valid = new ArrayList<>();
+        for (int i = 0; i < drafts.size(); i++) {
+            String problem = assignmentDraftProblem(drafts.get(i));
+            if (problem == null) {
+                valid.add(drafts.get(i));
+            } else {
+                warnings.add("Discarded generated assignment " + (i + 1) + ": " + problem);
+            }
+        }
+
+        if (valid.isEmpty()) {
+            throw new BusinessException("AI_INVALID_OUTPUT",
+                    "The AI returned no usable assignments. Please try again or rephrase the topic.",
+                    HttpStatus.BAD_GATEWAY);
+        }
+
+        return response.assignments(valid).warnings(warnings).build();
+    }
+
+    private List<AiAssignmentDraft> parseAssignmentDrafts(String raw) {
+        try {
+            Map<String, Object> root = objectMapper.readValue(raw, new TypeReference<>() {});
+            Object items = root.get("assignments");
+            if (items == null) throw new IllegalStateException("no assignments key");
+            return objectMapper.convertValue(items, new TypeReference<List<AiAssignmentDraft>>() {});
+        } catch (Exception e) {
+            throw new BusinessException("AI_MALFORMED_RESPONSE",
+                    "The AI returned a response this server could not read. Please try again.",
+                    HttpStatus.BAD_GATEWAY);
+        }
+    }
+
+    /** @return null when usable, otherwise why it was rejected. */
+    private String assignmentDraftProblem(AiAssignmentDraft a) {
+        if (a == null) return "empty assignment";
+        if (isBlank(a.getTitle())) return "title is empty";
+        if (isBlank(a.getDescription())) return "instructions are empty";
+        if (a.getPoints() == null || a.getPoints() <= 0 || a.getPoints() > 1000) {
+            return "marks are out of range";
+        }
+        if (a.getDifficulty() == null || !DIFFICULTIES.contains(a.getDifficulty().toUpperCase())) {
+            return "difficulty is not EASY, MEDIUM or HARD";
+        }
+        // A due date in the past would be unusable the moment it was created.
+        if (a.getSuggestedDueInDays() != null
+                && (a.getSuggestedDueInDays() < 1 || a.getSuggestedDueInDays() > 90)) {
+            return "suggested due date is not between 1 and 90 days";
+        }
+        return null;
+    }
+
+    private String assignmentSystemInstruction() {
+        return """
+            You are an experienced computer-science trainer writing practical assignment \
+            briefs for a technical training institute.
+
+            Rules you must follow:
+            - The brief must state exactly what the student has to build or produce.
+            - State how the work should be submitted: a repository link or a hosted link.
+            - Match the requested difficulty honestly.
+            - Scope the work to what a student can finish in the suggested number of days.
+            - Do not invent grading rubrics the platform cannot evaluate automatically.
+            - Marks must be a whole number a trainer would plausibly use.
+
+            DO NOT return Markdown.
+            DO NOT return explanatory text outside the schema.
+            RETURN ONLY the requested structured object.
+            """;
+    }
+
+    private String assignmentPrompt(AiGenerationRequest request, String difficulty, int count) {
+        StringBuilder p = new StringBuilder();
+        p.append("Generate ").append(count).append(' ').append(difficulty)
+                .append(" difficulty assignment brief(s) about: ").append(request.getTopic())
+                .append('.');
+        if (!isBlank(request.getInstructions())) {
+            p.append("\n\nAdditional instructions from the teacher: ")
+                    .append(request.getInstructions());
+        }
+        appendRegeneration(p, request, "assignments");
+        if (request.getExistingAssignments() != null && !request.getExistingAssignments().isEmpty()) {
+            p.append("\n\nThe assignments currently on screen are:\n")
+                    .append(safeJson(request.getExistingAssignments()));
+        }
+        return p.toString();
+    }
+
+    private Map<String, Object> assignmentSchema() {
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("type", "OBJECT");
+        item.put("properties", new LinkedHashMap<>(Map.of(
+                "title", Map.of("type", "STRING"),
+                "description", Map.of("type", "STRING"),
+                "points", Map.of("type", "INTEGER"),
+                "difficulty", Map.of("type", "STRING", "enum", List.of("EASY", "MEDIUM", "HARD")),
+                "suggestedDueInDays", Map.of("type", "INTEGER"))));
+        item.put("required", List.of("title", "description", "points", "difficulty"));
+
+        return Map.of(
+                "type", "OBJECT",
+                "properties", Map.of("assignments", Map.of("type", "ARRAY", "items", item)),
+                "required", List.of("assignments"));
     }
 
     private static boolean isBlank(String s) {

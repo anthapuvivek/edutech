@@ -43,17 +43,23 @@ import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AdminTeachersRouteImport } from './routes/admin.teachers'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
+import { Route as StudentAnalyticsRouteImport } from './routes/student.analytics'
+import { Route as StudentAnnouncementsRouteImport } from './routes/student.announcements'
 import { Route as StudentCareerRouteImport } from './routes/student.career'
 import { Route as StudentCoursesRouteImport } from './routes/student.courses'
 import { Route as StudentDashboardRouteImport } from './routes/student.dashboard'
 import { Route as StudentLeaderboardRouteImport } from './routes/student.leaderboard'
 import { Route as StudentLiveClassesRouteImport } from './routes/student.live-classes'
+import { Route as StudentProgressRouteImport } from './routes/student.progress'
 import { Route as StudentRecordingsRouteImport } from './routes/student.recordings'
 import { Route as TeacherAiAssistantRouteImport } from './routes/teacher.ai-assistant'
+import { Route as TeacherAnalyticsRouteImport } from './routes/teacher.analytics'
+import { Route as TeacherAnnouncementsRouteImport } from './routes/teacher.announcements'
 import { Route as TeacherBatchesRouteImport } from './routes/teacher.batches'
 import { Route as TeacherCodingProblemsRouteImport } from './routes/teacher.coding-problems'
 import { Route as TeacherDashboardRouteImport } from './routes/teacher.dashboard'
 import { Route as TeacherLiveClassesRouteImport } from './routes/teacher.live-classes'
+import { Route as TeacherProgressRouteImport } from './routes/teacher.progress'
 import { Route as TeacherQuizzesRouteImport } from './routes/teacher.quizzes'
 import { Route as TeacherStudentsRouteImport } from './routes/teacher.students'
 import { Route as AdminCareerApplicationsRouteImport } from './routes/admin.career.applications'
@@ -69,6 +75,7 @@ import { Route as AdminCrmLeadIdRouteImport } from './routes/admin.crm.$leadId'
 import { Route as AdminMarketingCouponsRouteImport } from './routes/admin.marketing.coupons'
 import { Route as AdminStudentsIndexRouteImport } from './routes/admin.students.index'
 import { Route as AdminStudentsStudentIdRouteImport } from './routes/admin.students.$studentId'
+import { Route as StudentAssignmentsIndexRouteImport } from './routes/student.assignments.index'
 import { Route as StudentCareerIndexRouteImport } from './routes/student.career.index'
 import { Route as StudentCareerApplicationsRouteImport } from './routes/student.career.applications'
 import { Route as StudentCareerJobsRouteImport } from './routes/student.career.jobs'
@@ -79,6 +86,7 @@ import { Route as StudentCodingPracticeProblemIdRouteImport } from './routes/stu
 import { Route as StudentQuizzesIndexRouteImport } from './routes/student.quizzes.index'
 import { Route as StudentQuizzesQuizIdRouteImport } from './routes/student.quizzes.$quizId'
 import { Route as StudentRecordingsIdRouteImport } from './routes/student.recordings.$id'
+import { Route as TeacherAssignmentsIndexRouteImport } from './routes/teacher.assignments.index'
 import { Route as TeacherRecordingsIndexRouteImport } from './routes/teacher.recordings.index'
 import { Route as TeacherRecordingsIdRouteImport } from './routes/teacher.recordings.$id'
 import { Route as TeacherRecordingsNewRouteImport } from './routes/teacher.recordings.new'
@@ -254,6 +262,16 @@ const CoursesSlugRoute = CoursesSlugRouteImport.update({
   path: '/courses/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudentAnalyticsRoute = StudentAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentAnnouncementsRoute = StudentAnnouncementsRouteImport.update({
+  id: '/announcements',
+  path: '/announcements',
+  getParentRoute: () => StudentRoute,
+} as any)
 const StudentCareerRoute = StudentCareerRouteImport.update({
   id: '/career',
   path: '/career',
@@ -279,6 +297,11 @@ const StudentLiveClassesRoute = StudentLiveClassesRouteImport.update({
   path: '/live-classes',
   getParentRoute: () => StudentRoute,
 } as any)
+const StudentProgressRoute = StudentProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => StudentRoute,
+} as any)
 const StudentRecordingsRoute = StudentRecordingsRouteImport.update({
   id: '/recordings',
   path: '/recordings',
@@ -287,6 +310,16 @@ const StudentRecordingsRoute = StudentRecordingsRouteImport.update({
 const TeacherAiAssistantRoute = TeacherAiAssistantRouteImport.update({
   id: '/ai-assistant',
   path: '/ai-assistant',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherAnalyticsRoute = TeacherAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherAnnouncementsRoute = TeacherAnnouncementsRouteImport.update({
+  id: '/announcements',
+  path: '/announcements',
   getParentRoute: () => TeacherRoute,
 } as any)
 const TeacherBatchesRoute = TeacherBatchesRouteImport.update({
@@ -307,6 +340,11 @@ const TeacherDashboardRoute = TeacherDashboardRouteImport.update({
 const TeacherLiveClassesRoute = TeacherLiveClassesRouteImport.update({
   id: '/live-classes',
   path: '/live-classes',
+  getParentRoute: () => TeacherRoute,
+} as any)
+const TeacherProgressRoute = TeacherProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
   getParentRoute: () => TeacherRoute,
 } as any)
 const TeacherQuizzesRoute = TeacherQuizzesRouteImport.update({
@@ -385,6 +423,11 @@ const AdminStudentsStudentIdRoute = AdminStudentsStudentIdRouteImport.update({
   path: '/students/$studentId',
   getParentRoute: () => AdminRoute,
 } as any)
+const StudentAssignmentsIndexRoute = StudentAssignmentsIndexRouteImport.update({
+  id: '/assignments/',
+  path: '/assignments/',
+  getParentRoute: () => StudentRoute,
+} as any)
 const StudentCareerIndexRoute = StudentCareerIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -437,6 +480,11 @@ const StudentRecordingsIdRoute = StudentRecordingsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
   getParentRoute: () => StudentRecordingsRoute,
+} as any)
+const TeacherAssignmentsIndexRoute = TeacherAssignmentsIndexRouteImport.update({
+  id: '/assignments/',
+  path: '/assignments/',
+  getParentRoute: () => TeacherRoute,
 } as any)
 const TeacherRecordingsIndexRoute = TeacherRecordingsIndexRouteImport.update({
   id: '/recordings/',
@@ -494,17 +542,23 @@ export interface FileRoutesByFullPath {
   '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
+  '/student/analytics': typeof StudentAnalyticsRoute
+  '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/career': typeof StudentCareerRouteWithChildren
   '/student/courses': typeof StudentCoursesRouteWithChildren
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
+  '/student/progress': typeof StudentProgressRoute
   '/student/recordings': typeof StudentRecordingsRouteWithChildren
   '/teacher/ai-assistant': typeof TeacherAiAssistantRoute
+  '/teacher/analytics': typeof TeacherAnalyticsRoute
+  '/teacher/announcements': typeof TeacherAnnouncementsRoute
   '/teacher/batches': typeof TeacherBatchesRoute
   '/teacher/coding-problems': typeof TeacherCodingProblemsRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/live-classes': typeof TeacherLiveClassesRoute
+  '/teacher/progress': typeof TeacherProgressRoute
   '/teacher/quizzes': typeof TeacherQuizzesRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
@@ -530,9 +584,11 @@ export interface FileRoutesByFullPath {
   '/teacher/recordings/new': typeof TeacherRecordingsNewRoute
   '/admin/crm/': typeof AdminCrmIndexRoute
   '/admin/students/': typeof AdminStudentsIndexRoute
+  '/student/assignments/': typeof StudentAssignmentsIndexRoute
   '/student/career/': typeof StudentCareerIndexRoute
   '/student/coding-practice/': typeof StudentCodingPracticeIndexRoute
   '/student/quizzes/': typeof StudentQuizzesIndexRoute
+  '/teacher/assignments/': typeof TeacherAssignmentsIndexRoute
   '/teacher/recordings/': typeof TeacherRecordingsIndexRoute
   '/student/courses/$slug/recordings': typeof StudentCoursesSlugRecordingsRoute
 }
@@ -570,16 +626,22 @@ export interface FileRoutesByTo {
   '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
+  '/student/analytics': typeof StudentAnalyticsRoute
+  '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/courses': typeof StudentCoursesRouteWithChildren
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
+  '/student/progress': typeof StudentProgressRoute
   '/student/recordings': typeof StudentRecordingsRouteWithChildren
   '/teacher/ai-assistant': typeof TeacherAiAssistantRoute
+  '/teacher/analytics': typeof TeacherAnalyticsRoute
+  '/teacher/announcements': typeof TeacherAnnouncementsRoute
   '/teacher/batches': typeof TeacherBatchesRoute
   '/teacher/coding-problems': typeof TeacherCodingProblemsRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/live-classes': typeof TeacherLiveClassesRoute
+  '/teacher/progress': typeof TeacherProgressRoute
   '/teacher/quizzes': typeof TeacherQuizzesRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses': typeof CoursesIndexRoute
@@ -605,9 +667,11 @@ export interface FileRoutesByTo {
   '/teacher/recordings/new': typeof TeacherRecordingsNewRoute
   '/admin/crm': typeof AdminCrmIndexRoute
   '/admin/students': typeof AdminStudentsIndexRoute
+  '/student/assignments': typeof StudentAssignmentsIndexRoute
   '/student/career': typeof StudentCareerIndexRoute
   '/student/coding-practice': typeof StudentCodingPracticeIndexRoute
   '/student/quizzes': typeof StudentQuizzesIndexRoute
+  '/teacher/assignments': typeof TeacherAssignmentsIndexRoute
   '/teacher/recordings': typeof TeacherRecordingsIndexRoute
   '/student/courses/$slug/recordings': typeof StudentCoursesSlugRecordingsRoute
 }
@@ -646,17 +710,23 @@ export interface FileRoutesById {
   '/admin/support': typeof AdminSupportRoute
   '/admin/teachers': typeof AdminTeachersRoute
   '/courses/$slug': typeof CoursesSlugRoute
+  '/student/analytics': typeof StudentAnalyticsRoute
+  '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/career': typeof StudentCareerRouteWithChildren
   '/student/courses': typeof StudentCoursesRouteWithChildren
   '/student/dashboard': typeof StudentDashboardRoute
   '/student/leaderboard': typeof StudentLeaderboardRoute
   '/student/live-classes': typeof StudentLiveClassesRoute
+  '/student/progress': typeof StudentProgressRoute
   '/student/recordings': typeof StudentRecordingsRouteWithChildren
   '/teacher/ai-assistant': typeof TeacherAiAssistantRoute
+  '/teacher/analytics': typeof TeacherAnalyticsRoute
+  '/teacher/announcements': typeof TeacherAnnouncementsRoute
   '/teacher/batches': typeof TeacherBatchesRoute
   '/teacher/coding-problems': typeof TeacherCodingProblemsRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
   '/teacher/live-classes': typeof TeacherLiveClassesRoute
+  '/teacher/progress': typeof TeacherProgressRoute
   '/teacher/quizzes': typeof TeacherQuizzesRoute
   '/teacher/students': typeof TeacherStudentsRoute
   '/courses/': typeof CoursesIndexRoute
@@ -682,9 +752,11 @@ export interface FileRoutesById {
   '/teacher/recordings/new': typeof TeacherRecordingsNewRoute
   '/admin/crm/': typeof AdminCrmIndexRoute
   '/admin/students/': typeof AdminStudentsIndexRoute
+  '/student/assignments/': typeof StudentAssignmentsIndexRoute
   '/student/career/': typeof StudentCareerIndexRoute
   '/student/coding-practice/': typeof StudentCodingPracticeIndexRoute
   '/student/quizzes/': typeof StudentQuizzesIndexRoute
+  '/teacher/assignments/': typeof TeacherAssignmentsIndexRoute
   '/teacher/recordings/': typeof TeacherRecordingsIndexRoute
   '/student/courses/$slug/recordings': typeof StudentCoursesSlugRecordingsRoute
 }
@@ -724,17 +796,23 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/admin/teachers'
     | '/courses/$slug'
+    | '/student/analytics'
+    | '/student/announcements'
     | '/student/career'
     | '/student/courses'
     | '/student/dashboard'
     | '/student/leaderboard'
     | '/student/live-classes'
+    | '/student/progress'
     | '/student/recordings'
     | '/teacher/ai-assistant'
+    | '/teacher/analytics'
+    | '/teacher/announcements'
     | '/teacher/batches'
     | '/teacher/coding-problems'
     | '/teacher/dashboard'
     | '/teacher/live-classes'
+    | '/teacher/progress'
     | '/teacher/quizzes'
     | '/teacher/students'
     | '/courses/'
@@ -760,9 +838,11 @@ export interface FileRouteTypes {
     | '/teacher/recordings/new'
     | '/admin/crm/'
     | '/admin/students/'
+    | '/student/assignments/'
     | '/student/career/'
     | '/student/coding-practice/'
     | '/student/quizzes/'
+    | '/teacher/assignments/'
     | '/teacher/recordings/'
     | '/student/courses/$slug/recordings'
   fileRoutesByTo: FileRoutesByTo
@@ -800,16 +880,22 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/admin/teachers'
     | '/courses/$slug'
+    | '/student/analytics'
+    | '/student/announcements'
     | '/student/courses'
     | '/student/dashboard'
     | '/student/leaderboard'
     | '/student/live-classes'
+    | '/student/progress'
     | '/student/recordings'
     | '/teacher/ai-assistant'
+    | '/teacher/analytics'
+    | '/teacher/announcements'
     | '/teacher/batches'
     | '/teacher/coding-problems'
     | '/teacher/dashboard'
     | '/teacher/live-classes'
+    | '/teacher/progress'
     | '/teacher/quizzes'
     | '/teacher/students'
     | '/courses'
@@ -835,9 +921,11 @@ export interface FileRouteTypes {
     | '/teacher/recordings/new'
     | '/admin/crm'
     | '/admin/students'
+    | '/student/assignments'
     | '/student/career'
     | '/student/coding-practice'
     | '/student/quizzes'
+    | '/teacher/assignments'
     | '/teacher/recordings'
     | '/student/courses/$slug/recordings'
   id:
@@ -875,17 +963,23 @@ export interface FileRouteTypes {
     | '/admin/support'
     | '/admin/teachers'
     | '/courses/$slug'
+    | '/student/analytics'
+    | '/student/announcements'
     | '/student/career'
     | '/student/courses'
     | '/student/dashboard'
     | '/student/leaderboard'
     | '/student/live-classes'
+    | '/student/progress'
     | '/student/recordings'
     | '/teacher/ai-assistant'
+    | '/teacher/analytics'
+    | '/teacher/announcements'
     | '/teacher/batches'
     | '/teacher/coding-problems'
     | '/teacher/dashboard'
     | '/teacher/live-classes'
+    | '/teacher/progress'
     | '/teacher/quizzes'
     | '/teacher/students'
     | '/courses/'
@@ -911,9 +1005,11 @@ export interface FileRouteTypes {
     | '/teacher/recordings/new'
     | '/admin/crm/'
     | '/admin/students/'
+    | '/student/assignments/'
     | '/student/career/'
     | '/student/coding-practice/'
     | '/student/quizzes/'
+    | '/teacher/assignments/'
     | '/teacher/recordings/'
     | '/student/courses/$slug/recordings'
   fileRoutesById: FileRoutesById
@@ -1178,6 +1274,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/student/analytics': {
+      id: '/student/analytics'
+      path: '/analytics'
+      fullPath: '/student/analytics'
+      preLoaderRoute: typeof StudentAnalyticsRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/announcements': {
+      id: '/student/announcements'
+      path: '/announcements'
+      fullPath: '/student/announcements'
+      preLoaderRoute: typeof StudentAnnouncementsRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/student/career': {
       id: '/student/career'
       path: '/career'
@@ -1213,6 +1323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentLiveClassesRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/student/progress': {
+      id: '/student/progress'
+      path: '/progress'
+      fullPath: '/student/progress'
+      preLoaderRoute: typeof StudentProgressRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/student/recordings': {
       id: '/student/recordings'
       path: '/recordings'
@@ -1225,6 +1342,20 @@ declare module '@tanstack/react-router' {
       path: '/ai-assistant'
       fullPath: '/teacher/ai-assistant'
       preLoaderRoute: typeof TeacherAiAssistantRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/analytics': {
+      id: '/teacher/analytics'
+      path: '/analytics'
+      fullPath: '/teacher/analytics'
+      preLoaderRoute: typeof TeacherAnalyticsRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/announcements': {
+      id: '/teacher/announcements'
+      path: '/announcements'
+      fullPath: '/teacher/announcements'
+      preLoaderRoute: typeof TeacherAnnouncementsRouteImport
       parentRoute: typeof TeacherRoute
     }
     '/teacher/batches': {
@@ -1253,6 +1384,13 @@ declare module '@tanstack/react-router' {
       path: '/live-classes'
       fullPath: '/teacher/live-classes'
       preLoaderRoute: typeof TeacherLiveClassesRouteImport
+      parentRoute: typeof TeacherRoute
+    }
+    '/teacher/progress': {
+      id: '/teacher/progress'
+      path: '/progress'
+      fullPath: '/teacher/progress'
+      preLoaderRoute: typeof TeacherProgressRouteImport
       parentRoute: typeof TeacherRoute
     }
     '/teacher/quizzes': {
@@ -1360,6 +1498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStudentsStudentIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/student/assignments/': {
+      id: '/student/assignments/'
+      path: '/assignments'
+      fullPath: '/student/assignments/'
+      preLoaderRoute: typeof StudentAssignmentsIndexRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/student/career/': {
       id: '/student/career/'
       path: '/'
@@ -1429,6 +1574,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/student/recordings/$id'
       preLoaderRoute: typeof StudentRecordingsIdRouteImport
       parentRoute: typeof StudentRecordingsRoute
+    }
+    '/teacher/assignments/': {
+      id: '/teacher/assignments/'
+      path: '/assignments'
+      fullPath: '/teacher/assignments/'
+      preLoaderRoute: typeof TeacherAssignmentsIndexRouteImport
+      parentRoute: typeof TeacherRoute
     }
     '/teacher/recordings/': {
       id: '/teacher/recordings/'
@@ -1573,27 +1725,35 @@ const StudentRecordingsRouteWithChildren =
   StudentRecordingsRoute._addFileChildren(StudentRecordingsRouteChildren)
 
 interface StudentRouteChildren {
+  StudentAnalyticsRoute: typeof StudentAnalyticsRoute
+  StudentAnnouncementsRoute: typeof StudentAnnouncementsRoute
   StudentCareerRoute: typeof StudentCareerRouteWithChildren
   StudentCoursesRoute: typeof StudentCoursesRouteWithChildren
   StudentDashboardRoute: typeof StudentDashboardRoute
   StudentLeaderboardRoute: typeof StudentLeaderboardRoute
   StudentLiveClassesRoute: typeof StudentLiveClassesRoute
+  StudentProgressRoute: typeof StudentProgressRoute
   StudentRecordingsRoute: typeof StudentRecordingsRouteWithChildren
   StudentCodingPracticeProblemIdRoute: typeof StudentCodingPracticeProblemIdRoute
   StudentQuizzesQuizIdRoute: typeof StudentQuizzesQuizIdRoute
+  StudentAssignmentsIndexRoute: typeof StudentAssignmentsIndexRoute
   StudentCodingPracticeIndexRoute: typeof StudentCodingPracticeIndexRoute
   StudentQuizzesIndexRoute: typeof StudentQuizzesIndexRoute
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
+  StudentAnalyticsRoute: StudentAnalyticsRoute,
+  StudentAnnouncementsRoute: StudentAnnouncementsRoute,
   StudentCareerRoute: StudentCareerRouteWithChildren,
   StudentCoursesRoute: StudentCoursesRouteWithChildren,
   StudentDashboardRoute: StudentDashboardRoute,
   StudentLeaderboardRoute: StudentLeaderboardRoute,
   StudentLiveClassesRoute: StudentLiveClassesRoute,
+  StudentProgressRoute: StudentProgressRoute,
   StudentRecordingsRoute: StudentRecordingsRouteWithChildren,
   StudentCodingPracticeProblemIdRoute: StudentCodingPracticeProblemIdRoute,
   StudentQuizzesQuizIdRoute: StudentQuizzesQuizIdRoute,
+  StudentAssignmentsIndexRoute: StudentAssignmentsIndexRoute,
   StudentCodingPracticeIndexRoute: StudentCodingPracticeIndexRoute,
   StudentQuizzesIndexRoute: StudentQuizzesIndexRoute,
 }
@@ -1603,27 +1763,35 @@ const StudentRouteWithChildren =
 
 interface TeacherRouteChildren {
   TeacherAiAssistantRoute: typeof TeacherAiAssistantRoute
+  TeacherAnalyticsRoute: typeof TeacherAnalyticsRoute
+  TeacherAnnouncementsRoute: typeof TeacherAnnouncementsRoute
   TeacherBatchesRoute: typeof TeacherBatchesRoute
   TeacherCodingProblemsRoute: typeof TeacherCodingProblemsRoute
   TeacherDashboardRoute: typeof TeacherDashboardRoute
   TeacherLiveClassesRoute: typeof TeacherLiveClassesRoute
+  TeacherProgressRoute: typeof TeacherProgressRoute
   TeacherQuizzesRoute: typeof TeacherQuizzesRoute
   TeacherStudentsRoute: typeof TeacherStudentsRoute
   TeacherRecordingsIdRoute: typeof TeacherRecordingsIdRoute
   TeacherRecordingsNewRoute: typeof TeacherRecordingsNewRoute
+  TeacherAssignmentsIndexRoute: typeof TeacherAssignmentsIndexRoute
   TeacherRecordingsIndexRoute: typeof TeacherRecordingsIndexRoute
 }
 
 const TeacherRouteChildren: TeacherRouteChildren = {
   TeacherAiAssistantRoute: TeacherAiAssistantRoute,
+  TeacherAnalyticsRoute: TeacherAnalyticsRoute,
+  TeacherAnnouncementsRoute: TeacherAnnouncementsRoute,
   TeacherBatchesRoute: TeacherBatchesRoute,
   TeacherCodingProblemsRoute: TeacherCodingProblemsRoute,
   TeacherDashboardRoute: TeacherDashboardRoute,
   TeacherLiveClassesRoute: TeacherLiveClassesRoute,
+  TeacherProgressRoute: TeacherProgressRoute,
   TeacherQuizzesRoute: TeacherQuizzesRoute,
   TeacherStudentsRoute: TeacherStudentsRoute,
   TeacherRecordingsIdRoute: TeacherRecordingsIdRoute,
   TeacherRecordingsNewRoute: TeacherRecordingsNewRoute,
+  TeacherAssignmentsIndexRoute: TeacherAssignmentsIndexRoute,
   TeacherRecordingsIndexRoute: TeacherRecordingsIndexRoute,
 }
 

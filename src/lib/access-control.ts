@@ -23,6 +23,10 @@ export const routePermissions: Record<string, Permission[]> = {
   // whether the page may be opened at all.
   "/student/quizzes": ["learning.own"],
   "/student/coding-practice": ["learning.own"],
+  "/student/assignments": ["learning.own"],
+  "/student/progress": ["learning.own"],
+  "/student/analytics": ["learning.own"],
+  "/student/announcements": ["learning.own"],
   "/student/career": ["career.own"],
   "/student/career/jobs": ["career.own"],
   "/student/career/applications": ["career.own"],
@@ -40,6 +44,10 @@ export const routePermissions: Record<string, Permission[]> = {
   // ownership on every call, so this gate is about the page, not the data.
   "/teacher/quizzes": ["teaching.manage"],
   "/teacher/coding-problems": ["teaching.manage"],
+  "/teacher/assignments": ["teaching.manage"],
+  "/teacher/progress": ["teaching.manage"],
+  "/teacher/analytics": ["teaching.manage"],
+  "/teacher/announcements": ["teaching.manage"],
   // AI Question Assistant. Teacher-only: the backend rejects a student with 403
   // regardless of this entry, which only governs whether the page may be opened.
   "/teacher/ai-assistant": ["teaching.manage"],
